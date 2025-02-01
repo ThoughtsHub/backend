@@ -21,9 +21,9 @@ app.use(express.static(_env.app.PUBLIC));
 app.disable("x-powered-by");
 
 // Connect to databases
-// _connect.nosql();
-// _connect.sql();
-// initAssociation(); // link all the tables
+await _connect.nosql();
+await _connect.sql();
+initAssociation(); // link all the tables
 
 app.get("/", (req, res) => {
   res.sendFile("index.html");
@@ -38,22 +38,22 @@ const server = app.listen(port, () => {
 
 // shutdown of the application
 {
-  const shutDown = () => {
+  const shutDown = async () => {
     // Close running services here
     server.close();
-    // _close.nosql();
-    // _close.sql();
+    await _close.nosql();
+    await _close.sql();
 
     console.debug("Gracefully closing the application");
   };
 
-  process.on("SIGINT", () => {
+  process.on("SIGINT", async () => {
     console.debug("Recieved SIGINT");
-    shutDown();
+    await shutDown();
   });
 
-  process.on("SIGTERM", () => {
+  process.on("SIGTERM", async () => {
     console.debug("Recieved SIGTERM/(nodemon restarts)");
-    shutDown();
+    await shutDown();
   });
 }
