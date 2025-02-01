@@ -1,14 +1,11 @@
 import _env from "../constants/env.js";
 import User from "../models/User.js";
 
-
 const getUserDataByUsername = async (username) => {
   const user = await User.findOne({
     where: { username },
     attributes: ["id", "username", "blocked"],
   });
-
-  console.log(user);
 
   const userData = {
     id: user.id,
