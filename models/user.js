@@ -30,11 +30,12 @@ const User = db.define("User", {
     defaultValue: false,
     allowNull: false,
   },
-  isSeller: {
+  verified: {
     type: dt.BOOLEAN,
-    defaultValue: false,
     allowNull: false,
-  },
+    defaultValue: false,
+  }, // should be added in authentication middleware
+  // email and phone should be added
 });
 
 export default User;
