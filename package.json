@@ -9,8 +9,11 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "npm i",
+        "redis": "node .\\scripts\\start_redis.js",
         "dev": "nodemon --signal SIGTERM app.js",
-        "start": "node app.js"
+        "start": "node app.js",
+        "rdev": "npm run redis && npm run dev",
+        "rstart": "npm run redis && npm run start"
     },
     "dependencies": {
         "bcryptjs": "latest",
