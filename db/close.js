@@ -24,8 +24,8 @@ const closeSqlConnection = () => {
 };
 
 const _close = {
-  mongo: closeNoSqlConnection,
-  pg: closeSqlConnection,
+  nosql: closeNoSqlConnection,
+  sql: closeSqlConnection,
 };
 
 export default _close;

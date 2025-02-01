@@ -51,8 +51,8 @@ const connectToSqlDb = () => {
 };
 
 const _connect = {
-  mongo: connectToNoSqlDb,
-  pg: connectToSqlDb,
+  nosql: connectToNoSqlDb,
+  sql: connectToSqlDb,
 };
 
 export const db = SqlDatabase;

@@ -21,8 +21,8 @@ app.use(express.static(_env.app.PUBLIC));
 app.disable("x-powered-by");
 
 // Connect to databases
-// _connect.mongo();
-// _connect.pg();
+// _connect.nosql();
+// _connect.sql();
 // initAssociation(); // link all the tables
 
 app.get("/", (req, res) => {
@@ -41,8 +41,8 @@ const server = app.listen(port, () => {
   const shutDown = () => {
     // Close running services here
     server.close();
-    // _close.mongo();
-    // _close.pg();
+    // _close.nosql();
+    // _close.sql();
 
     console.debug("Gracefully closing the application");
   };
