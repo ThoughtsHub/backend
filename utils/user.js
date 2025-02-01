@@ -1,17 +1,20 @@
 import _env from "../constants/env.js";
+import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 
 const getUserDataByUsername = async (username) => {
   const user = await User.findOne({
     where: { username },
-    attributes: ["id", "username", "blocked"],
+    attributes: { exclude: ["password"] },
+    include: [
+      { model: Profile, as: "data", attributes: { exclude: ["userId"] } },
+    ],
   });
 
-  const userData = {
-    id: user.id,
-    username: user.username,
-    blocked: user.blocked,
-  };
+  let userData = { ...user.dataValues };
+
+  userData.profile = userData.data;
+  delete userData.data;
 
   return userData;
 };
