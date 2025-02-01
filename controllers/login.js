@@ -50,6 +50,7 @@ const loginHandler = async (req, res) => {
 const signupHandler = async (req, res) => {
   const { username = null, password = null } = req.body;
 
+  let transactionCommit = false;
   const t = await db.transaction();
   try {
     if (username === null || password === null)
@@ -68,6 +69,7 @@ const signupHandler = async (req, res) => {
     const user = await User.create({ username, password }, { transaction: t });
 
     await t.commit(); // save user data
+    transactionCommit = true; // transaction commited
 
     const userData = await _user.getUserDataByUsername(user.username);
 
@@ -81,11 +83,15 @@ const signupHandler = async (req, res) => {
 
     res.status(c.CREATED).json({ message: "User created" });
   } catch (err) {
-    await t.rollback();
+    if (transactionCommit == false) await t.rollback();
     console.log(err);
     res
       .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+      .json({
+        message: transactionCommit
+          ? "Account has been created, but couldn't get you logged in, Please go to /login to login to your account"
+          : "Internal server error",
+      });
   }
 };
 

@@ -9,6 +9,14 @@ const userAssociations = () => {
     as: "data",
   });
   Profile.belongsTo(User, { foreignKey: "userId" });
+
+  // create a user profile on user creation
+  User.afterCreate(async (payload, options) => {
+    await Profile.create(
+      { firstName: payload.username, userId: payload.id },
+      { transaction: options.transaction }
+    );
+  });
 };
 
 export default userAssociations;
