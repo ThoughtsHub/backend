@@ -1,10 +1,10 @@
-// do the association of sql tables here
-// in this directory
-
 import { db } from "../db/connect.js";
+import profileAssociations from "./profile.js";
+import userAssociations from "./user.js";
 
 const initAssociation = () => {
-  // put association here
+  userAssociations();
+  profileAssociations();
 
   db.sync({ alter: true }); // after linking, sync
 };
