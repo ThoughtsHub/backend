@@ -5,7 +5,7 @@ const nameLength = 12;
 const uniqValLength = 8;
 
 const createHandle = (name, uniqVal = Date.now().toString()) => {
-  uniqVal = uniqVal.replaceAll("-", "").substring(0, uniqValLength);
+  uniqVal = String(uniqVal).replaceAll("-", "").substring(0, uniqValLength);
 
   name = name.replace(/[^a-zA-Z]/g, "");
   const nameLen = name.length > nameLength ? nameLength : name.length;
