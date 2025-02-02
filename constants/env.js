@@ -5,7 +5,13 @@ const APP = {
   HOST: process.env.HOST || "localhost",
   PORT: process.env.PORT || 3000,
   PUBLIC: "./" + "public", // change according to your folder name
+  UPLOADS: {
+    DIR: "./" + "public/uploads",
+    URL: "./" + "uploads",
+  },
 };
+
+const APP_URL = `http://${APP.HOST}:${APP.PORT}`;
 
 // Authentication
 const JWT = {
@@ -44,7 +50,7 @@ const NOSQL_DB = REDIS;
 const SQL_DB = POSTGRESQL;
 
 const _env = {
-  app: APP,
+  app: { ...APP, URL: APP_URL },
   db: {
     nosql: NOSQL_DB,
     sql: SQL_DB,

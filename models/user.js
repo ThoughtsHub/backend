@@ -36,6 +36,11 @@ const User = db.define("User", {
     defaultValue: false,
   }, // should be added in authentication middleware
   // email and phone should be added
+  uploads: {
+    type: dt.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  },
 });
 
 export default User;

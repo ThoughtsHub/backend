@@ -36,6 +36,7 @@ app.get("/test", (req, res) => {
   res.json(req.user);
 });
 
+app.use("/uploads", r.uploads); // user uploads
 app.use("/logout", r.logout);
 
 app.all("*", (_, res) => {

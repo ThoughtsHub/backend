@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Profile from "../models/Profile.js";
+import Upload from "../models/Upload.js";
 
 const userAssociations = () => {
   // User have one profile
@@ -9,6 +10,13 @@ const userAssociations = () => {
     as: "data",
   });
   Profile.belongsTo(User, { foreignKey: "userId" });
+
+  // user can have many uploads
+  User.hasMany(Upload, {
+    foreignKey: "userId",
+    onDelete: "SET NULL",
+  });
+  Upload.belongsTo(User, { foreignKey: "userId" });
 
   // create a user profile on user creation
   User.afterCreate(async (payload, options) => {

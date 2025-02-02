@@ -17,10 +17,15 @@ const HANDLE = {
   limit: 32,
 };
 
+const UPLOAD = {
+  limit: 12,
+};
+
 const attr = {
   id: ID,
   default: DEFAULT,
   handle: HANDLE,
+  upload: UPLOAD,
 };
 
 export default attr;
