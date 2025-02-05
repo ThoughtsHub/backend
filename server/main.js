@@ -7,7 +7,6 @@ import _env from "../constants/env.js";
 
 const app = express();
 
-// application can use cookies
 app.use(express.json()); // body parser
 app.use(cookieParser()); // cookie parser
 app.use(helmet()); // many middleware functions
