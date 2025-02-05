@@ -11,6 +11,7 @@ const Profile = db.define("Profile", {
   },
   middleName: dt.STRING,
   lastName: dt.STRING,
+  displayName: dt.STRING,
   age: dt.INTEGER,
   about: {
     type: dt.TEXT,
