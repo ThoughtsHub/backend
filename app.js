@@ -1,8 +1,8 @@
 import _env from "./constants/env.js"; // env variables
-import _connect from "./db/connect.js";
-import _close from "./db/close.js";
+import _connect from "./db/connect.js"; // db
+import _close from "./db/close.js"; // db
 import initAssociation from "./associations/association.js";
-import server from "./server/socket.js";
+import server from "./server/socket.js"; // server
 
 const port = _env.app.PORT;
 
