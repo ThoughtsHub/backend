@@ -26,6 +26,7 @@
         "pg": "latest",
         "redis": "latest",
         "sequelize": "latest",
+        "socket.io": "^4.8.1",
         "uuid": "latest"
     },
     "devDependencies": {
