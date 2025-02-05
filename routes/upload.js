@@ -1,8 +1,6 @@
 import { Router } from "express";
 import upload from "../middlewares/upload.js";
-import _env from "../constants/env.js";
 import handler from "../controllers/upload.js";
-import _file from "../utils/file.js";
 
 const router = Router();
 
