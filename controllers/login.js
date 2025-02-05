@@ -38,7 +38,9 @@ const loginHandler = async (req, res) => {
       secure: true,
     });
 
-    res.status(c.OK).json({ message: "User logged in successfully" });
+    res
+      .status(c.OK)
+      .json({ message: "User logged in successfully", sessionId });
   } catch (err) {
     console.log(err);
     res
@@ -81,17 +83,15 @@ const signupHandler = async (req, res) => {
       secure: true,
     });
 
-    res.status(c.CREATED).json({ message: "User created" });
+    res.status(c.CREATED).json({ message: "User created", sessionId });
   } catch (err) {
     if (transactionCommit == false) await t.rollback();
     console.log(err);
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({
-        message: transactionCommit
-          ? "Account has been created, but couldn't get you logged in, Please go to /login to login to your account"
-          : "Internal server error",
-      });
+    res.status(c.INTERNAL_SERVER_ERROR).json({
+      message: transactionCommit
+        ? "Account has been created, but couldn't get you logged in, Please go to /login to login to your account"
+        : "Internal server error",
+    });
   }
 };
 
