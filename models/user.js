@@ -34,8 +34,20 @@ const User = db.define("User", {
     type: dt.BOOLEAN,
     allowNull: false,
     defaultValue: false,
-  }, // should be added in authentication middleware
-  // email and phone should be added
+  }, // phone or email verified, meaning verified
+  email: {
+    type: dt.STRING,
+    allowNull: false,
+    unique: true,
+    set(value) {
+      this.setDataValue("email", value.trim());
+    },
+  },
+  email_verified: {
+    type: dt.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   uploads: {
     type: dt.INTEGER,
     allowNull: false,

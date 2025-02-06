@@ -34,10 +34,17 @@ const isUsernameAvailable = async (username) => {
   return user === null;
 };
 
+const isEmailAvailable = async (email) => {
+  const user = await User.findOne({ where: { email } });
+
+  return user === null;
+};
+
 const _user = {
   getUserDataByUsername,
   isUserBlocked,
   isUsernameAvailable,
+  isEmailAvailable,
 };
 
 export default _user;

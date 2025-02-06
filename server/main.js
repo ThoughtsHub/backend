@@ -13,6 +13,7 @@ app.use(helmet()); // many middleware functions
 
 // login should not be with verification
 app.use("/login", r.login);
+app.use("/email", r.email); // email verification
 
 app.use(auth.verify); // session verification middleware
 

@@ -17,16 +17,18 @@ const Profile = db.define("Profile", {
   about: {
     type: dt.TEXT,
     set(value) {
-      const gzippedBuffer = gzipSync(value);
-      this.setDataValue("about", gzippedBuffer.toString("base64"));
+      if (value !== null) {
+        const gzippedBuffer = gzipSync(value);
+        this.setDataValue("about", gzippedBuffer.toString("base64"));
+      } else this.setDataValue("about", null);
     },
     get() {
       const storedValue = this.getDataValue("about");
+      if (storedValue === null) return null;
       const gzippedBuffer = Buffer.from(storedValue, "base64");
       const unzippedBuffer = gunzipSync(gzippedBuffer);
       return unzippedBuffer.toString();
     },
-    defaultValue: "",
   },
   likes: {
     type: dt.INTEGER,

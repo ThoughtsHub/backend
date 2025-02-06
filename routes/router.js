@@ -1,5 +1,6 @@
 // import all your routes here than put them in _routes
 
+import { EmailRouter } from "./email.js";
 import { LoginRouter } from "./login.js";
 import { LogoutRouter } from "./logout.js";
 import { ProfileRouter } from "./profile.js";
@@ -10,6 +11,7 @@ const _routes = {
   logout: LogoutRouter,
   uploads: UploadRouter,
   profile: ProfileRouter,
+  email: EmailRouter,
 };
 
 export default _routes;
