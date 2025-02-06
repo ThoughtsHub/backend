@@ -11,7 +11,7 @@ await _connect.nosql();
 await _connect.sql();
 initAssociation(); // link all the tables
 
-server.listen(port, () => {
+server.listen(port, _env.app.HOST, () => {
   console.log(`Application started on http://${_env.app.HOST}:${port}`);
 });
 
