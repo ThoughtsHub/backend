@@ -20,13 +20,15 @@
         "cookie-parser": "latest",
         "express": "latest",
         "express-setup": "file:",
+        "googleapis": "latest",
         "jsonwebtoken": "latest",
         "mongoose": "latest",
         "multer": "latest",
+        "nodemailer": "latest",
         "pg": "latest",
         "redis": "latest",
         "sequelize": "latest",
-        "socket.io": "^4.8.1",
+        "socket.io": "latest",
         "uuid": "latest"
     },
     "devDependencies": {
