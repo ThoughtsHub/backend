@@ -10,7 +10,7 @@ const initAssociation = () => {
   profileAssociations();
   educationAssociations();
 
-  db.sync({ force: true }); // after linking, sync
+  db.sync({ alter: true }); // after linking, sync
 };
 
 export default initAssociation;
