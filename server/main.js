@@ -27,6 +27,7 @@ app.get("/test", (req, res) => {
   res.json(req.user);
 });
 
+app.use("/profile", r.profile); // profile
 app.use("/uploads", r.uploads); // user uploads
 app.use("/logout", r.logout);
 

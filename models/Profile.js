@@ -1,6 +1,7 @@
 import { DataTypes as dt } from "sequelize";
 import attr from "../constants/db.js";
 import { db } from "../db/connect.js";
+import { gzipSync, gunzipSync } from "zlib";
 
 const Profile = db.define("Profile", {
   id: attr.id,
@@ -16,16 +17,16 @@ const Profile = db.define("Profile", {
   about: {
     type: dt.TEXT,
     set(value) {
-      if (value !== null)
-        value = Buffer.from(value, "utf-8").toString("base64");
-      this.setDataValue("about", value);
+      const gzippedBuffer = gzipSync(value);
+      this.setDataValue("about", gzippedBuffer.toString("base64"));
     },
     get() {
-      let value = this.getDataValue("about");
-      if (value !== null)
-        value = Buffer.from(value, "base64").toString("utf-8");
-      return value;
+      const storedValue = this.getDataValue("about");
+      const gzippedBuffer = Buffer.from(storedValue, "base64");
+      const unzippedBuffer = gunzipSync(gzippedBuffer);
+      return unzippedBuffer.toString();
     },
+    defaultValue: "",
   },
   likes: {
     type: dt.INTEGER,
