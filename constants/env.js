@@ -49,6 +49,13 @@ const POSTGRESQL = {
 const NOSQL_DB = REDIS;
 const SQL_DB = POSTGRESQL;
 
+// Nodemailer
+const NODEMAILER = {
+  SERVICE: "gmail",
+  EMAIL: process.env.GOOGLE_EMAIL,
+  PASSWORD: process.env.GOOGLE_PASSWORD,
+};
+
 const _env = {
   app: { ...APP, URL: APP_URL },
   db: {
@@ -58,6 +65,7 @@ const _env = {
   auth: {
     jwt: JWT,
   },
+  nodemailer: NODEMAILER,
 };
 
 export default _env;

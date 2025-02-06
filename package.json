@@ -20,7 +20,6 @@
         "cookie-parser": "latest",
         "express": "latest",
         "express-setup": "file:",
-        "googleapis": "latest",
         "jsonwebtoken": "latest",
         "mongoose": "latest",
         "multer": "latest",
