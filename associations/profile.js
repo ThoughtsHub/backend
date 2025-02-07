@@ -2,6 +2,7 @@ import Profile from "../models/Profile.js";
 import Interest from "../models/Interest.js";
 import AccountLink from "../models/AccountLink.js";
 import Education from "../models/Education.js";
+import Forum from "../models/Forum.js";
 
 const profileAssociations = () => {
   // a profile can have many interests
@@ -34,6 +35,14 @@ const profileAssociations = () => {
     onDelete: "CASCADE",
   });
   Education.belongsTo(Profile, { foreignKey: "profileId" });
+
+  // a profile will have many forums
+  Profile.hasMany(Forum, {
+    foreignKey: "profileId",
+    as: "postedForums",
+    onDelete: "SET NULL",
+  });
+  Forum.belongsTo(Profile, { foreignKey: "profileId" });
 };
 
 export default profileAssociations;
