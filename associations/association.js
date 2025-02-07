@@ -1,8 +1,10 @@
 import { db } from "../db/connect.js";
 import commentAssociations from "./comment.js";
+import companyAssociations from "./company.js";
 import creativityAssociations from "./creativity.js";
 import educationAssociations from "./education.js";
 import forumAssociations from "./forum.js";
+import jobAssociations from "./job.js";
 import likeAssociations from "./like.js";
 import profileAssociations from "./profile.js";
 import savedListAssociations from "./savedlist.js";
@@ -23,6 +25,8 @@ const initAssociation = () => {
   wishListBooksAssociations();
   creativityAssociations();
   likeAssociations();
+  jobAssociations();
+  companyAssociations();
 
   db.sync({ alter: true }); // after linking, sync
 };
