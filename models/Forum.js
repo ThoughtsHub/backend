@@ -25,7 +25,7 @@ const Forum = db.define("Forum", {
       return unzippedBuffer.toString();
     },
   },
-  images: dt.ARRAY,
+  images: dt.ARRAY(dt.STRING),
   upvotes: {
     type: dt.INTEGER,
     allowNull: false,
