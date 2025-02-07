@@ -7,7 +7,7 @@ const Comment = db.define(
   {
     id: attr.id,
     comment: {
-      type: dt.STRING,
+      type: dt.TEXT,
       allowNull: false,
     },
   },

@@ -12,7 +12,7 @@ const News = db.define(
       allowNull: false,
     },
     content: {
-      type: dt.STRING,
+      type: dt.TEXT,
       allowNull: false,
       set(value) {
         if (value !== null) {
