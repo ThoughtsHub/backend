@@ -5,6 +5,7 @@ import Education from "../models/Education.js";
 import Forum from "../models/Forum.js";
 import Vote from "../models/Vote.js";
 import Comment from "../models/Comment.js";
+import News from "../models/News.js";
 
 const profileAssociations = () => {
   // a profile can have many interests
@@ -53,6 +54,10 @@ const profileAssociations = () => {
   // a profile can have many comments on a forum
   Profile.hasMany(Comment, { foreignKey: "profileId", onDelete: "CASCADE" });
   Comment.belongsTo(Profile, { foreignKey: "profileId" });
+
+  // a profile can have news
+  Profile.hasMany(News, { foreignKey: "userId", onDelete: "SET NULL" });
+  News.belongsTo(Profile, { foreignKey: "userId" });
 };
 
 export default profileAssociations;
