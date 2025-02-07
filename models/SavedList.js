@@ -16,4 +16,6 @@ import { db } from "../db/connect.js";
 // currently only news can be saved
 export const SavedListNews = db.define("SavedListNews", {});
 
+export const SavedListJobs = db.define("SavedListJobs", {});
+
 // export default SavedList;
