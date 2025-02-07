@@ -10,11 +10,13 @@ const savedListAssociations = () => {
     through: SavedListNews,
     foreignKey: "profileId",
     otherKey: "newsId",
+    onDelete: "SET NULL",
   });
   News.belongsToMany(Profile, {
     through: SavedListNews,
     foreignKey: "newsId",
     otherKey: "profileId",
+    onDelete: "SET NULL",
   });
 
   // jobs saved
@@ -22,11 +24,13 @@ const savedListAssociations = () => {
     through: SavedListJobs,
     foreignKey: "profileId",
     otherKey: "jobId",
+    onDelete: "SET NULL",
   });
   PrivateJob.belongsToMany(Profile, {
     through: SavedListJobs,
     foreignKey: "jobId",
     otherKey: "profileId",
+    onDelete: "SET NULL",
   });
 };
 
