@@ -1,3 +1,4 @@
+import Comment from "../models/Comment.js";
 import Forum from "../models/Forum.js";
 import Profile from "../models/Profile.js";
 import Vote from "../models/Vote.js";
@@ -6,6 +7,10 @@ const forumAssociations = () => {
   // a forum can have many votes
   Forum.hasMany(Vote, { foreignKey: "forumId", onDelete: "CASCADE" });
   Vote.belongsTo(Forum, { foreignKey: "forumId" });
+
+  // a forum can have many comments
+  Forum.hasMany(Comment, { foreignKey: "forumId", onDelete: "CASCADE" });
+  Comment.belongsTo(Forum, { foreignKey: "forumId" });
 
   // update forums count when creating/deleting forums
   Forum.afterCreate(async (payload, options) => {

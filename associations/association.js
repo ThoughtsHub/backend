@@ -1,4 +1,5 @@
 import { db } from "../db/connect.js";
+import commentAssociations from "./comment.js";
 import educationAssociations from "./education.js";
 import forumAssociations from "./forum.js";
 import profileAssociations from "./profile.js";
@@ -13,6 +14,7 @@ const initAssociation = () => {
   educationAssociations();
   forumAssociations();
   voteAssociations();
+  commentAssociations();
 
   db.sync({ alter: true }); // after linking, sync
 };

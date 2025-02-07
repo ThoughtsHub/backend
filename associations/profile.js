@@ -4,6 +4,7 @@ import AccountLink from "../models/AccountLink.js";
 import Education from "../models/Education.js";
 import Forum from "../models/Forum.js";
 import Vote from "../models/Vote.js";
+import Comment from "../models/Comment.js";
 
 const profileAssociations = () => {
   // a profile can have many interests
@@ -48,6 +49,10 @@ const profileAssociations = () => {
   // a profile can have many votes, but on forum only one
   Profile.hasMany(Vote, { foreignKey: "profileId", onDelete: "SET NULL" });
   Vote.belongsTo(Profile, { foreignKey: "profileId" });
+
+  // a profile can have many comments on a forum
+  Profile.hasMany(Comment, { foreignKey: "profileId", onDelete: "CASCADE" });
+  Comment.belongsTo(Profile, { foreignKey: "profileId" });
 };
 
 export default profileAssociations;
