@@ -107,6 +107,7 @@ const PrivateJob = db.define("PrivateJob", {
   tags: {
     type: dt.ARRAY(dt.STRING),
   },
+  url: dt.STRING,
 });
 
 export default PrivateJob;
