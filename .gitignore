@@ -38,3 +38,6 @@ pids
 
 # user uploads
 public/uploads/*
+
+# constant data for application
+data
