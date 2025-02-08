@@ -31,6 +31,11 @@ const News = db.define(
     images: dt.ARRAY(dt.STRING),
     tags: dt.ARRAY(dt.STRING),
     category: dt.ARRAY(dt.STRING),
+    handle: {
+      type: dt.STRING,
+      allowNull: false,
+      unique: true,
+    },
   },
   { tableName: "News" }
 );

@@ -103,10 +103,19 @@ const verifyConnection = async (req, res, next) => {
   next();
 };
 
+const admin = (req, res, next) => {
+  const username = req.user.username;
+  if (username !== _env.admin.USERNAME)
+    return res.status(c.FORBIDDEN).json({ message: "Only admins have access" });
+
+  next();
+};
+
 const auth = {
   setup: setupAuthentication,
   verify: verifyConnection,
   resetup: resetAuthentication,
+  admin,
 };
 
 export default auth;
