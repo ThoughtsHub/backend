@@ -11,6 +11,8 @@ const addEducation = async (req, res) => {
   delete sentData.educationId;
   delete sentData.profileId;
   delete sentData.id;
+  delete sentData.createdAt;
+  delete sentData.updatedAt;
 
   try {
     const education = await Education.create(
@@ -42,6 +44,8 @@ const updateEducation = async (req, res) => {
   delete sentData.educationId;
   delete sentData.profileId;
   delete sentData.id;
+  delete sentData.createdAt;
+  delete sentData.updatedAt;
 
   if (educationId === null)
     return res.status(c.BAD_REQUEST).json({ message: "No education Id" });
