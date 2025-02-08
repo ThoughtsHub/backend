@@ -9,7 +9,11 @@ const getUserDataByUsername = async (username) => {
     attributes: { exclude: ["password"] },
     include: [
       { model: Profile, as: "data", attributes: { exclude: ["userId"] } },
-      { model: Email, as: "userEmails", attributes: ["email"] },
+      {
+        model: Email,
+        as: "userEmails",
+        attributes: ["email", "type", "verified"],
+      },
     ],
   });
 
