@@ -23,7 +23,7 @@ const getProfile = async (req, res) => {
         {
           model: Education,
           as: "education",
-          attributes: { exclude: ["id", "profileId", "skillId"] },
+          attributes: { exclude: ["profileId"] },
           include: Skill,
         },
       ],
