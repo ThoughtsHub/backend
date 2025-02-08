@@ -1,22 +1,15 @@
 import Education from "../models/Education.js";
+import getData from "../utils/request.js";
 import c from "../utils/status_codes.js";
 
 const addEducation = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const sentData = Object.fromEntries(
-    Object.entries(req.body).filter(([_, value]) => value != null)
-  );
-
-  delete sentData.educationId;
-  delete sentData.profileId;
-  delete sentData.id;
-  delete sentData.createdAt;
-  delete sentData.updatedAt;
+  const [data] = getData(req.body, ["educationId", "profileId", "id"]);
 
   try {
     const education = await Education.create(
-      { ...sentData, profileId },
+      { ...data, profileId },
       { validate: true }
     );
 
@@ -35,25 +28,15 @@ const addEducation = async (req, res) => {
 const updateEducation = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const sentData = Object.fromEntries(
-    Object.entries(req.body).filter(([_, value]) => value != null)
-  );
+  const [data, id] = getData(req.body, ["educationId", "profileId", "id"]);
 
-  const educationId = sentData.educationId ?? null;
-
-  delete sentData.educationId;
-  delete sentData.profileId;
-  delete sentData.id;
-  delete sentData.createdAt;
-  delete sentData.updatedAt;
-
-  if (educationId === null)
+  if (id === null)
     return res.status(c.BAD_REQUEST).json({ message: "No education Id" });
 
   try {
     const [updateResult] = await Education.update(
-      { ...sentData },
-      { where: { profileId, id: educationId }, transaction: t, validate: true }
+      { ...data },
+      { where: { profileId, id }, transaction: t, validate: true }
     );
 
     if (updateResult !== 1)
@@ -83,7 +66,7 @@ const removeEducation = async (req, res) => {
 
   try {
     const destroyResult = await Education.destroy({
-      where: { id },
+      where: { id, profileId },
       individualHooks: true,
     });
 

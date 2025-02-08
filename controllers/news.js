@@ -1,6 +1,7 @@
 import _env from "../constants/env.js";
 import News from "../models/News.js";
 import handle from "../utils/handle.js";
+import getData from "../utils/request.js";
 import c from "../utils/status_codes.js";
 
 const getNews = async (req, res) => {
@@ -25,34 +26,20 @@ const getNews = async (req, res) => {
 };
 
 const createNews = async (req, res) => {
-  const sentData = Object.fromEntries(
-    Object.entries(req.body).filter(([_, value]) => value != null)
-  );
-
-  delete sentData.handle;
-  delete sentData.userId;
-  delete sentData.id;
-  delete sentData.createdAt;
-  delete sentData.updatedAt;
+  const [data] = getData(req.body, ["handle", "userId", "id"]);
 
   if (
-    [sentData.title, sentData.content].includes(undefined) ||
-    [sentData.title, sentData.content].includes(null)
+    [data.title, data.content].includes(undefined) ||
+    [data.title, data.content].includes(null)
   )
     return res
       .status(c.BAD_REQUEST)
       .json({ message: "Required info not given" });
 
   try {
-    const newsHandle = handle.create(sentData.title);
+    const newsHandle = handle.create(data.title);
 
-    await News.create(
-      {
-        ...sentData,
-        handle: newsHandle,
-      },
-      { validate: true }
-    );
+    await News.create({ ...data, handle: newsHandle }, { validate: true });
 
     res.status(c.CREATED).json({ message: "News created" });
   } catch (err) {
@@ -65,20 +52,11 @@ const createNews = async (req, res) => {
 };
 
 const updateNews = async (req, res) => {
-  const sentData = Object.fromEntries(
-    Object.entries(req.body).filter(([_, value]) => value != null)
-  );
-
-  const newsHandle = sentData.handle ?? null;
-  delete sentData.handle;
-  delete sentData.userId;
-  delete sentData.id;
-  delete sentData.createdAt;
-  delete sentData.updatedAt;
+  const [data, newsHandle] = getData(req.body, ["handle", "userId", "id"]);
 
   try {
     await News.update(
-      { ...sentData },
+      { ...data },
       { where: { handle: newsHandle }, validate: true }
     );
 
