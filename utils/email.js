@@ -23,8 +23,11 @@ const sendOtpEmail = async (recipient, otp) => {
   return false;
 };
 
-const generateOtp = () => {
-  return uuidv4().substring(0, 8).toUpperCase();
+const generateOtp = (length = 8) => {
+  return uuidv4()
+    .replaceAll("-", "")
+    .substring(0, length > 0 ? length : 6)
+    .toUpperCase();
 };
 
 const otp = {

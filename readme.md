@@ -2,11 +2,7 @@
 
 Process of creating a user:
 
-/login/new <- username, email, password
--> OTP on email
+GET /email/verify (query=email) -> OTP on email
+POST /email/verify (body=otp) -> OK, DIFF
 
-/email/verify <- username, otp
--> if correct, verified
-
-/login <- username, password
--> get authentication code
+POST /login/new (body=password,email,username,profile_information) -> OK, logs in
