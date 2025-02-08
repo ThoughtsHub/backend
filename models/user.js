@@ -35,19 +35,6 @@ const User = db.define("User", {
     allowNull: false,
     defaultValue: false,
   }, // phone or email verified, meaning verified
-  email: {
-    type: dt.STRING,
-    allowNull: false,
-    unique: true,
-    set(value) {
-      this.setDataValue("email", value.trim());
-    },
-  },
-  email_verified: {
-    type: dt.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  },
   uploads: {
     type: dt.INTEGER,
     allowNull: false,

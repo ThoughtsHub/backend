@@ -28,7 +28,7 @@ const initAssociation = () => {
   jobAssociations();
   companyAssociations();
 
-  db.sync({ alter: true }); // after linking, sync
+  db.sync({ force: true }); // after linking, sync
 };
 
 export default initAssociation;

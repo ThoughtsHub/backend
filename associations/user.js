@@ -1,8 +1,17 @@
 import User from "../models/User.js";
 import Profile from "../models/Profile.js";
 import Upload from "../models/Upload.js";
+import Email from "../models/Email.js";
 
 const userAssociations = () => {
+  // user will have a email
+  User.hasMany(Email, {
+    foreignKey: "userId",
+    as: "userEmails",
+    onDelete: "CASCADE",
+  });
+  Email.belongsTo(User, { foreignKey: "userId" });
+
   // User have one profile
   User.hasOne(Profile, {
     foreignKey: "userId",
