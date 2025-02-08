@@ -3,6 +3,7 @@ import _connect from "./db/connect.js"; // db
 import _close from "./db/close.js"; // db
 import initAssociation from "./associations/association.js";
 import server from "./server/socket.js"; // server
+import admin from "./scripts/admin.js";
 
 const port = _env.app.PORT;
 
@@ -10,6 +11,9 @@ const port = _env.app.PORT;
 await _connect.nosql();
 await _connect.sql();
 initAssociation(); // link all the tables
+
+// Create admin if not exist
+await admin();
 
 server.listen(port, _env.app.HOST, () => {
   console.log(`Application started on http://${_env.app.HOST}:${port}`);

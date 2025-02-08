@@ -56,6 +56,12 @@ const NODEMAILER = {
   PASSWORD: process.env.GOOGLE_PASSWORD,
 };
 
+// Admin Credentials
+const ADMIN = {
+  USERNAME: process.env.ADMIN_USERNAME,
+  PASSWORD: process.env.ADMIN_PASSWORD,
+};
+
 const _env = {
   app: { ...APP, URL: APP_URL },
   db: {
@@ -66,6 +72,7 @@ const _env = {
     jwt: JWT,
   },
   nodemailer: NODEMAILER,
+  admin: ADMIN
 };
 
 export default _env;
