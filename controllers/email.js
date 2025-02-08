@@ -34,12 +34,16 @@ const verifyOtp = async (req, res) => {
   if (email === null)
     return res.status(c.BAD_REQUEST).json({ message: "No email" });
 
+  const _email = await Email.findOne({ where: { email } });
+
+  if (_email && _email?.verified === true)
+    return res.status(c.OK).json({ message: "Email already verified" });
+
   try {
     if (await _otp.verify(email, otp)) {
       // create/update the email
       {
-        const email = await Email.findOne({ where: { email } });
-        if (email === null) await Email.create({ email, verified: true });
+        if (_email === null) await Email.create({ email, verified: true });
         else await Email.update({ verified: true }, { where: { email } });
       }
 
