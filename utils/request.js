@@ -4,7 +4,7 @@ const getData = (data = {}, exclude = [], excludeTimestamps = true) => {
   );
 
   // timestamps not required
-  if (excludeTimestamps) exclude += ["createdAt", "updatedAt"];
+  if (excludeTimestamps) exclude = [...exclude, "createdAt", "updatedAt"];
 
   let result = [];
 

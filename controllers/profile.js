@@ -13,6 +13,19 @@ const profileKeys = [
   "age",
 ];
 
+const notAccessed = [
+  "likes",
+  "followers",
+  "following",
+  "groups",
+  "news",
+  "articles",
+  "posts",
+  "forums",
+  "booksIssued",
+  "wallet",
+];
+
 const get = async (req, res) => {
   const profileId = req.user.profile.id;
 
@@ -46,7 +59,13 @@ const get = async (req, res) => {
 const update = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data] = getData(req.body, ["handle", "userId", "id", "profileId"]);
+  const [data] = getData(req.body, [
+    "handle",
+    "userId",
+    "id",
+    "profileId",
+    ...notAccessed,
+  ]);
 
   if (typeof data.firstName === "string")
     return res.bad("First name cannot be empty");
@@ -59,31 +78,6 @@ const update = async (req, res) => {
     });
 
     res.ok("Profile Updated");
-  } catch (err) {
-    console.log(err);
-
-    res.serverError();
-  }
-};
-
-const updateProfileAttribute = async (req, res) => {
-  const profileId = req.user.profile.id;
-
-  const { key, value } = req.params;
-
-  if (!profileKeys.includes(key)) return res.bad("Bad key update request");
-
-  const updateData = {};
-  updateData[key] = value;
-
-  try {
-    const updateResult = await Profile.update(updateData, {
-      where: { id: profileId },
-      individualHooks: true,
-      validate: true,
-    });
-
-    res.ok("Attribute updated");
   } catch (err) {
     console.log(err);
 
@@ -119,10 +113,7 @@ const removeProfileAttribute = async (req, res) => {
 
 const ProfileHandler = {
   get,
-  update: {
-    profile: update,
-    attribute: updateProfileAttribute,
-  },
+  update,
   del: removeProfileAttribute,
 };
 

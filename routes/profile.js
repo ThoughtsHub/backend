@@ -8,11 +8,9 @@ const router = Router();
 
 router.get("/", handler.get);
 
-router.patch("/", handler.update.profile); // both requests are handle by same handler
+router.patch("/", handler.update); // both requests are handle by same handler
 
-router.put("/", handler.update.profile); // both requests are handle by same handler
-
-router.patch("/:key/:value", handler.update.attribute); // set key to value in profile
+router.put("/", handler.update); // both requests are handle by same handler
 
 router.delete("/:key", handler.del); // updates a key to null in profile
 
