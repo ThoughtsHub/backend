@@ -1,6 +1,5 @@
 import Education from "../models/Education.js";
 import getData from "../utils/request.js";
-import c from "../utils/status_codes.js";
 
 const addEducation = async (req, res) => {
   const profileId = req.user.profile.id;
@@ -13,15 +12,11 @@ const addEducation = async (req, res) => {
       { validate: true }
     );
 
-    res
-      .status(c.CREATED)
-      .json({ message: "Education added", educationId: education.id });
+    res.created("Education added", { educationId: education.id });
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -30,8 +25,7 @@ const updateEducation = async (req, res) => {
 
   const [data, id] = getData(req.body, ["educationId", "profileId", "id"]);
 
-  if (id === null)
-    return res.status(c.BAD_REQUEST).json({ message: "No education Id" });
+  if (id === null) return res.bad("No education Id");
 
   try {
     const [updateResult] = await Education.update(
@@ -39,18 +33,13 @@ const updateEducation = async (req, res) => {
       { where: { profileId, id }, transaction: t, validate: true }
     );
 
-    if (updateResult !== 1)
-      return res
-        .status(c.BAD_REQUEST)
-        .json({ message: "You have no education like that" });
+    if (updateResult !== 1) return res.bad("You have no education like that");
 
-    res.status(c.CREATED).json({ message: "Education added" });
+    res.created("Education updated");
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -59,10 +48,7 @@ const removeEducation = async (req, res) => {
 
   const { id = null } = req.query;
 
-  if (id === null)
-    return res
-      .status(c.BAD_REQUEST)
-      .json({ message: "Required info not given" });
+  if (id === null) return res.noParams();
 
   try {
     const destroyResult = await Education.destroy({
@@ -70,13 +56,11 @@ const removeEducation = async (req, res) => {
       individualHooks: true,
     });
 
-    res.status(c.NO_CONTENT);
+    res.deleted();
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 

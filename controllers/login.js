@@ -4,7 +4,6 @@ import auth from "../middlewares/auth.js";
 import cookie from "../constants/cookies.js";
 import { db } from "../db/connect.js";
 import User from "../models/User.js";
-import c from "../utils/status_codes.js";
 import Email from "../models/Email.js";
 
 const COOKIE_OPTIONS = {
@@ -24,25 +23,15 @@ const loginHandler = async (req, res) => {
         attributes: ["blocked", "password", "verified"],
       });
 
-      if (user === null)
-        return res
-          .status(c.BAD_REQUEST)
-          .json({ message: "No user with that username" });
+      if (user === null) return res.bad("No user with that username");
 
-      if (user.blocked === true)
-        return res
-          .status(c.FORBIDDEN)
-          .json({ message: "User is blocked by admin" });
+      if (user.blocked) return res.forbidden("User is blocked by admin");
 
-      if (user.verified === false)
-        return res
-          .status(c.UNAUTHORIZED)
-          .json({ message: "Unverified user, please verify your email" });
+      if (!user.verified)
+        return res.unauth("Unverified user, please verify your email");
 
-      if (
-        _password.comparePassword(username, password, user.password) === false
-      )
-        return res.status(c.UNAUTHORIZED).json({ message: "Wrong password" });
+      if (!_password.comparePassword(username, password, user.password))
+        return res.unauth("Wrong password");
     }
 
     const userData = await _user.getUserDataByUsername(username);
@@ -51,14 +40,11 @@ const loginHandler = async (req, res) => {
 
     res.cookie(cookie.sessionId, sessionId, COOKIE_OPTIONS);
 
-    res
-      .status(c.OK)
-      .json({ message: "User logged in successfully", sessionId });
+    res.ok("User logged in successfully", { sessionId });
   } catch (err) {
     console.log(err);
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+
+    res.serverError();
   }
 };
 
@@ -72,35 +58,27 @@ const signupHandler = async (req, res) => {
     {
       if (username === null || password === null || email === null) {
         await t.rollback();
-        return res
-          .status(c.BAD_REQUEST)
-          .json({ message: "Required credentials missing" });
+        return res.noParams();
       }
 
       if (!(await _user.isUsernameAvailable(username))) {
         await t.rollback();
-        return res
-          .status(c.CONFLICT)
-          .json({ message: "Username already taken" });
+        return res.conflict("Username already taken");
       }
 
       const _email = await Email.findOne({ where: { email } });
       if (_email === null || _email?.verified === false) {
         await t.rollback();
-        return res
-          .status(c.UNAUTHORIZED)
-          .json({ message: "Email is not verified" });
+        return res.unauth("Email is not verified");
       }
       if (_email?.userId !== null) {
         await t.rollback();
-        return res.status(c.CONFLICT).json({ message: "Email already exist" });
+        return res.conflict("Email already exist");
       }
 
       if (!_password.checkPassword(password)) {
         await t.rollback();
-        return res
-          .status(c.BAD_REQUEST)
-          .json({ message: "Password doesn't adhere rules" });
+        return res.bad("Password doesn't adhere rules");
       }
     }
 
@@ -131,17 +109,16 @@ const signupHandler = async (req, res) => {
 
     res.cookie(cookie.sessionId, sessionId, COOKIE_OPTIONS);
 
-    res
-      .status(c.OK)
-      .json({ message: "User logged in successfully", sessionId });
+    res.ok("User logged in successfully", { sessionId });
   } catch (err) {
     if (transactionCommit == false) await t.rollback();
     console.log(err);
-    res.status(c.INTERNAL_SERVER_ERROR).json({
-      message: transactionCommit
+
+    res.serverError(
+      transactionCommit
         ? "User created but not logged in, try /login"
-        : "Internal server error",
-    });
+        : "Internal server error"
+    );
   }
 };
 

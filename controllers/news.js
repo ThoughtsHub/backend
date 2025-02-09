@@ -2,7 +2,6 @@ import _env from "../constants/env.js";
 import News from "../models/News.js";
 import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
-import c from "../utils/status_codes.js";
 
 const getNews = async (req, res) => {
   const { offset = 0 } = req.query;
@@ -15,39 +14,31 @@ const getNews = async (req, res) => {
       limit: 30,
     });
 
-    res.status(c.OK).json({ message: "News", news });
+    res.ok("News", { news });
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
 const createNews = async (req, res) => {
   const [data] = getData(req.body, ["handle", "userId", "id"]);
 
-  if (
-    [data.title, data.content].includes(undefined) ||
-    [data.title, data.content].includes(null)
-  )
-    return res
-      .status(c.BAD_REQUEST)
-      .json({ message: "Required info not given" });
+  const reqParams = [data.title, data.content];
+  if (reqParams.includes(undefined) || reqParams.includes(null))
+    return res.noParams();
 
   try {
     const newsHandle = handle.create(data.title);
 
     await News.create({ ...data, handle: newsHandle }, { validate: true });
 
-    res.status(c.CREATED).json({ message: "News created" });
+    res.created("News created");
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -60,21 +51,18 @@ const updateNews = async (req, res) => {
       { where: { handle: newsHandle }, validate: true }
     );
 
-    res.status(c.OK).json({ message: "News updated" });
+    res.ok("News updated");
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
 const removeNews = async (req, res) => {
   const { handle = null } = req.query;
 
-  if (handle === null)
-    return res.status(c.BAD_REQUEST).json({ message: "No handle given" });
+  if (handle === null) return res.bad("No handle given");
 
   try {
     const destroyResult = await News.destroy({
@@ -82,13 +70,11 @@ const removeNews = async (req, res) => {
       individualHooks: true,
     });
 
-    res.status(c.NO_CONTENT);
+    res.deleted();
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 

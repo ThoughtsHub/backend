@@ -1,5 +1,4 @@
 import { client } from "../db/connect.js";
-import c from "../utils/status_codes.js";
 import cookie from "../constants/cookies.js";
 
 const logoutHandler = async (req, res) => {
@@ -7,12 +6,11 @@ const logoutHandler = async (req, res) => {
     await client.del(req.sessionId); // remove from db
     res.clearCookie(cookie.sessionId); // remove cookies
 
-    res.sendStatus(c.NO_CONTENT);
+    res.deleted();
   } catch (err) {
     console.log(err);
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+
+    res.serverError();
   }
 };
 
