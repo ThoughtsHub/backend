@@ -3,7 +3,7 @@ import News from "../models/News.js";
 import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
 
-const getNews = async (req, res) => {
+const get = async (req, res) => {
   const { offset = 0 } = req.query;
 
   try {
@@ -22,7 +22,7 @@ const getNews = async (req, res) => {
   }
 };
 
-const createNews = async (req, res) => {
+const create = async (req, res) => {
   const [data] = getData(req.body, ["handle", "userId", "id"]);
 
   const reqParams = [data.title, data.content];
@@ -42,7 +42,7 @@ const createNews = async (req, res) => {
   }
 };
 
-const updateNews = async (req, res) => {
+const modify = async (req, res) => {
   const [data, newsHandle] = getData(req.body, ["handle", "userId", "id"]);
 
   try {
@@ -59,7 +59,7 @@ const updateNews = async (req, res) => {
   }
 };
 
-const removeNews = async (req, res) => {
+const remove = async (req, res) => {
   const { handle = null } = req.query;
 
   if (handle === null) return res.bad("No handle given");
@@ -78,11 +78,6 @@ const removeNews = async (req, res) => {
   }
 };
 
-const handler = {
-  get: getNews,
-  create: createNews,
-  del: removeNews,
-  update: updateNews,
-};
+const NewsHandler = { get, create, del: remove, modify };
 
-export default handler;
+export default NewsHandler;

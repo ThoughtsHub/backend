@@ -6,7 +6,7 @@ import attr from "../constants/db.js";
 
 const UPLOAD_LIMIT = attr.upload.limit; // upload limits
 
-const getUploadsHandler = async (req, res) => {
+const getUploads = async (req, res) => {
   const userId = req.user.id;
   const { offset = 0 } = req.query;
 
@@ -27,7 +27,7 @@ const getUploadsHandler = async (req, res) => {
   }
 };
 
-const uploadHandler = async (req, res) => {
+const upload = async (req, res) => {
   const userId = req.user.id;
   const filename = req.file?.filename ?? null;
   if (filename === null) throw new Error("Filename is null, file not saved");
@@ -64,7 +64,7 @@ const uploadHandler = async (req, res) => {
   }
 };
 
-const updateUploadHandler = async (req, res) => {
+const updateUpload = async (req, res) => {
   const userId = req.user.id;
   const { name = null, handle = null } = req.body;
 
@@ -87,7 +87,7 @@ const updateUploadHandler = async (req, res) => {
   }
 };
 
-const deleteHandler = async (req, res) => {
+const removeUpload = async (req, res) => {
   const userId = req.user.id;
   const { handle } = req.params;
 
@@ -113,11 +113,11 @@ const deleteHandler = async (req, res) => {
   }
 };
 
-const handler = {
-  upload: uploadHandler,
-  getUploads: getUploadsHandler,
-  patch: updateUploadHandler,
-  delete: deleteHandler,
+const UploadHandler = {
+  upload,
+  get: getUploads,
+  modify: updateUpload,
+  delete: removeUpload,
 };
 
-export default handler;
+export default UploadHandler;

@@ -49,9 +49,6 @@ const verifyOtp = async (req, res) => {
   }
 };
 
-const handler = {
-  send: sendOtp,
-  verify: verifyOtp,
-};
+const EmailHandler = { send: sendOtp, verify: verifyOtp };
 
-export default handler;
+export default EmailHandler;

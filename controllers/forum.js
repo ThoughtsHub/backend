@@ -2,7 +2,7 @@ import Forum from "../models/Forum.js";
 import Profile from "../models/Profile.js";
 import getData from "../utils/request.js";
 
-const getForums = async (req, res) => {
+const get = async (req, res) => {
   const { offset = 0 } = req.query;
 
   try {
@@ -27,7 +27,7 @@ const getForums = async (req, res) => {
   }
 };
 
-const createForum = async (req, res) => {
+const create = async (req, res) => {
   const profileId = req.user.profile.id;
 
   const [data] = getData(req.body, ["handle", "profileId", "id"]);
@@ -46,7 +46,7 @@ const createForum = async (req, res) => {
   }
 };
 
-const updateForum = async (req, res) => {
+const modify = async (req, res) => {
   const profileId = req.user.profile.id;
 
   const [data, handle] = getData(req.body, [
@@ -75,7 +75,7 @@ const updateForum = async (req, res) => {
   }
 };
 
-const removeForum = async (req, res) => {
+const remove = async (req, res) => {
   const profileId = req.user.profile.id;
 
   const { handle = null } = req.query;
@@ -96,11 +96,6 @@ const removeForum = async (req, res) => {
   }
 };
 
-const handler = {
-  get: getForums,
-  create: createForum,
-  modify: updateForum,
-  del: removeForum,
-};
+const ForumsHandler = { get, create, modify, del: remove };
 
-export default handler;
+export default ForumsHandler;

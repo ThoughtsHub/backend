@@ -1,5 +1,7 @@
 import { Router } from "express";
-import handler from "../controllers/email.js";
+import h from "../controllers/handlers.js";
+
+const handler = h.email; // email handler
 
 const router = Router();
 

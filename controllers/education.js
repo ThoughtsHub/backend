@@ -1,7 +1,7 @@
 import Education from "../models/Education.js";
 import getData from "../utils/request.js";
 
-const addEducation = async (req, res) => {
+const add = async (req, res) => {
   const profileId = req.user.profile.id;
 
   const [data] = getData(req.body, ["educationId", "profileId", "id"]);
@@ -20,7 +20,7 @@ const addEducation = async (req, res) => {
   }
 };
 
-const updateEducation = async (req, res) => {
+const modify = async (req, res) => {
   const profileId = req.user.profile.id;
 
   const [data, id] = getData(req.body, ["educationId", "profileId", "id"]);
@@ -43,7 +43,7 @@ const updateEducation = async (req, res) => {
   }
 };
 
-const removeEducation = async (req, res) => {
+const remove = async (req, res) => {
   const profileId = req.user.profile.id;
 
   const { id = null } = req.query;
@@ -64,10 +64,6 @@ const removeEducation = async (req, res) => {
   }
 };
 
-const handler = {
-  add: addEducation,
-  remove: removeEducation,
-  update: updateEducation,
-};
+const EducationHandler = { add, modify, del: remove };
 
-export default handler;
+export default EducationHandler;

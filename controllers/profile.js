@@ -13,7 +13,7 @@ const profileKeys = [
   "age",
 ];
 
-const getProfile = async (req, res) => {
+const get = async (req, res) => {
   const profileId = req.user.profile.id;
 
   try {
@@ -43,7 +43,7 @@ const getProfile = async (req, res) => {
   }
 };
 
-const updateProfile = async (req, res) => {
+const update = async (req, res) => {
   const profileId = req.user.profile.id;
 
   const [data] = getData(req.body, ["handle", "userId", "id", "profileId"]);
@@ -91,7 +91,7 @@ const updateProfileAttribute = async (req, res) => {
   }
 };
 
-const deleteProfileAttribute = async (req, res) => {
+const removeProfileAttribute = async (req, res) => {
   const profileId = req.user.profile.id;
   const { key } = req.params;
 
@@ -117,13 +117,13 @@ const deleteProfileAttribute = async (req, res) => {
   }
 };
 
-const handler = {
-  get: getProfile,
+const ProfileHandler = {
+  get,
   update: {
-    profile: updateProfile,
+    profile: update,
     attribute: updateProfileAttribute,
   },
-  delete: deleteProfileAttribute,
+  del: removeProfileAttribute,
 };
 
-export default handler;
+export default ProfileHandler;

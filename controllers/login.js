@@ -12,7 +12,7 @@ const COOKIE_OPTIONS = {
   secure: true,
 };
 
-const loginHandler = async (req, res) => {
+const login = async (req, res) => {
   const { username = null, password = null } = req.body;
 
   try {
@@ -48,7 +48,7 @@ const loginHandler = async (req, res) => {
   }
 };
 
-const signupHandler = async (req, res) => {
+const signup = async (req, res) => {
   const { username = null, password = null, email = null } = req.body;
 
   let transactionCommit = false;
@@ -122,9 +122,6 @@ const signupHandler = async (req, res) => {
   }
 };
 
-const handler = {
-  login: loginHandler,
-  signup: signupHandler,
-};
+const LoginHandler = { login, signup };
 
-export default handler;
+export default LoginHandler;

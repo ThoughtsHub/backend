@@ -1,5 +1,7 @@
 import { Router } from "express";
-import handler from "../controllers/forum.js";
+import h from "../controllers/handlers.js";
+
+const handler = h.forums; // forums handler
 
 const router = Router();
 

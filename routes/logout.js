@@ -1,5 +1,7 @@
 import { Router } from "express";
-import handler from "../controllers/logout.js";
+import h from "../controllers/handlers.js";
+
+const handler = h.logout; // logout handler
 
 const router = Router();
 
