@@ -2,10 +2,10 @@
 
 Process of creating a user:
 
-GET /email/verify (query=email) -> OTP on email
-POST /email/verify (body=otp) -> OK, DIFF
+GET /email/verify (query=email) -> OTP on email\
+POST /email/verify (body=otp,email) -> OK, DIFF
 
-POST /login/new (body=password,email,username,profile_information) -> OK, logs in
+POST /login/new (body=password,email,username) -> OK, logs in
 
 ## Routes
 
