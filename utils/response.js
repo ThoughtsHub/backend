@@ -8,6 +8,10 @@ response.failure = function (
   this.status(statusCode).json({ message });
 };
 
+response.bad = function (message = "", additionalData = {}) {
+  this.failure(c.BAD_REQUEST).json({ message, ...additionalData });
+};
+
 response.ok = function (message = "", additionalData = {}) {
   this.status(c.OK).json({ message, ...additionalData });
 };
