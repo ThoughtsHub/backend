@@ -27,8 +27,8 @@ status code: `200`
 
 ```sh
 {
-    message: "user logged in succesfully";
-    sessionId: string;
+    message: "user logged in succesfully",
+    sessionId: string
 }
 ```
 
@@ -67,8 +67,8 @@ status code: `200`
 
 ```sh
 {
-    message: "user logged in succesfully";
-    sessionId: string;
+    message: "user logged in succesfully",
+    sessionId: string
 }
 ```
 
