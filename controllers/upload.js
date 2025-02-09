@@ -1,5 +1,4 @@
 import _env from "../constants/env.js";
-import c from "../utils/status_codes.js";
 import Upload from "../models/Upload.js";
 import { db } from "../db/connect.js";
 import _file from "../utils/file.js";
@@ -9,12 +8,9 @@ const UPLOAD_LIMIT = attr.upload.limit; // upload limits
 
 const getUploadsHandler = async (req, res) => {
   const userId = req.user.id;
-  const { offset: rawOffset = 0 } = req.query;
+  const { offset = 0 } = req.query;
 
   try {
-    const offset =
-      typeof rawOffset === "string" ? parseInt(rawOffset) : rawOffset;
-
     const uploads = await Upload.findAll({
       where: { userId },
       offset,
@@ -23,13 +19,11 @@ const getUploadsHandler = async (req, res) => {
       attributes: { exclude: ["userId", "id"] },
     });
 
-    res.status(c.OK).json({ message: "Your uploads", uploads });
+    res.ok("Your uploads", { uploads });
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -61,17 +55,12 @@ const uploadHandler = async (req, res) => {
 
     await t.commit();
 
-    res.status(c.CREATED).json({
-      message: "File uploaded",
-      file: fileDetails,
-    });
+    res.created("File uploaded", { file: fileDetails });
   } catch (err) {
     await t.rollback();
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -79,30 +68,22 @@ const updateUploadHandler = async (req, res) => {
   const userId = req.user.id;
   const { name = null, handle = null } = req.body;
 
-  if (name === null || handle === null)
-    return res
-      .status(c.BAD_REQUEST)
-      .json({ message: "Required parameters not given" });
+  if (name === null || handle === null) return res.noParams();
 
   try {
     const isFileUsers = await Upload.findOne({ handle, userId });
-    if (isFileUsers === null)
-      return res
-        .status(c.FORBIDDEN)
-        .json({ message: "You don't own this file" });
+    if (isFileUsers === null) return res.forbidden("You don't own this file");
 
     const updateResult = await Upload.update(
       { name },
       { where: { userId, handle }, individualHooks: true }
     );
 
-    res.status(c.OK).json({ message: "Updated" });
+    res.ok("Updated");
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -115,10 +96,7 @@ const deleteHandler = async (req, res) => {
   const t = await db.transaction();
   try {
     const isFileUsers = await Upload.findOne({ handle: file.name, userId });
-    if (isFileUsers === null)
-      return res
-        .status(c.FORBIDDEN)
-        .json({ message: "You don't own this file" });
+    if (isFileUsers === null) return res.forbidden("You don't own this file");
 
     const destoryResult = await Upload.destroy({
       where: { handle: file.name, userId },
@@ -126,14 +104,12 @@ const deleteHandler = async (req, res) => {
       individualHooks: true,
     });
 
-    res.sendStatus(c.NO_CONTENT);
+    res.deleted();
   } catch (err) {
     await t.rollback();
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
