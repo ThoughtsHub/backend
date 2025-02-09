@@ -16,6 +16,8 @@ const getUserDataByUsername = async (username) => {
       },
     ],
   });
+  
+  if (user === undefined) throw new Error("Invalid username");
 
   let userData = { ...user.dataValues };
 

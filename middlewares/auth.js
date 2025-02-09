@@ -81,12 +81,14 @@ const verifyConnection = async (req, res, next) => {
     try {
       const userData = await verifyTokens(tokens); // verify jwt tokens
 
-      if (userData.blocked === true)
+      const _userData = await _user.getUserDataByUsername(userData.username); // new user data, only when in production
+
+      if (_userData.blocked === true)
         return res
           .status(c.FORBIDDEN)
           .json({ message: "User is blocked by admin" });
 
-      req.user = userData; // set user data
+      req.user = _userData; // set user data
       req.sessionId = sessionId; // set session id for logout
     } catch (err) {
       console.log(err);
