@@ -1,7 +1,7 @@
 import Profile from "../models/Profile.js";
-import c from "../utils/status_codes.js";
 import Education from "../models/Education.js";
 import Skill from "../models/Skill.js";
+import getData from "../utils/request.js";
 
 const profileKeys = [
   "firstName",
@@ -35,59 +35,34 @@ const getProfile = async (req, res) => {
       ...profile.get({ plain: true }),
     };
 
-    res.status(c.OK).json({ message: "Your Profile", profile: _profile });
+    res.ok("Your Profile", { profile: _profile });
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
 const updateProfile = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const {
-    pfp = null,
-    firstName = null,
-    middleName = null,
-    lastName = null,
-    about = null,
-    displayName = null,
-    age = null,
-  } = req.body;
+  const [data] = getData(req.body, ["handle", "userId", "id", "profileId"]);
 
-  const updateData = Object.fromEntries(
-    Object.entries({
-      pfp,
-      firstName,
-      lastName,
-      middleName,
-      displayName,
-      about,
-      age,
-    }).filter(([_, value]) => value != null)
-  );
-
-  if (typeof updateData.firstName === "string")
-    return res
-      .status(c.BAD_REQUEST)
-      .json({ message: "First name cannot be empty" });
+  if (typeof data.firstName === "string")
+    return res.bad("First name cannot be empty");
 
   try {
-    const updateResult = await Profile.update(updateData, {
+    const updateResult = await Profile.update(data, {
       where: { id: profileId },
       individualHooks: true,
+      validate: true,
     });
 
-    res.status(c.OK).json({ message: "Profile updated" });
+    res.ok("Profile Updated");
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -96,10 +71,7 @@ const updateProfileAttribute = async (req, res) => {
 
   const { key, value } = req.params;
 
-  if (!profileKeys.includes(key))
-    return res
-      .status(c.BAD_REQUEST)
-      .json({ message: "Bad key update request" });
+  if (!profileKeys.includes(key)) return res.bad("Bad key update request");
 
   const updateData = {};
   updateData[key] = value;
@@ -108,17 +80,14 @@ const updateProfileAttribute = async (req, res) => {
     const updateResult = await Profile.update(updateData, {
       where: { id: profileId },
       individualHooks: true,
+      validate: true,
     });
 
-    console.log(updateResult);
-
-    res.status(c.OK).json({ message: "Attribute updated" });
+    res.ok("Attribute updated");
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
@@ -126,15 +95,9 @@ const deleteProfileAttribute = async (req, res) => {
   const profileId = req.user.profile.id;
   const { key } = req.params;
 
-  if (!profileKeys.includes(key))
-    return res
-      .status(c.BAD_REQUEST)
-      .json({ message: "Bad key delete request" });
+  if (!profileKeys.includes(key)) return res.bad("Bad key delete request");
 
-  if (key === "firstName")
-    return res
-      .status(c.BAD_REQUEST)
-      .json({ message: "First Name cannot be deleted" });
+  if (key === "firstName") return res.bad("First Name cannot be deleted");
 
   const updateData = {}; // set updateData
   updateData[key] = null; // key is string, cannot use dot operator, or else
@@ -146,13 +109,11 @@ const deleteProfileAttribute = async (req, res) => {
       individualHooks: true,
     });
 
-    res.status(c.OK).json({ message: "Attribute set to null" });
+    res.ok("Attribute set to null");
   } catch (err) {
     console.log(err);
 
-    res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+    res.serverError();
   }
 };
 
