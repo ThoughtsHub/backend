@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Profile from "../models/Profile.js";
 import Upload from "../models/Upload.js";
 import Email from "../models/Email.js";
+import handle from "../utils/handle.js";
 
 const userAssociations = () => {
   // user will have a email
@@ -29,8 +30,9 @@ const userAssociations = () => {
 
   // create a user profile on user creation
   User.afterCreate(async (payload, options) => {
+    const _handle = handle.create(payload.username);
     await Profile.create(
-      { firstName: payload.username, userId: payload.id },
+      { firstName: payload.username, handle: _handle, userId: payload.id },
       { transaction: options.transaction }
     );
   });

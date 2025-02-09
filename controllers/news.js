@@ -3,6 +3,15 @@ import News from "../models/News.js";
 import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
 
+const allowedFields = [
+  "title",
+  "content",
+  "images",
+  "tags",
+  "category",
+  "handle",
+];
+
 const get = async (req, res) => {
   const { offset = 0 } = req.query;
 
@@ -23,7 +32,7 @@ const get = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const [data] = getData(req.body, ["handle", "userId", "id"]);
+  const [data] = getData(req.body, ["handle"]);
 
   const reqParams = [data.title, data.content];
   if (reqParams.includes(undefined) || reqParams.includes(null))
@@ -32,7 +41,10 @@ const create = async (req, res) => {
   try {
     const newsHandle = handle.create(data.title);
 
-    await News.create({ ...data, handle: newsHandle }, { validate: true });
+    await News.create(
+      { ...data, handle: newsHandle },
+      { validate: true, fields: allowedFields }
+    );
 
     res.created("News created");
   } catch (err) {
@@ -43,12 +55,12 @@ const create = async (req, res) => {
 };
 
 const modify = async (req, res) => {
-  const [data, newsHandle] = getData(req.body, ["handle", "userId", "id"]);
+  const [data, newsHandle] = getData(req.body, ["handle"]);
 
   try {
     await News.update(
       { ...data },
-      { where: { handle: newsHandle }, validate: true }
+      { where: { handle: newsHandle }, validate: true, fields: allowedFields }
     );
 
     res.ok("News updated");
@@ -69,6 +81,8 @@ const remove = async (req, res) => {
       where: { handle },
       individualHooks: true,
     });
+
+    if (destroyResult !== 1) return res.bad("No news like that to delete");
 
     res.deleted();
   } catch (err) {

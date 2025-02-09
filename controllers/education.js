@@ -1,15 +1,30 @@
 import Education from "../models/Education.js";
 import getData from "../utils/request.js";
 
+const allowedFields = [
+  "school",
+  "degree",
+  "fieldOfStudy",
+  "startMonth",
+  "startYear",
+  "endMonth",
+  "endYear",
+  "grade",
+  "gradeType",
+  "activitesAndSocieties",
+  "description",
+  "images",
+];
+
 const add = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data] = getData(req.body, ["educationId", "profileId", "id"]);
+  const [data] = getData(req.body);
 
   try {
     const education = await Education.create(
       { ...data, profileId },
-      { validate: true }
+      { validate: true, fields: allowedFields }
     );
 
     res.created("Education added", { educationId: education.id });
@@ -23,14 +38,19 @@ const add = async (req, res) => {
 const modify = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data, id] = getData(req.body, ["educationId", "profileId", "id"]);
+  const [data, id] = getData(req.body, ["educationId"]);
 
   if (id === null) return res.bad("No education Id");
 
   try {
     const [updateResult] = await Education.update(
       { ...data },
-      { where: { profileId, id }, transaction: t, validate: true }
+      {
+        where: { profileId, id },
+        transaction: t,
+        validate: true,
+        fields: allowedFields,
+      }
     );
 
     if (updateResult !== 1) return res.bad("You have no education like that");

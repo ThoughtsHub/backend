@@ -13,7 +13,7 @@ await _connect.sql();
 initAssociation(); // link all the tables
 
 // Create admin if not exist
-await admin();
+setTimeout(admin, 4000);
 
 server.listen(port, _env.app.HOST, () => {
   console.log(`Application started on http://${_env.app.HOST}:${port}`);

@@ -30,6 +30,11 @@ const Profile = db.define("Profile", {
       return unzippedBuffer.toString();
     },
   },
+  handle: {
+    type: dt.STRING,
+    allowNull: false,
+    unique: true,
+  },
   likes: {
     type: dt.INTEGER,
     allowNull: false,

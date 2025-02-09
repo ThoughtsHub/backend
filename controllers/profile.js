@@ -3,7 +3,7 @@ import Education from "../models/Education.js";
 import Skill from "../models/Skill.js";
 import getData from "../utils/request.js";
 
-const profileKeys = [
+const allowedFields = [
   "firstName",
   "middleName",
   "lastName",
@@ -11,19 +11,6 @@ const profileKeys = [
   "displayName",
   "about",
   "age",
-];
-
-const notAccessed = [
-  "likes",
-  "followers",
-  "following",
-  "groups",
-  "news",
-  "articles",
-  "posts",
-  "forums",
-  "booksIssued",
-  "wallet",
 ];
 
 const get = async (req, res) => {
@@ -59,13 +46,7 @@ const get = async (req, res) => {
 const update = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data] = getData(req.body, [
-    "handle",
-    "userId",
-    "id",
-    "profileId",
-    ...notAccessed,
-  ]);
+  const [data] = getData(req.body);
 
   if (typeof data.firstName === "string")
     return res.bad("First name cannot be empty");
@@ -75,6 +56,7 @@ const update = async (req, res) => {
       where: { id: profileId },
       individualHooks: true,
       validate: true,
+      fields: allowedFields,
     });
 
     res.ok("Profile Updated");
@@ -89,8 +71,6 @@ const removeProfileAttribute = async (req, res) => {
   const profileId = req.user.profile.id;
   const { key } = req.params;
 
-  if (!profileKeys.includes(key)) return res.bad("Bad key delete request");
-
   if (key === "firstName") return res.bad("First Name cannot be deleted");
 
   const updateData = {}; // set updateData
@@ -101,6 +81,7 @@ const removeProfileAttribute = async (req, res) => {
     const updateResult = await Profile.update(updateData, {
       where: { id: profileId },
       individualHooks: true,
+      fields: allowedFields,
     });
 
     res.ok("Attribute set to null");

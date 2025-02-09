@@ -1,6 +1,10 @@
+import Comment from "../models/Comment.js";
 import Forum from "../models/Forum.js";
 import Profile from "../models/Profile.js";
+import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
+
+const allowedFields = ["title", "description", "images", "handle"];
 
 const get = async (req, res) => {
   const { offset = 0 } = req.query;
@@ -13,7 +17,31 @@ const get = async (req, res) => {
       include: [
         {
           model: Profile,
-          attributes: ["pfp", "displayName", "firstName", "lastName", "about"],
+          attributes: [
+            "pfp",
+            "displayName",
+            "firstName",
+            "lastName",
+            "about",
+            "handle",
+          ],
+        },
+        {
+          model: Comment,
+          attributes: { exclude: ["forumId"] },
+          include: [
+            {
+              model: Profile,
+              attributes: [
+                "pfp",
+                "displayName",
+                "firstName",
+                "lastName",
+                "about",
+                "handle",
+              ],
+            },
+          ],
         },
       ],
       order: [["updatedAt", "desc"]],
@@ -30,12 +58,15 @@ const get = async (req, res) => {
 const create = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data] = getData(req.body, ["handle", "profileId", "id"]);
+  const [data] = getData(req.body, ["handle"]);
 
   try {
+    if (data.title === null) return res.bad("Forum Title cannot be null");
+    const forumHandle = handle.create(data.title ?? req.user.username);
+
     const forum = await Forum.create(
-      { ...data, profileId },
-      { validate: true }
+      { ...data, profileId, handle: forumHandle },
+      { validate: true, fields: allowedFields }
     );
 
     res.created("Forum Created", { forumId: forum.id });
@@ -49,12 +80,7 @@ const create = async (req, res) => {
 const modify = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data, handle] = getData(req.body, [
-    "handle",
-    "forumId",
-    "profileId",
-    "id",
-  ]);
+  const [data, handle] = getData(req.body, ["handle"]);
 
   if (handle === null) return res.noParams();
 
@@ -63,6 +89,7 @@ const modify = async (req, res) => {
       where: { handle, profileId },
       individualHooks: true,
       validate: true,
+      fields: allowedFields,
     });
 
     if (updateResult !== 1) return res.bad("You don't own this forum");
@@ -87,6 +114,8 @@ const remove = async (req, res) => {
       where: { handle, profileId },
       individualHooks: true,
     });
+
+    if (destroyResult !== 1) return res.bad("You don't own this forum");
 
     res.deleted();
   } catch (err) {
