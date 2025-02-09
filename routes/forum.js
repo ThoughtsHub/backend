@@ -15,4 +15,4 @@ router.put("/", handler.modify);
 
 router.delete("/", handler.del);
 
-export const LoginRouter = router;
+export const ForumsRouter = router;
