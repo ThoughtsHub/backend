@@ -2,6 +2,7 @@ import Profile from "../models/Profile.js";
 import Education from "../models/Education.js";
 import Skill from "../models/Skill.js";
 import getData from "../utils/request.js";
+import User from "../models/User.js";
 
 const allowedFields = [
   "firstName",
@@ -36,6 +37,43 @@ const get = async (req, res) => {
     };
 
     res.ok("Your Profile", { profile: _profile });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
+const getByUsername = async (req, res) => {
+  const { username = null } = req.params;
+
+  if (username === null) return res.noParams();
+
+  try {
+    const user = await User.findOne({ where: { username } });
+
+    if (user === null) return res.bad("Invalid username");
+
+    const profile = await Profile.findOne({
+      where: { userId: user.id },
+      attributes: { exclude: ["userId", "id"] },
+      include: [
+        {
+          model: Education,
+          as: "education",
+          attributes: { exclude: ["profileId"] },
+          include: Skill,
+        },
+      ],
+    });
+
+    // a profile should have a username
+    const _profile = {
+      username: req.user.username,
+      ...profile.get({ plain: true }),
+    };
+
+    res.ok("Profile information", { profile: _profile });
   } catch (err) {
     console.log(err);
 
@@ -94,6 +132,7 @@ const removeProfileAttribute = async (req, res) => {
 
 const ProfileHandler = {
   get,
+  getByUsername,
   update,
   del: removeProfileAttribute,
 };
