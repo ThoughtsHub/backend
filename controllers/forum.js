@@ -55,6 +55,57 @@ const get = async (req, res) => {
   }
 };
 
+const getByHandle = async (req, res) => {
+  const { handle = null } = req.params;
+
+  if (handle === null) return res.noParams();
+
+  try {
+    const forum = await Forum.findOne({
+      where: { handle },
+      attributes: { exclude: ["id", "profileId"] },
+      include: [
+        {
+          model: Profile,
+          attributes: [
+            "pfp",
+            "displayName",
+            "firstName",
+            "lastName",
+            "about",
+            "handle",
+          ],
+        },
+        {
+          model: Comment,
+          attributes: { exclude: ["forumId"] },
+          include: [
+            {
+              model: Profile,
+              attributes: [
+                "pfp",
+                "displayName",
+                "firstName",
+                "lastName",
+                "about",
+                "handle",
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (forum === null) return res.bad("Invalid handle");
+
+    res.ok("Forum found", { forum });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
 const create = async (req, res) => {
   const profileId = req.user.profile.id;
 
@@ -125,6 +176,6 @@ const remove = async (req, res) => {
   }
 };
 
-const ForumsHandler = { get, create, modify, del: remove };
+const ForumsHandler = { get, getByHandle, create, modify, del: remove };
 
 export default ForumsHandler;

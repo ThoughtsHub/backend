@@ -7,6 +7,8 @@ const router = Router();
 
 router.get("/", handler.get);
 
+router.get("/:handle", handler.getByHandle);
+
 router.post("/", handler.create);
 
 router.patch("/", handler.modify);
