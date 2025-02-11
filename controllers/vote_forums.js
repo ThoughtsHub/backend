@@ -56,7 +56,7 @@ const unvote = async (req, res) => {
     }
 
     const destroyResult = await Vote.destroy({
-      where: { profileId, forumId: forum.id },
+      where: { id: hasVoted.id },
       individualHooks: true,
     });
 
