@@ -22,7 +22,7 @@ const upvote = async (req, res) => {
     else
       vote = await Vote.update(
         { type: UPVOTE },
-        { where: { profileId, forumId: forum.id } }
+        { where: { id: hasVoted.id } }
       );
 
     await t.commit();
