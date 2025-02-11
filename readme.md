@@ -32,7 +32,7 @@ status code: `200`
 }
 ```
 
-#### Reasons for unsuccesful login:
+**Reasons for unsuccesful login:**
 
 - username/password not given
 - password wrong
@@ -72,7 +72,7 @@ status code: `200`
 }
 ```
 
-#### Reasons for unsuccesful signup
+**Reasons for unsuccesful signup**
 
 - username/password/email not given
 - username not available
@@ -115,7 +115,7 @@ status code: `200`
 }
 ```
 
-#### Reasons for not getting OTP:
+**Reasons for not getting OTP:**
 
 - No email given in query
 - couldn't generate otp (server error)
@@ -152,7 +152,7 @@ status code: `200`
 }
 ```
 
-#### Reasons for not getting OTP:
+**Reasons for not getting OTP:**
 
 - No email given
 - email already verified
