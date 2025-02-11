@@ -481,7 +481,7 @@ status code: `200`
 
 **same as PATCH /news**
 
-# DELETE /news
+### DELETE /news
 
 deletes the specified news, with `handle`
 
