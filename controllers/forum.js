@@ -1,6 +1,7 @@
 import Comment from "../models/Comment.js";
 import Forum from "../models/Forum.js";
 import Profile from "../models/Profile.js";
+import User from "../models/User.js";
 import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
 import CommentHandler from "./comment_forums.js";
@@ -67,6 +68,28 @@ const getUsers = async (req, res) => {
   const { offset = 0 } = req.query;
 
   await getForums({ profileId }, offset, res);
+};
+
+const getByUsername = async (req, res) => {
+  const { offset = 0 } = req.query;
+
+  const { username = null } = req.params;
+
+  if (username === null) return res.noParams();
+
+  try {
+    const user = await User.findOne({ where: { username } });
+    if (user === null) return res.bad("Invalid username");
+
+    const profile = await Profile.findOne({ where: { userId: user.id } });
+    if (profile === null) return res.bad("Invalid username");
+
+    await getForums({ profileId: profile.id }, offset, res);
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
 };
 
 const getByHandle = async (req, res) => {
@@ -195,6 +218,7 @@ const remove = async (req, res) => {
 const ForumsHandler = {
   get,
   getUsers,
+  getByUsername,
   getByHandle,
   create,
   modify,

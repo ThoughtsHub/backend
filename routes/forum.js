@@ -29,6 +29,8 @@ router.post("/comment", handler.comment);
 
 router.delete("/comment", handler.uncomment);
 
-router.get("/:handle", handler.getByHandle);
+router.get("/h/:handle", handler.getByHandle);
+
+router.get("/u/:username", handler.getByUsername);
 
 export const ForumsRouter = router;
