@@ -16,6 +16,8 @@ const createEmailOtpKey = async (email, otp) => {
 const verifyEmailOtpKey = async (email, otp) => {
   try {
     const setOtp = await client.get(`otp:${email}`);
+    if (setOtp === null) return false;
+
     await client.del(`otp:${email}`);
 
     return otp === setOtp;
