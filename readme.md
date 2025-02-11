@@ -392,3 +392,106 @@ _No body_
   - status code: `400`
 - if key not from above given list
   - status code: `400`
+
+### GET /news
+
+gets all the news from the **latest** to **oldest**
+
+**Query :**
+
+```sh
+{
+    offset: integer | 0
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "News",
+    news: [{
+            title: string,
+            content: string,
+            images: [string] | null,
+            tags: [string] | null,
+            category: [string] | null,
+            handle: string,
+            createdAt: Date,
+            updatedAt: Date
+        }]
+}
+```
+
+**next 4 endpoints requires to be `admin`**
+
+### POST /news
+
+creates a new news
+
+**Body :**
+
+```sh
+{
+    title: string,
+    content: string,
+    images: [string],   [optional]
+    tags: [string],     [optional]
+    category: [string], [optional]
+}
+```
+
+**Response (success) :**\
+status code: `201`
+
+```sh
+{
+    message: "News created"
+}
+```
+
+### PATCH /news
+
+modifies the specified news with the content
+
+**Body :**
+
+```sh
+{
+    handle: string,
+    title: string,      [optional]
+    content: string,    [optional]
+    images: [string],   [optional]
+    tags: [string],     [optional]
+    category: [string], [optional]
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "News updated"
+}
+```
+
+### PUT /news
+
+**same as PATCH /news**
+
+# DELETE /news
+
+deletes the specified news, with `handle`
+
+**Query :**
+
+```sh
+{
+    handle: string
+}
+```
+
+**Response (success) :**\
+status code: `204`
