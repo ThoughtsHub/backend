@@ -3,6 +3,7 @@ import Forum from "../models/Forum.js";
 import Profile from "../models/Profile.js";
 import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
+import VoteHandler from "./vote_forums.js";
 
 const allowedFields = ["title", "description", "images", "handle"];
 
@@ -176,6 +177,13 @@ const remove = async (req, res) => {
   }
 };
 
-const ForumsHandler = { get, getByHandle, create, modify, del: remove };
+const ForumsHandler = {
+  get,
+  getByHandle,
+  create,
+  modify,
+  del: remove,
+  ...VoteHandler,
+};
 
 export default ForumsHandler;

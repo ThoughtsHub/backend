@@ -7,8 +7,6 @@ const router = Router();
 
 router.get("/", handler.get);
 
-router.get("/:handle", handler.getByHandle);
-
 router.post("/", handler.create);
 
 router.patch("/", handler.modify);
@@ -16,5 +14,12 @@ router.patch("/", handler.modify);
 router.put("/", handler.modify);
 
 router.delete("/", handler.del);
+
+// voting
+router.get("/upvote", handler.upvote);
+
+router.delete("/upvote", handler.unvote);
+
+router.get("/:handle", handler.getByHandle);
 
 export const ForumsRouter = router;

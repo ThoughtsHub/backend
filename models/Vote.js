@@ -2,8 +2,8 @@ import { DataTypes as dt } from "sequelize";
 import attr from "../constants/db.js";
 import { db } from "../db/connect.js";
 
-const UPVOTE = "upvote";
-const DOWNVOTE = "downvote";
+export const UPVOTE = "upvote";
+export const DOWNVOTE = "downvote";
 
 const Vote = db.define(
   "Vote",
