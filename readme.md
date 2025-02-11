@@ -32,12 +32,6 @@ status code: `200`
 }
 ```
 
-**Reasons for unsuccesful login:**
-
-- username/password not given
-- password wrong
-- user blocked by admin
-
 **Response (unsuccesful login) :**
 
 - username/password not given
@@ -71,14 +65,6 @@ status code: `200`
     sessionId: string
 }
 ```
-
-**Reasons for unsuccesful signup**
-
-- username/password/email not given
-- username not available
-- email is not verified
-- email is already used by another user
-- password doesn't adhere rules
 
 **Response (unsuccesful login) :**
 
@@ -115,12 +101,6 @@ status code: `200`
 }
 ```
 
-**Reasons for not getting OTP:**
-
-- No email given in query
-- couldn't generate otp (server error)
-- another error (server error)
-
 **Response (If unsuccessful) :**
 
 - No email given in query
@@ -151,13 +131,6 @@ status code: `200`
     email: string
 }
 ```
-
-**Reasons for not getting OTP:**
-
-- No email given
-- email already verified
-- invalid otp
-- another error (server error)
 
 **Response (If unsuccessful) :**
 
