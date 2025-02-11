@@ -1,4 +1,3 @@
-import e from "express";
 import { db } from "../db/connect.js";
 import Forum from "../models/Forum.js";
 import Vote, { UPVOTE } from "../models/Vote.js";
