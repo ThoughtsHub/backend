@@ -6,13 +6,12 @@ import getData from "../utils/request.js";
 import CommentHandler from "./comment_forums.js";
 import VoteHandler from "./vote_forums.js";
 
-const allowedFields = ["title", "description", "images", "handle"];
+const allowedFields = ["title", "description", "images", "handle", "profileId"];
 
-const get = async (req, res) => {
-  const { offset = 0 } = req.query;
-
+const getForums = async (where = {}, offset, res) => {
   try {
     const forums = await Forum.findAll({
+      where,
       attributes: { exclude: ["id", "profileId"] },
       offset,
       limit: 45,
@@ -55,6 +54,19 @@ const get = async (req, res) => {
 
     res.serverError();
   }
+};
+
+const get = async (req, res) => {
+  const { offset = 0 } = req.query;
+
+  await getForums({}, offset, res);
+};
+
+const getUsers = async (req, res) => {
+  const profileId = req.user.profile.id;
+  const { offset = 0 } = req.query;
+
+  await getForums({ profileId }, offset, res);
 };
 
 const getByHandle = async (req, res) => {
@@ -113,7 +125,7 @@ const getByHandle = async (req, res) => {
 const create = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data] = getData(req.body, ["handle"]);
+  const [data] = getData(req.body, ["handle", "profileId"]);
 
   try {
     if (data.title === null) return res.bad("Forum Title cannot be null");
@@ -124,7 +136,7 @@ const create = async (req, res) => {
       { validate: true, fields: allowedFields }
     );
 
-    res.created("Forum Created", { forumId: forum.id });
+    res.created("Forum Created", { forumHandle: forum.handle });
   } catch (err) {
     console.log(err);
 
@@ -135,7 +147,7 @@ const create = async (req, res) => {
 const modify = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const [data, handle] = getData(req.body, ["handle"]);
+  const [data, handle] = getData(req.body, ["handle", "profileId"]);
 
   if (handle === null) return res.noParams();
 
@@ -182,6 +194,7 @@ const remove = async (req, res) => {
 
 const ForumsHandler = {
   get,
+  getUsers,
   getByHandle,
   create,
   modify,

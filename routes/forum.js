@@ -7,6 +7,8 @@ const router = Router();
 
 router.get("/", handler.get);
 
+router.get("/me", handler.getUsers); // get user's forums
+
 router.post("/", handler.create);
 
 router.patch("/", handler.modify);
