@@ -265,3 +265,130 @@ _No body_
 
 - `file` does not belong to `user`
   - status code: `403`
+
+### GET /profile
+
+gets the profile of the **logged in** user
+
+**Response (success) :**
+status code: `200`
+
+```sh
+{
+    username: string,
+    pfp: string,
+    firstName: string,
+    middleName: string,
+    lastName: string,
+    displayName: string,
+    age: integer,
+    about: string,
+    handle: string,
+    likes: integer,
+    followers: integer,
+    following: integer,
+    groups: integer,
+    news: integer,
+    articles: integer,
+    posts: integer,
+    forums: integer,
+    booksIssued: integer,
+    wallet: integer,
+    education: []
+}
+```
+
+### GET /profile/:username
+
+gets the profile of the specified `username`
+
+**Params :**
+
+```sh
+{
+    username: string
+}
+```
+
+**Response (success) :**
+status code: `200`
+
+```sh
+{
+    username: string,
+    pfp: string,
+    firstName: string,
+    middleName: string,
+    lastName: string,
+    displayName: string,
+    age: integer,
+    about: string,
+    handle: string,
+    likes: integer,
+    followers: integer,
+    following: integer,
+    groups: integer,
+    news: integer,
+    articles: integer,
+    posts: integer,
+    forums: integer,
+    booksIssued: integer,
+    wallet: integer,
+    education: []
+}
+```
+
+**Response (!success) :**
+
+- invalid username
+  - status code: `400`
+
+### PATCH /profile
+
+updates the content of profile with given parameters
+
+**Body :**
+
+```sh
+{
+    firstName: string,
+    middleName: string,
+    lastName: string,
+    pfp: string,
+    displayName: string,
+    about: string,
+    age: integer
+}
+```
+
+**Response (success) :**
+status code: `200`
+
+```sh
+{
+    message: "Profile Updated"
+}
+```
+
+All error result in status code of `500`
+
+### PUT /profile
+
+**Same as PATCH /profile**
+
+### DELETE /profile/:key
+
+empties the key (set to `null`) for the given key
+
+key can be `firstName`, `lastName`, `middleName`, `displayName`
+
+**Response (success) :**
+status code: `204`
+_No body_
+
+**Response (!success) :**
+
+- if key is `firstName`, `pfp`, `age`, `about`
+  - status code: `400`
+- if key not from above given list
+  - status code: `400`

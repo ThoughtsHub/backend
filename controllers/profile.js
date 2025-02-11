@@ -86,9 +86,6 @@ const update = async (req, res) => {
 
   const [data] = getData(req.body);
 
-  if (typeof data.firstName === "string")
-    return res.bad("First name cannot be empty");
-
   try {
     const updateResult = await Profile.update(data, {
       where: { id: profileId },
@@ -109,7 +106,10 @@ const removeProfileAttribute = async (req, res) => {
   const profileId = req.user.profile.id;
   const { key } = req.params;
 
-  if (key === "firstName") return res.bad("First Name cannot be deleted");
+  if (["firstName", "age", "about", "pfp"].includes(key))
+    return res.bad("First Name cannot be deleted");
+
+  if (!allowedFields.includes(key)) return res.bad("setting unallowed key");
 
   const updateData = {}; // set updateData
   updateData[key] = null; // key is string, cannot use dot operator, or else
