@@ -495,3 +495,401 @@ deletes the specified news, with `handle`
 
 **Response (success) :**\
 status code: `204`
+
+### GET /forums
+
+gets the forums in order from **latest** to **oldest**
+
+**Query :**
+
+```sh
+{
+    offset: integer | 0
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Forums",
+    forums: [{
+        title: string
+        description: string
+        images: string
+        votes: integer
+        upvotes: integer
+        comments: integer
+        handle: string
+        createdAt: string
+        updatedAt: string
+        Profile: ({
+                about: string
+                pfp: string
+                displayName: string
+                firstName: string
+                lastName: string
+                handle: string
+                }),
+        Comments: ({
+                body: string
+                handle: string
+                createdAt: string
+                updatedAt: string
+                Profile: ({
+                        about: string
+                        pfp: string
+                        displayName: string
+                        firstName: string
+                        lastName: string
+                        handle: string
+                        })
+                })
+    }]
+}
+```
+
+### GET /forums/me
+
+gets the forums in order from **latest** to **oldest** of the current logged in `user`
+
+**Query :**
+
+```sh
+{
+    offset: integer | 0
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Forums",
+    forums: [{
+        title: string
+        description: string
+        images: string
+        votes: integer
+        upvotes: integer
+        comments: integer
+        handle: string
+        createdAt: string
+        updatedAt: string
+        Profile: ({
+                about: string
+                pfp: string
+                displayName: string
+                firstName: string
+                lastName: string
+                handle: string
+                }),
+        Comments: ({
+                body: string
+                handle: string
+                createdAt: string
+                updatedAt: string
+                Profile: ({
+                        about: string
+                        pfp: string
+                        displayName: string
+                        firstName: string
+                        lastName: string
+                        handle: string
+                        })
+                })
+    }]
+}
+```
+
+### GET /forums/u/:username
+
+gets the forums in order from **latest** to **oldest** of the specified `user`
+
+**Params :**
+
+```sh
+{
+    offset: integer | 0,
+    username: string
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Forums",
+    forums: [{
+        title: string
+        description: string
+        images: string
+        votes: integer
+        upvotes: integer
+        comments: integer
+        handle: string
+        createdAt: string
+        updatedAt: string
+        Profile: ({
+                about: string
+                pfp: string
+                displayName: string
+                firstName: string
+                lastName: string
+                handle: string
+                }),
+        Comments: ({
+                body: string
+                handle: string
+                createdAt: string
+                updatedAt: string
+                Profile: ({
+                        about: string
+                        pfp: string
+                        displayName: string
+                        firstName: string
+                        lastName: string
+                        handle: string
+                        })
+                })
+    }]
+}
+```
+
+### GET /forums/h/:handle
+
+gets the specified forum
+
+**Params :**
+
+```sh
+{
+    offset: integer | 0,
+    handle: string
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Forum found",
+    forums: ({
+        title: string
+        description: string
+        images: string
+        votes: integer
+        upvotes: integer
+        comments: integer
+        handle: string
+        createdAt: string
+        updatedAt: string
+        Profile: ({
+                about: string
+                pfp: string
+                displayName: string
+                firstName: string
+                lastName: string
+                handle: string
+                }),
+        Comments: ({
+                body: string
+                handle: string
+                createdAt: string
+                updatedAt: string
+                Profile: ({
+                        about: string
+                        pfp: string
+                        displayName: string
+                        firstName: string
+                        lastName: string
+                        handle: string
+                        })
+                })
+    })
+}
+```
+
+### POST /forums
+
+create a new forum
+
+**Body :**
+
+```sh
+{
+    title: string,
+    description: string,
+    images: [string] | null,
+}
+```
+
+**Response (success) :**\
+status code: `201`
+
+```sh
+{
+    message: "Forum Created",
+    forumHandle: string
+}
+```
+
+### PATCH /forums
+
+modifies the forum
+
+**Body :**
+
+```sh
+{
+    title: string,
+    description: string,
+    images: [string] | null,
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Forum updated",
+}
+```
+
+### PUT /forums
+
+**same as PATCH /fprums**
+
+### DELETE /forums
+
+deletes the specified forum
+
+**Query :**
+
+```sh
+{
+    handle: string
+}
+```
+
+**Response (success) :**\
+status code: `204`\
+_No body_
+
+### GET /forums/upvote
+
+upvotes a forum
+
+**Query :**
+
+```sh
+{
+    handle: string
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Upvoted"
+}
+```
+
+### DELETE /forums/upvote
+
+unvotes a forum
+
+**Query :**
+
+```sh
+{
+    handle: string
+}
+```
+
+**Response (success) :**\
+status code: `204`\
+_No body_
+
+### GET /forums/comment
+
+gets the comments of a forum
+
+**Query :**
+
+```sh
+{
+    offset: integer | 0,
+    forumHandle: string
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Comments",
+    comments: [{
+            body: string
+            handle: string
+            createdAt: string
+            updatedAt: string
+            Profile: ({
+                    about: string
+                    pfp: string
+                    displayName: string
+                    firstName: string
+                    lastName: string
+                    handle: string
+                })
+    }]
+}
+```
+
+### POST /forums/comment
+
+creates a new comment on a forum
+
+**Body :**
+
+```sh
+{
+    forumHandle: string,
+    body: string
+}
+```
+
+**Response (success) :**\
+status code: `200`
+
+```sh
+{
+    message: "Commented",
+    commentHandle: string
+}
+```
+
+### DELETE /forums/comment
+
+deletes a specified comment
+
+**Query :**
+
+```sh
+{
+    commentHandle: string,
+    forumHandle: string
+}
+```
+
+**Response (success) :**\
+status code: `204`\
+_No body_
