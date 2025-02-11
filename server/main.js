@@ -29,6 +29,7 @@ app.get("/test", (req, res) => {
   res.json(req.user);
 });
 
+app.use("/book", r.books); // books
 app.use("/forums", r.forums); // forums
 app.use("/news", r.news); // news
 app.use("/profile", r.profile); // profile

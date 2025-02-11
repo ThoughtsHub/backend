@@ -1,5 +1,6 @@
 // import all your routes here than put them in _routes
 
+import { BookRouter } from "./book.js";
 import { EmailRouter } from "./email.js";
 import { ForumsRouter } from "./forum.js";
 import { LoginRouter } from "./login.js";
@@ -16,6 +17,7 @@ const _routes = {
   email: EmailRouter,
   news: NewsRouter,
   forums: ForumsRouter,
+  books: BookRouter,
 };
 
 export default _routes;

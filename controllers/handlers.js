@@ -1,3 +1,4 @@
+import BookHandler from "./book.js";
 import EducationHandler from "./education.js";
 import EmailHandler from "./email.js";
 import ForumsHandler from "./forum.js";
@@ -16,6 +17,7 @@ const handlers = {
   forums: ForumsHandler,
   email: EmailHandler,
   education: EducationHandler,
+  book: BookHandler
 };
 
 export default handlers;

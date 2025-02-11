@@ -65,6 +65,11 @@ const Book = db.define("Book", {
     defaultValue: 0,
   },
   content: dt.STRING,
+  handle: {
+    type: dt.STRING,
+    allowNull: false,
+    unique: true,
+  },
 });
 
 export default Book;
