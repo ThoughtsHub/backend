@@ -7,6 +7,8 @@ POST /email/verify (body=otp,email) -> OK, DIFF
 
 POST /login/new (body=password,email,username) -> OK, logs in
 
+Any error outside specified will have status code of `500`
+
 ## Routes
 
 ### POST /login
@@ -107,8 +109,6 @@ status code: `200`
   - status code: `400`
 - couldn't generate otp (server error)
   - status code: `500`
-- another error (server error)
-  - status code: `500`
 
 ### POST /email/verify
 
@@ -140,5 +140,3 @@ status code: `200`
   - status code: `200`
 - invalid otp
   - status code: `401`
-- another error (server error)
-  - status code: `500`
