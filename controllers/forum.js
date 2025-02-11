@@ -3,6 +3,7 @@ import Forum from "../models/Forum.js";
 import Profile from "../models/Profile.js";
 import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
+import CommentHandler from "./comment_forums.js";
 import VoteHandler from "./vote_forums.js";
 
 const allowedFields = ["title", "description", "images", "handle"];
@@ -80,6 +81,8 @@ const getByHandle = async (req, res) => {
         {
           model: Comment,
           attributes: { exclude: ["forumId"] },
+          limit: 1,
+          order: [["createdAt", "desc"]],
           include: [
             {
               model: Profile,
@@ -184,6 +187,7 @@ const ForumsHandler = {
   modify,
   del: remove,
   ...VoteHandler,
+  ...CommentHandler,
 };
 
 export default ForumsHandler;

@@ -20,6 +20,13 @@ router.get("/upvote", handler.upvote);
 
 router.delete("/upvote", handler.unvote);
 
+// commenting
+router.get("/comment", handler.getComments);
+
+router.post("/comment", handler.comment);
+
+router.delete("/comment", handler.uncomment);
+
 router.get("/:handle", handler.getByHandle);
 
 export const ForumsRouter = router;
