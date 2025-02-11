@@ -140,3 +140,128 @@ status code: `200`
   - status code: `200`
 - invalid otp
   - status code: `401`
+
+### GET /logout
+
+Logs the user out
+
+**Not expecting anything from user**
+
+**Response (success):**
+status code: `204`
+
+### POST /uploads
+
+Upload an `Image`, `File`, `Document` anything on this in a form field with **name** `file`
+
+**Body :**
+
+```sh
+{
+    name: string,
+    file: Full file here
+}
+```
+
+**Response (success) :**
+status code: `201`
+
+```sh
+{
+    message: "File uploaded",
+    file: Object({
+        handle: string,
+        url: string
+    })
+}
+```
+
+**Response (!success) :**
+
+- any error
+  - status code: `500`
+
+### GET /uploads
+
+gives all the uploads the user has ever done
+
+**Query :**
+
+```sh
+{
+    offset: integer | 0
+}
+```
+
+**Response (success) :**
+status code: `200`
+
+```sh
+{
+    message: "Your uploads",
+    uploads: [{
+            url: string,
+            filename: string,
+            name: string,
+            ext: string, # extension
+            handle: string,
+            createdAt: Date,
+            updatedAt: Date
+        }]
+}
+```
+
+### GET /uploads/:filename
+
+gives you the file if you put filename after /uploads
+or status code: `404`
+
+### PATCH /uploads
+
+modify the name of the file, filename would not be change by this, just the `name` field of the file
+
+**Body :**
+
+```sh
+{
+    name: string,
+    handle: string
+}
+```
+
+**Response (success) :**
+status code: `200`
+
+```sh
+{
+    message: "Updated"
+}
+```
+
+**Response (!success) :**
+
+- `name` or `handle` is not given
+  - status code: `400`
+- `file` does not belong to `user`
+  - status code: `403`
+
+### DELETE /uploads/:handle
+
+deletes the uploaded file with the specified `handle`
+
+**Params :**
+
+```sh
+{
+    handle: string
+}
+```
+
+**Response (success) :**
+status code: `204`
+_No body_
+
+**Response (!success) :**
+
+- `file` does not belong to `user`
+  - status code: `403`
