@@ -147,7 +147,7 @@ Logs the user out
 
 **Not expecting anything from user**
 
-**Response (success):**
+**Response (success):**\
 status code: `204`
 
 ### POST /uploads
@@ -163,16 +163,16 @@ Upload an `Image`, `File`, `Document` anything on this in a form field with **na
 }
 ```
 
-**Response (success) :**
+**Response (success) :**\
 status code: `201`
 
 ```sh
 {
     message: "File uploaded",
-    file: Object({
-        handle: string,
-        url: string
-    })
+    file: {
+            handle: string,
+            url: string,
+          }
 }
 ```
 
@@ -193,7 +193,7 @@ gives all the uploads the user has ever done
 }
 ```
 
-**Response (success) :**
+**Response (success) :**\
 status code: `200`
 
 ```sh
@@ -229,7 +229,7 @@ modify the name of the file, filename would not be change by this, just the `nam
 }
 ```
 
-**Response (success) :**
+**Response (success) :**\
 status code: `200`
 
 ```sh
@@ -257,8 +257,8 @@ deletes the uploaded file with the specified `handle`
 }
 ```
 
-**Response (success) :**
-status code: `204`
+**Response (success) :**\
+status code: `204`\
 _No body_
 
 **Response (!success) :**
@@ -270,7 +270,7 @@ _No body_
 
 gets the profile of the **logged in** user
 
-**Response (success) :**
+**Response (success) :**\
 status code: `200`
 
 ```sh
@@ -310,7 +310,7 @@ gets the profile of the specified `username`
 }
 ```
 
-**Response (success) :**
+**Response (success) :**\
 status code: `200`
 
 ```sh
@@ -361,7 +361,7 @@ updates the content of profile with given parameters
 }
 ```
 
-**Response (success) :**
+**Response (success) :**\
 status code: `200`
 
 ```sh
@@ -382,8 +382,8 @@ empties the key (set to `null`) for the given key
 
 key can be `firstName`, `lastName`, `middleName`, `displayName`
 
-**Response (success) :**
-status code: `204`
+**Response (success) :**\
+status code: `204`\
 _No body_
 
 **Response (!success) :**
