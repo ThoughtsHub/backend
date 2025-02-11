@@ -1,4 +1,6 @@
 import Book from "../models/Book.js";
+import Profile from "../models/Profile.js";
+import { SavedListBooks } from "../models/SavedList.js";
 import handle from "../utils/handle.js";
 import getData from "../utils/request.js";
 
@@ -123,6 +125,82 @@ const remove = async (req, res) => {
   }
 };
 
-const BookHandler = { get, getByHandle, create, modify, del: remove };
+const getSavedBoooks = async (req, res) => {
+  const profileId = req.user.profile.id;
+
+  try {
+    const profile = await Profile.findByPk(profileId);
+
+    const savedBooks = await profile.getBooks({
+      attributes: { exclude: ["id"] },
+    });
+
+    res.ok("Books", { books: savedBooks });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
+const save = async (req, res) => {
+  const profileId = req.user.profile.id;
+
+  const { handle = null } = req.body;
+
+  if (handle === null) res.noParams();
+
+  try {
+    const book = await Book.findOne({ where: { handle } });
+    if (book === null) return res.bad("Invalid handle");
+
+    const savedResult = await SavedListBooks.create({
+      profileId,
+      bookId: book.id,
+    });
+
+    res.ok("Saved");
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
+const unsave = async (req, res) => {
+  const profileId = req.user.profile.id;
+
+  const { handle = null } = req.query;
+  if (handle === null) return res.noParams();
+
+  try {
+    const book = await Book.findOne({ where: { handle } });
+    if (book === null) return res.bad("Invalid handle");
+
+    const destroyResult = await SavedListBooks.destroy({
+      where: { profileId, bookId: book.id },
+      individualHooks: true,
+    });
+
+    if (destroyResult !== 1) return res.bad("Never saved this book");
+
+    res.deleted();
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
+const BookHandler = {
+  get,
+  getByHandle,
+  create,
+  modify,
+  del: remove,
+  getSavedBoooks,
+  save,
+  unsave,
+};
 
 export default BookHandler;

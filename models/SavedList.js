@@ -18,4 +18,10 @@ export const SavedListNews = db.define("SavedListNews", {});
 
 export const SavedListJobs = db.define("SavedListJobs", {});
 
+export const SavedListBooks = db.define(
+  "SavedListBooks",
+  {},
+  { indexes: [{ type: "UNIQUE", fields: ["profileId", "bookId"] }] }
+);
+
 // export default SavedList;

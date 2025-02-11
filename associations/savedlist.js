@@ -1,7 +1,12 @@
+import Book from "../models/Book.js";
 import PrivateJob from "../models/Job.js";
 import News from "../models/News.js";
 import Profile from "../models/Profile.js";
-import { SavedListJobs, SavedListNews } from "../models/SavedList.js";
+import {
+  SavedListBooks,
+  SavedListJobs,
+  SavedListNews,
+} from "../models/SavedList.js";
 // import SavedList from "../models/SavedList.js";
 
 const savedListAssociations = () => {
@@ -29,6 +34,20 @@ const savedListAssociations = () => {
   PrivateJob.belongsToMany(Profile, {
     through: SavedListJobs,
     foreignKey: "jobId",
+    otherKey: "profileId",
+    onDelete: "SET NULL",
+  });
+
+  // books
+  Profile.belongsToMany(Book, {
+    through: SavedListBooks,
+    foreignKey: "profileId",
+    otherKey: "bookId",
+    onDelete: "SET NULL",
+  });
+  Book.belongsToMany(Profile, {
+    through: SavedListBooks,
+    foreignKey: "bookId",
     otherKey: "profileId",
     onDelete: "SET NULL",
   });
