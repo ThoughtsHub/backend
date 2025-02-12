@@ -10,6 +10,7 @@ const admin = async () => {
     await User.create({
       username: _env.admin.USERNAME,
       password: _env.admin.PASSWORD,
+      usernameSet: true,
       verified: true,
     });
 };
