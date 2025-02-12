@@ -29,8 +29,8 @@ app.get("/test", (req, res) => {
 });
 
 app.use("/school", auth.login, r.school); // education/s
-app.use("/book", r.books); // books
-app.use("/forums", r.forums); // forums
+app.use("/book", auth.login, r.books); // books
+app.use("/forums", auth.login, r.forums); // forums
 app.use("/news", r.news); // news
 app.use("/profile", r.profile); // profile
 app.use("/uploads", auth.login, r.uploads); // user uploads
