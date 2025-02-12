@@ -33,6 +33,7 @@ sessionId when found, Send it with each subsequent request
     success: bool
     message: "Logged in"
     sessionId: string
+    isUsernameSet: bool
 }
 ```
 
@@ -98,6 +99,27 @@ sessionId when found, Send it with each subsequent request
     success: bool
     message: "User created"
     sessionId: string
+}
+```
+
+## POST /set-username
+
+sessionId is necessary in order to set username
+
+**Body :**
+
+```sh
+{
+    username: string
+}
+```
+
+**Response :**
+
+```sh
+{
+    success: bool
+    message: "Username set"
 }
 ```
 
