@@ -5,6 +5,7 @@ import auth from "../middlewares/auth.js";
 import r from "../routes/router.js";
 import _env from "../constants/env.js";
 import "../utils/response.js";
+import handlers from "../controllers/handlers.js";
 
 const app = express();
 
@@ -12,9 +13,7 @@ app.use(express.json()); // body parser
 app.use(cookieParser()); // cookie parser
 app.use(helmet()); // many middleware functions
 
-// login should not be with verification
-app.use("/login", r.login);
-app.use("/email", r.email); // email verification
+app.use("/", r.login)
 
 app.use(auth.verify); // session verification middleware
 

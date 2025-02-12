@@ -9,16 +9,12 @@ const User = db.define("User", {
   username: {
     type: dt.STRING,
     unique: true,
-    allowNull: false,
-    set(value) {
-      this.setDataValue("username", value.trim());
-    },
   },
   password: {
     type: dt.STRING,
     allowNull: false,
     set(value) {
-      const updatedPassword = pass.secret + value + this.username; // join secret and username to password
+      const updatedPassword = pass.secret + value; // join secret and username to password
       this.setDataValue(
         "password",
         bcryptjs.hashSync(updatedPassword, pass.salt)
@@ -39,6 +35,14 @@ const User = db.define("User", {
     type: dt.INTEGER,
     allowNull: false,
     defaultValue: 0,
+  },
+  email: {
+    type: dt.STRING,
+    unique: true,
+  },
+  mobile: {
+    type: dt.STRING,
+    unique: true,
   },
 });
 

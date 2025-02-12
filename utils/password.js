@@ -6,8 +6,8 @@ const checkPassword = (password) => {
   return true;
 };
 
-const comparePassword = (username, password, hashedPassword) => {
-  const updatedPassword = pass.secret + password + username;
+const comparePassword = (password, hashedPassword) => {
+  const updatedPassword = pass.secret + password;
   const eq = bcryptjs.compareSync(updatedPassword, hashedPassword);
   return eq;
 };

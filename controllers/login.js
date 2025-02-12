@@ -5,23 +5,43 @@ import cookie from "../constants/cookies.js";
 import { db } from "../db/connect.js";
 import User from "../models/User.js";
 import Email from "../models/Email.js";
+import { or } from "sequelize";
 
-const COOKIE_OPTIONS = {
+export const COOKIE_OPTIONS = {
   sameSite: "strict",
   httpOnly: true,
   secure: true,
 };
 
 const login = async (req, res) => {
-  const { username = null, password = null } = req.body;
+  const {
+    username = null,
+    password = null,
+    email = null,
+    mobile = null,
+  } = req.body;
 
   try {
     // checks
+    let user;
     {
-      const user = await User.findOne({
-        where: { username },
-        attributes: ["blocked", "password", "verified"],
-      });
+      if (username === null) {
+        if (email === null) {
+          if (mobile === null) return res.noParams();
+          user = await User.findOne({
+            where: { mobile },
+            attributes: ["blocked", "password", "verified", "username"],
+          });
+        }
+        user = await User.findOne({
+          where: { email },
+          attributes: ["blocked", "password", "verified", "username"],
+        });
+      } else
+        user = await User.findOne({
+          where: { username },
+          attributes: ["blocked", "password", "verified", "username"],
+        });
 
       if (user === null) return res.bad("No user with that username");
 
@@ -30,11 +50,11 @@ const login = async (req, res) => {
       if (!user.verified)
         return res.unauth("Unverified user, please verify your email");
 
-      if (!_password.comparePassword(username, password, user.password))
+      if (!_password.comparePassword(password, user.password))
         return res.unauth("Wrong password");
     }
 
-    const userData = await _user.getUserDataByUsername(username);
+    const userData = await _user.getUserDataByUsername(user.username);
 
     const sessionId = await auth.setup(userData);
 

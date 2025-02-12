@@ -5,19 +5,19 @@ response.failure = function (
   statusCode,
   message = "Something unexpected happened"
 ) {
-  this.status(statusCode).json({ message });
+  this.status(statusCode).json({ message, success: false });
 };
 
 response.bad = function (message = "", additionalData = {}) {
-  this.status(c.BAD_REQUEST).json({ message, ...additionalData });
+  this.status(c.BAD_REQUEST).json({ message, success: false, ...additionalData });
 };
 
 response.ok = function (message = "", additionalData = {}) {
-  this.status(c.OK).json({ message, ...additionalData });
+  this.status(c.OK).json({ message, success: true, ...additionalData });
 };
 
 response.created = function (message = "", additionalData = {}) {
-  this.status(c.CREATED).json({ message, ...additionalData });
+  this.status(c.CREATED).json({ message, success: true, ...additionalData });
 };
 
 response.serverError = function (message = "Internal server error") {
@@ -37,7 +37,7 @@ response.noMethod = function () {
 };
 
 response.conflict = function (message = "", additionalData = {}) {
-  this.status(c.CONFLICT).json({ message, ...additionalData });
+  this.status(c.CONFLICT).json({ message, success: false, ...additionalData });
 };
 
 response.forbidden = function (message = "Access not available") {
@@ -49,5 +49,5 @@ response.unauth = function (message = "Unverified user") {
 };
 
 response.deleted = function () {
-  this.sendStatus(c.NO_CONTENT);
+  this.status(c.NO_CONTENT).json({message: "Success", success: false});
 };
