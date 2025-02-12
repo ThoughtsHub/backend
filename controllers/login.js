@@ -28,17 +28,35 @@ const login = async (req, res) => {
           if (mobile === null) return res.noParams();
           user = await User.findOne({
             where: { mobile },
-            attributes: ["blocked", "password", "verified", "username"],
+            attributes: [
+              "blocked",
+              "password",
+              "verified",
+              "username",
+              "usernameSet",
+            ],
           });
         }
         user = await User.findOne({
           where: { email },
-          attributes: ["blocked", "password", "verified", "username"],
+          attributes: [
+            "blocked",
+            "password",
+            "verified",
+            "username",
+            "usernameSet",
+          ],
         });
       } else
         user = await User.findOne({
           where: { username },
-          attributes: ["blocked", "password", "verified", "username"],
+          attributes: [
+            "blocked",
+            "password",
+            "verified",
+            "username",
+            "usernameSet",
+          ],
         });
 
       if (user === null) return res.bad("No user with that username");
@@ -58,7 +76,10 @@ const login = async (req, res) => {
 
     res.cookie(cookie.sessionId, sessionId, COOKIE_OPTIONS);
 
-    res.ok("User logged in successfully", { sessionId });
+    res.ok("User logged in successfully", {
+      sessionId,
+      isUsernameSet: user.usernameSet,
+    });
   } catch (err) {
     console.log(err);
 
@@ -103,6 +124,30 @@ const signup = async (req, res) => {
   }
 };
 
-const LoginHandler = { login, signup };
+const setUsername = async (req, res) => {
+  const userId = req.user.id;
+
+  const { username = null } = req.body;
+
+  if (username === null) return res.noParams();
+
+  try {
+    if ((await _user.isUsernameAvailable(username)) === false)
+      return res.conflict("Username not available");
+
+    const [updateResult] = await User.update(
+      { username, usernameSet: true },
+      { where: { id: userId }, individualHooks: true }
+    );
+
+    res.ok("Username set");
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
+const LoginHandler = { login, signup, setUsername };
 
 export default LoginHandler;

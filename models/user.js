@@ -44,6 +44,11 @@ const User = db.define("User", {
     type: dt.STRING,
     unique: true,
   },
+  usernameSet: {
+    type: dt.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
 });
 
 export default User;
