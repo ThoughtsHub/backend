@@ -97,7 +97,7 @@ const signup = async (req, res) => {
 
     res.cookie(cookie.sessionId, sessionId, COOKIE_OPTIONS);
 
-    res.ok("User logged in successfully", { sessionId });
+    res.created("User created", { sessionId });
   } catch (err) {
     console.log(err);
 

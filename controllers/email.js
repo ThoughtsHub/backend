@@ -18,7 +18,7 @@ const sendOtp = async (req, res) => {
       const confirmationId = handle.createConfirmationId();
       await client.setEx(`confirm:${confirmationId}`, 5 * 60, email); // set confirmation Id
 
-      res.ok("OTP sent", { confirmationId });
+      res.ok("OTP sent", { confirmationId, otpSent: true });
     } else res.serverError("Couldn't send the otp");
   } catch (err) {
     console.log(err);
@@ -43,7 +43,7 @@ const verifyOtp = async (req, res) => {
       const newConfirmationId = handle.createConfirmationId();
       client.setEx(`confirmPassword:${newConfirmationId}`, 5 * 60, email); // set new confirmation Id
 
-      res.ok("OTP verified", { email, confirmationId: newConfirmationId });
+      res.ok("OK", { email, confirmationId: newConfirmationId, confirmationCodeMatched: true });
     } else res.unauth("OTP invalid");
   } catch (err) {
     console.log(err);
