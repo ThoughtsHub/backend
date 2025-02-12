@@ -5,29 +5,29 @@ import { _months } from "../constants/other.js";
 
 const Education = db.define("Education", {
   id: attr.id,
-  school: {
+  schoolName: {
     type: dt.STRING,
     allowNull: false,
   }, // university or school name
-  degree: {
+  studyCourse: {
     type: dt.STRING,
     allowNull: false,
   }, // 12th, Btech, etc.
   fieldOfStudy: dt.STRING, // civil engg, pcm, etc.
   startMonth: {
     type: dt.STRING,
-    allowNull: false,
     values: _months,
   }, // start date necessary
+  startDate: dt.DATEONLY,
   startYear: {
     type: dt.INTEGER,
-    allowNull: false,
     validate: {
       min: 1950, // at least this old can still add
       // max will be done manually by checking if it is not
       // more than current year
     },
   }, // start date necessary
+  endDateExpected: dt.DATEONLY,
   endMonth: {
     type: dt.STRING,
     values: _months,

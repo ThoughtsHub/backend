@@ -13,7 +13,7 @@ app.use(express.json()); // body parser
 app.use(cookieParser()); // cookie parser
 app.use(helmet()); // many middleware functions
 
-app.use("/", r.login)
+app.use("/", r.login);
 
 app.use(auth.verify); // session verification middleware
 
@@ -28,6 +28,7 @@ app.get("/test", (req, res) => {
   res.json(req.user);
 });
 
+app.use("/school", r.school); // education/s
 app.use("/book", r.books); // books
 app.use("/forums", r.forums); // forums
 app.use("/news", r.news); // news

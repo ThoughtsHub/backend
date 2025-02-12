@@ -37,6 +37,19 @@ sessionId when found, Send it with each subsequent request
 }
 ```
 
+## GET /delete-user
+
+The user has to be logged In, i.e. sessionId should be given
+
+**Response :**
+
+```sh
+{
+    success: bool
+    message: "User deleted"
+}
+```
+
 ## POST /get-otp
 
 **Body :**

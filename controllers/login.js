@@ -101,7 +101,7 @@ const signup = async (req, res) => {
       return res.bad("password does not match criteria");
 
     const userAvailable = await User.findOne({ where: { email } });
-    if (userAvailable !== null) res.conflict("Email already used");
+    if (userAvailable !== null) return res.conflict("Email already used");
 
     const user = await User.create({
       username: email,
@@ -116,7 +116,7 @@ const signup = async (req, res) => {
 
     res.cookie(cookie.sessionId, sessionId, COOKIE_OPTIONS);
 
-    res.created("User created", { sessionId });
+    res.ok("User created", { sessionId });
   } catch (err) {
     console.log(err);
 
