@@ -10,6 +10,8 @@ router.get("/", handler.get);
 
 router.get("/:username", handler.getByUsername); // with username
 
+router.post("/", handler.update);
+
 router.patch("/", handler.update); // both requests are handle by same handler
 
 router.put("/", handler.update); // both requests are handle by same handler

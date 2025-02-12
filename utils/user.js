@@ -1,5 +1,4 @@
 import _env from "../constants/env.js";
-import Email from "../models/Email.js";
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 
@@ -9,14 +8,9 @@ const getUserDataByUsername = async (username) => {
     attributes: { exclude: ["password"] },
     include: [
       { model: Profile, as: "data", attributes: { exclude: ["userId"] } },
-      {
-        model: Email,
-        as: "userEmails",
-        attributes: ["email", "type", "verified"],
-      },
     ],
   });
-  
+
   if (user === undefined) throw new Error("Invalid username");
 
   let userData = { ...user.dataValues };

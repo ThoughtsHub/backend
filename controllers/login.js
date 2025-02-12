@@ -2,10 +2,8 @@ import _password from "../utils/password.js";
 import _user from "../utils/user.js";
 import auth from "../middlewares/auth.js";
 import cookie from "../constants/cookies.js";
-import { client, db } from "../db/connect.js";
+import { client } from "../db/connect.js";
 import User from "../models/User.js";
-import Email from "../models/Email.js";
-import { or } from "sequelize";
 
 export const COOKIE_OPTIONS = {
   sameSite: "strict",

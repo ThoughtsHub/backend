@@ -4,15 +4,7 @@ import Skill from "../models/Skill.js";
 import getData from "../utils/request.js";
 import User from "../models/User.js";
 
-const allowedFields = [
-  "firstName",
-  "middleName",
-  "lastName",
-  "pfp",
-  "displayName",
-  "about",
-  "age",
-];
+const allowedFields = ["fullName", "about", "gender", "dob"];
 
 const get = async (req, res) => {
   const profileId = req.user.profile.id;
@@ -86,6 +78,8 @@ const update = async (req, res) => {
 
   const [data] = getData(req.body);
 
+  if (data.dob !== null) data.dob = Date(data.dob);
+
   try {
     const updateResult = await Profile.update(data, {
       where: { id: profileId },
@@ -94,7 +88,7 @@ const update = async (req, res) => {
       fields: allowedFields,
     });
 
-    res.ok("Profile Updated");
+    res.ok("Profile created");
   } catch (err) {
     console.log(err);
 

@@ -6,6 +6,13 @@ import { gzipSync, gunzipSync } from "zlib";
 const Profile = db.define("Profile", {
   id: attr.id,
   pfp: dt.STRING, // profile picture
+  fullName: {
+    type: dt.STRING,
+  },
+  gender: {
+    type: dt.ENUM("Male", "Female", "Other"),
+  },
+  dob: dt.DATEONLY,
   firstName: {
     type: dt.STRING,
     allowNull: false,
