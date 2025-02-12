@@ -43,6 +43,7 @@ sessionId when found, Send it with each subsequent request
     success: bool
     message: "OTP sent"
     otpSent: bool
+    confirmationId: string
 }
 ```
 
@@ -53,6 +54,7 @@ sessionId when found, Send it with each subsequent request
 ```sh
 {
     otp: string
+    confirmationId: string
 }
 ```
 
@@ -63,7 +65,7 @@ sessionId when found, Send it with each subsequent request
     success: bool
     message: "OK"
     confirmationCodeMatched: bool
-    confirmationId: string
+    confirmationId: string  ( different than previous one )
 }
 ```
 
