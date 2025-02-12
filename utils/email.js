@@ -24,8 +24,8 @@ const sendOtpEmail = async (recipient, otp) => {
 };
 
 const generateOtp = (length = 8) => {
-  return uuidv4()
-    .replaceAll("-", "")
+  return (uuidv4()+uuidv4()+uuidv4())
+    .replaceAll(/[A-Za-z-]/g, "")
     .substring(0, length > 0 ? length : 6)
     .toUpperCase();
 };

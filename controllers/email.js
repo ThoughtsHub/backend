@@ -8,7 +8,7 @@ const sendOtp = async (req, res) => {
 
   if (email === null) return res.bad("No email");
 
-  const generatedOtp = otp.generate();
+  const generatedOtp = otp.generate(6); // otp length 6
 
   try {
     if (
@@ -43,7 +43,11 @@ const verifyOtp = async (req, res) => {
       const newConfirmationId = handle.createConfirmationId();
       client.setEx(`confirmPassword:${newConfirmationId}`, 5 * 60, email); // set new confirmation Id
 
-      res.ok("OK", { email, confirmationId: newConfirmationId, confirmationCodeMatched: true });
+      res.ok("OK", {
+        email,
+        confirmationId: newConfirmationId,
+        confirmationCodeMatched: true,
+      });
     } else res.unauth("OTP invalid");
   } catch (err) {
     console.log(err);
