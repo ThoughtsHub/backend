@@ -2,7 +2,7 @@ import _password from "../utils/password.js";
 import _user from "../utils/user.js";
 import auth from "../middlewares/auth.js";
 import cookie from "../constants/cookies.js";
-import { db } from "../db/connect.js";
+import { client, db } from "../db/connect.js";
 import User from "../models/User.js";
 import Email from "../models/Email.js";
 import { or } from "sequelize";
@@ -69,61 +69,29 @@ const login = async (req, res) => {
 };
 
 const signup = async (req, res) => {
-  const { username = null, password = null, email = null } = req.body;
+  const { password = null, confirmationId = null } = req.body;
 
-  let transactionCommit = false;
-  const t = await db.transaction();
+  if (password === null) return res.bad("No password");
+  if (confirmationId === null) return res.bad("Invalid confirmation Id");
+
   try {
-    // checks
-    {
-      if (username === null || password === null || email === null) {
-        await t.rollback();
-        return res.noParams();
-      }
+    const email = await client.get(`confirmPassword:${confirmationId}`);
+    if (email === null) return res.bad("Invalid confirmation Id");
 
-      if (!(await _user.isUsernameAvailable(username))) {
-        await t.rollback();
-        return res.conflict("Username already taken");
-      }
+    if (!_password.checkPassword(password))
+      return res.bad("password does not match criteria");
 
-      const _email = await Email.findOne({ where: { email } });
-      if (_email === null || _email?.verified === false) {
-        await t.rollback();
-        return res.unauth("Email is not verified");
-      }
-      if (_email?.userId !== null) {
-        await t.rollback();
-        return res.conflict("Email already exist");
-      }
+    const userAvailable = await User.findOne({ where: { email } });
+    if (userAvailable !== null) res.conflict("Email already used");
 
-      if (!_password.checkPassword(password)) {
-        await t.rollback();
-        return res.bad("Password doesn't adhere rules");
-      }
-    }
+    const user = await User.create({
+      username: email,
+      email,
+      password,
+      verified: true,
+    });
 
-    // creation and association
-    {
-      const user = await User.create(
-        { username, password },
-        { transaction: t }
-      ); // create user
-
-      await Email.update(
-        { userId: user.id },
-        { where: { email }, transaction: t }
-      ); // associate the email with user
-
-      await User.update(
-        { verified: true },
-        { where: { id: user.id }, transaction: t }
-      ); // update user is verified
-    }
-
-    await t.commit(); // save user data
-    transactionCommit = true; // transaction commited
-
-    const userData = await _user.getUserDataByUsername(username);
+    const userData = await _user.getUserDataByUsername(user.username);
 
     const sessionId = await auth.setup(userData);
 
@@ -131,14 +99,9 @@ const signup = async (req, res) => {
 
     res.ok("User logged in successfully", { sessionId });
   } catch (err) {
-    if (transactionCommit == false) await t.rollback();
     console.log(err);
 
-    res.serverError(
-      transactionCommit
-        ? "User created but not logged in, try /login"
-        : "Internal server error"
-    );
+    res.serverError();
   }
 };
 

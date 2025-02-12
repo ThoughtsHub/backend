@@ -19,8 +19,13 @@ const createHandle = (name, uniqVal = Date.now().toString()) => {
   return handle;
 };
 
+const createConfirmationId = () => {
+  return (uuidv4().toString() + Date.now().toString()).replaceAll("-", "");
+};
+
 const handle = {
   create: createHandle,
+  createConfirmationId,
 };
 
 export default handle;
