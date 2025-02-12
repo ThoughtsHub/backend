@@ -1,3 +1,14 @@
+# Process
+
+## Signup
+
+1. POST /get-otp with mobile or email
+2. You will get a response with a confirmationId
+3. POST /verify-otp with otp and the above confirmationId
+4. You will get a response with a new confirmationId
+5. POST /create-password with password and above confirmationId
+6. You will get a sessionId, you can discard the confirmationId now
+
 # Routes
 
 ## Important Information
