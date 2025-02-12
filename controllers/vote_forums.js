@@ -5,7 +5,7 @@ import Vote, { UPVOTE } from "../models/Vote.js";
 const upvote = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const { handle = null } = req.query;
+  const { handle = null } = req.body;
   if (handle === null) return res.noParams();
 
   const t = await db.transaction();

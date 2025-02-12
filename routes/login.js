@@ -27,11 +27,24 @@ router.get("/delete-user", auth.verify, async (req, res) => {
     await User.destroy({ where: { id: userId } });
     await client.del(req.sessionId); // remove from db
     res.clearCookie(cookie.sessionId); // remove cookies
-    
 
     res.ok("Deleted");
   } catch (err) {
     console.log(err);
+    res.serverError();
+  }
+});
+
+router.get("/delete/e/:email", async (req, res) => {
+  const { email = null } = req.params;
+
+  try {
+    await User.destroy({ where: { email } });
+
+    res.ok("user deleted");
+  } catch (err) {
+    console.log(err);
+
     res.serverError();
   }
 });

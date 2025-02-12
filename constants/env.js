@@ -12,6 +12,7 @@ const APP = {
 };
 
 const APP_URL = `http://${APP.HOST}:${APP.PORT}`;
+const BASE_URL = process.env.BASE_URL;
 
 // Authentication
 const JWT = {
@@ -63,6 +64,7 @@ const ADMIN = {
 };
 
 const _env = {
+  baseUrl: BASE_URL,
   app: { ...APP, URL: APP_URL },
   db: {
     nosql: NOSQL_DB,
@@ -72,7 +74,7 @@ const _env = {
     jwt: JWT,
   },
   nodemailer: NODEMAILER,
-  admin: ADMIN
+  admin: ADMIN,
 };
 
 export default _env;

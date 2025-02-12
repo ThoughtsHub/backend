@@ -34,7 +34,7 @@ const get = async (req, res) => {
     const _news = news.map((x) => {
       return {
         ...x.get({ plain: true }),
-        shareUrl: `${_env.app.URL}/news/${x.handle}`,
+        shareUrl: `${_env.baseUrl}/news/${x.handle}`,
       };
     });
 
@@ -64,7 +64,7 @@ const getByHandle = async (req, res) => {
 
     const _news = {
       ...news.get({ plain: true }),
-      shareUrl: `${_env.app.URL}/news/${news.handle}`,
+      shareUrl: `${_env.baseUrl}/news/${news.handle}`,
     };
 
     res.ok("News", { news: _news });

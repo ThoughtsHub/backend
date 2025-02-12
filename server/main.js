@@ -28,13 +28,13 @@ app.get("/test", (req, res) => {
   res.json(req.user);
 });
 
-app.use("/school", r.school); // education/s
+app.use("/school", auth.login, r.school); // education/s
 app.use("/book", r.books); // books
 app.use("/forums", r.forums); // forums
 app.use("/news", r.news); // news
 app.use("/profile", r.profile); // profile
-app.use("/uploads", r.uploads); // user uploads
-app.use("/logout", r.logout);
+app.use("/uploads", auth.login, r.uploads); // user uploads
+app.use("/logout", auth.login, r.logout);
 
 app.all("*", (_, res) => {
   res.sendStatus(404); // Not found

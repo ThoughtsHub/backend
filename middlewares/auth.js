@@ -68,13 +68,11 @@ const verifyConnection = async (req, res, next) => {
       req.headers?.authorization?.split(" ")[1] ??
       null; // get session Id
 
-    if (typeof sessionId !== "string")
-      return res.status(c.FORBIDDEN).json({ message: "Invalid session" });
+    if (typeof sessionId !== "string") return next();
 
     const tokensStringified = await client.get(sessionId);
 
-    if (tokensStringified === null)
-      return res.status(c.FORBIDDEN).json({ message: "No session" });
+    if (tokensStringified === null) return next();
 
     const tokens = JSON.parse(tokensStringified);
 
@@ -92,14 +90,9 @@ const verifyConnection = async (req, res, next) => {
       req.sessionId = sessionId; // set session id for logout
     } catch (err) {
       console.log(err);
-      return res.status(c.FORBIDDEN).json({ message: "Invalid session" });
     }
   } catch (err) {
     console.log(err);
-
-    return res
-      .status(c.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal Server Error" });
   }
 
   next();
@@ -113,11 +106,17 @@ const admin = (req, res, next) => {
   next();
 };
 
+const isLoggedIn = (req, res, next) => {
+  if (req.user === undefined) return res.unauth("You are not logged in");
+  next();
+};
+
 const auth = {
   setup: setupAuthentication,
   verify: verifyConnection,
   resetup: resetAuthentication,
   admin,
+  login: isLoggedIn,
 };
 
 export default auth;
