@@ -11,17 +11,17 @@ const News = db.define(
       type: dt.STRING,
       allowNull: false,
     },
-    content: {
+    description: {
       type: dt.TEXT,
       allowNull: false,
       set(value) {
         if (value !== null) {
           const gzippedBuffer = gzipSync(value);
-          this.setDataValue("content", gzippedBuffer.toString("base64"));
-        } else this.setDataValue("content", null);
+          this.setDataValue("description", gzippedBuffer.toString("base64"));
+        } else this.setDataValue("description", null);
       },
       get() {
-        const storedValue = this.getDataValue("content");
+        const storedValue = this.getDataValue("description");
         if (storedValue === null) return null;
         const gzippedBuffer = Buffer.from(storedValue, "base64");
         const unzippedBuffer = gunzipSync(gzippedBuffer);

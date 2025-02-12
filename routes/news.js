@@ -8,6 +8,8 @@ const router = Router();
 
 router.get("/", handler.get);
 
+router.get("/:handle", handler.getByHandle);
+
 router.post("/", auth.admin, handler.create);
 
 router.patch("/", auth.admin, handler.modify);

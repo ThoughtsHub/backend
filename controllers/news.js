@@ -5,7 +5,7 @@ import getData from "../utils/request.js";
 
 const allowedFields = [
   "title",
-  "content",
+  "description",
   "images",
   "tags",
   "category",
@@ -17,13 +17,57 @@ const get = async (req, res) => {
 
   try {
     const news = await News.findAll({
-      attributes: { exclude: ["id"] },
+      attributes: [
+        "title",
+        "description",
+        "images",
+        "handle",
+        "createdAt",
+        "updatedAt",
+      ],
       order: [["createdAt", "desc"]],
       offset,
       limit: 30,
     });
 
-    res.ok("News", { news });
+    // console.log(news);
+    const _news = news.map((x) => {
+      return {
+        ...x.get({ plain: true }),
+        shareUrl: `${_env.app.URL}/news/${x.handle}`,
+      };
+    });
+
+    res.ok("News", { news: _news, offsetNext: offset + news.length });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
+const getByHandle = async (req, res) => {
+  const { handle } = req.params;
+
+  try {
+    const news = await News.findOne({
+      where: { handle },
+      attributes: [
+        "title",
+        "description",
+        "images",
+        "handle",
+        "createdAt",
+        "updatedAt",
+      ],
+    });
+
+    const _news = {
+      ...news.get({ plain: true }),
+      shareUrl: `${_env.app.URL}/news/${news.handle}`,
+    };
+
+    res.ok("News", { news: _news });
   } catch (err) {
     console.log(err);
 
@@ -34,7 +78,7 @@ const get = async (req, res) => {
 const create = async (req, res) => {
   const [data] = getData(req.body, ["handle"]);
 
-  const reqParams = [data.title, data.content];
+  const reqParams = [data.title, data.description];
   if (reqParams.includes(undefined) || reqParams.includes(null))
     return res.noParams();
 
@@ -43,7 +87,7 @@ const create = async (req, res) => {
 
     await News.create(
       { ...data, handle: newsHandle },
-      { validate: true, fields: allowedFields }
+      { fields: allowedFields }
     );
 
     res.created("News created");
@@ -92,6 +136,6 @@ const remove = async (req, res) => {
   }
 };
 
-const NewsHandler = { get, create, del: remove, modify };
+const NewsHandler = { get, getByHandle, create, del: remove, modify };
 
 export default NewsHandler;
