@@ -61,7 +61,7 @@ const getByUsername = async (req, res) => {
 
     // a profile should have a username
     const _profile = {
-      username: req.user.username,
+      username,
       ...profile.get({ plain: true }),
     };
 

@@ -65,7 +65,7 @@ const verifyConnection = async (req, res, next) => {
   try {
     const sessionId =
       req.cookies?.[cookie.sessionId] ??
-      req.headers?.authorization?.split(" ")[1] ??
+      req.headers?.["auth_token"] ??
       null; // get session Id
 
     if (typeof sessionId !== "string") return next();

@@ -1,7 +1,7 @@
 {
-    "name": "express-setup",
+    "name": "startup",
     "version": "1.0.0",
-    "description": "express backend setup for projects with no sql and sql databases",
+    "description": "startup backend",
     "license": "ISC",
     "author": "masked-redhat",
     "type": "module",
@@ -28,6 +28,7 @@
         "redis": "latest",
         "sequelize": "latest",
         "socket.io": "latest",
+        "startup": "file:",
         "uuid": "latest"
     },
     "devDependencies": {
