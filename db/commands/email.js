@@ -3,7 +3,7 @@ import { client } from "../connect.js";
 const createEmailOtpKey = async (email, otp) => {
   try {
     await client.del(`otp:${email}`);
-    await client.set(`otp:${email}`, 5 * 60, otp);
+    await client.setEx(`otp:${email}`, 5 * 60, otp);
 
     return true;
   } catch (err) {
