@@ -1,0 +1,39 @@
+{
+    "name": "startup-backend",
+    "version": "1.0.0",
+    "description": "startup backend",
+    "license": "ISC",
+    "author": "masked-redhat",
+    "type": "module",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "npm i",
+        "dev": "nodemon --signal SIGTERM app.js",
+        "start": "node app.js",
+        "redis": "node ./scripts/start_redis.js",
+        "rdev": "npm run redis && npm run dev",
+        "rstart": "npm run redis && npm run start"
+    },
+    "dependencies": {
+        "bcryptjs": "latest",
+        "cookie-parser": "latest",
+        "express": "latest",
+        "express-setup": "file:",
+        "jsonwebtoken": "latest",
+        "mongoose": "latest",
+        "multer": "latest",
+        "nodemailer": "latest",
+        "pg": "latest",
+        "redis": "latest",
+        "sequelize": "latest",
+        "socket.io": "latest",
+        "startup-backend": "file:",
+        "uuid": "latest"
+    },
+    "devDependencies": {
+        "dotenv": "latest",
+        "helmet": "latest",
+        "nodemon": "latest"
+    }
+}
