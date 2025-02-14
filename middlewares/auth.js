@@ -1,14 +1,21 @@
-import cookie from "../constants/cookies.js";
 import { ADMIN } from "../constants/env.js";
 import jwtAuth from "../utils/auth.js";
 import { client } from "../db/clients.js";
 import { v4 as uuidv4 } from "uuid";
 import { c } from "../utils/status_codes.js";
-import _user from "../utils/user.js";
+import user from "../utils/user.js";
 
 const REFERSH_KEY = "userId";
 
-const setupAuthentication = async (userId) => {
+const COOKIE_OPTIONS = {
+  sameSite: "strict",
+  httpOnly: true,
+  secure: true,
+};
+
+const SID = "sessionId";
+
+const setupAuthentication = async (userId, res) => {
   // generate tokens
   const tokens = {
     access: jwtAuth.generate.access({ userId }),
@@ -21,36 +28,24 @@ const setupAuthentication = async (userId) => {
 
   await client.setEx(sessionId, 7 * 24 * 60 * 60, tokensStringified); // set expiry
 
+  res.cookie(SID, sessionId, COOKIE_OPTIONS);
+
   return sessionId;
-};
-
-const resetAuthentication = async (req, res) => {
-  const userData = await _user.getUserDataByUsername(req.user.username);
-
-  const sessionId = await setupAuthentication(userData);
-
-  await client.del(req.sessionId); // remove from db
-
-  // update the sessionId cookie
-  res.cookie(cookie.sessionId, sessionId, {
-    sameSite: "strict",
-    httpOnly: true,
-    secure: true,
-  });
 };
 
 const verifyTokens = async ({ access, refresh }) => {
   try {
     // check the access token first
     const data = jwtAuth.verify.access(access);
-    return data;
+    const userData = await user.getUserData(data[REFERSH_KEY]);
+    return userData;
   } catch {
     console.log("Access Token did not get verified");
   }
 
   try {
     const data = jwtAuth.verify.refresh(refresh);
-    const userData = await _user.getUserDataByUsername(data[REFERSH_KEY]);
+    const userData = await user.getUserData(data[REFERSH_KEY]);
     return userData;
   } catch {
     console.log("Refresh Token did not get verified");
@@ -62,27 +57,25 @@ const verifyTokens = async ({ access, refresh }) => {
 const verifyConnection = async (req, res, next) => {
   try {
     const sessionId =
-      req.cookies?.[cookie.sessionId] ?? req.headers?.["auth_token"] ?? null; // get session Id
+      req.cookies?.[SID] ?? req.headers?.["auth_token"] ?? null; // get session Id
 
-    if (typeof sessionId !== "string") return next();
+    if (typeof sessionId !== "string") return next(); // verification failed
 
     const tokensStringified = await client.get(sessionId);
 
-    if (tokensStringified === null) return next();
+    if (tokensStringified === null) return next(); // verification failed
 
     const tokens = JSON.parse(tokensStringified);
 
     try {
       const userData = await verifyTokens(tokens); // verify jwt tokens
 
-      const _userData = await _user.getUserDataByUsername(userData.username); // new user data, only when in production
-
-      if (_userData.blocked === true)
+      if (userData.blocked === true)
         return res
           .status(c.FORBIDDEN)
           .json({ message: "User is blocked by admin" });
 
-      req.user = _userData; // set user data
+      req.user = userData; // set user data
       req.sessionId = sessionId; // set session id for logout
     } catch (err) {
       console.log(err);
@@ -110,7 +103,6 @@ const isLoggedIn = (req, res, next) => {
 const auth = {
   setup: setupAuthentication,
   verify: verifyConnection,
-  resetup: resetAuthentication,
   admin,
   login: isLoggedIn,
 };

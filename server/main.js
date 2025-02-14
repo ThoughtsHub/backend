@@ -3,6 +3,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import env from "../constants/env.js";
 import { appRouter } from "../routes/router.js";
+import "../utils/response.js";
 
 const app = express();
 
