@@ -17,10 +17,7 @@ const User = db.define("User", {
     allowNull: false,
     set(value) {
       const updatedPassword = PASSWORD.SECRET + value; // join secret to password
-      this.setDataValue(
-        "password",
-        bcryptjs.hashSync(updatedPassword, pass.salt)
-      ); // hash password and save
+      this.setDataValue("password", bcryptjs.hashSync(updatedPassword, 10)); // hash password and save
     },
   },
 });

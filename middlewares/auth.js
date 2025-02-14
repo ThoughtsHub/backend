@@ -15,7 +15,7 @@ const COOKIE_OPTIONS = {
 
 const SID = "sessionId";
 
-const setupAuthentication = async (userId, res) => {
+const setupAuthentication = async (userId, res, keyVal) => {
   // generate tokens
   const tokens = {
     access: jwtAuth.generate.access({ userId }),
@@ -24,7 +24,7 @@ const setupAuthentication = async (userId, res) => {
 
   const tokensStringified = JSON.stringify(tokens);
 
-  const sessionId = `${keyVal}:${uuidv4()}`; // create a random session Id
+  const sessionId = `${keyVal ?? userId}-${uuidv4()}`; // create a random session Id
 
   await client.setEx(sessionId, 7 * 24 * 60 * 60, tokensStringified); // set expiry
 
@@ -56,8 +56,7 @@ const verifyTokens = async ({ access, refresh }) => {
 
 const verifyConnection = async (req, res, next) => {
   try {
-    const sessionId =
-      req.cookies?.[SID] ?? req.headers?.["auth_token"] ?? null; // get session Id
+    const sessionId = req.cookies?.[SID] ?? req.headers?.["auth_token"] ?? null; // get session Id
 
     if (typeof sessionId !== "string") return next(); // verification failed
 

@@ -3,6 +3,7 @@ import connectDb from "./db/connect.js";
 import closeDb from "./db/close.js";
 import initAssociation from "./associations/association.js";
 import server from "./server/socket.js";
+import createAdmin from "./scripts/admin.js";
 
 const port = APP.PORT;
 
@@ -10,6 +11,8 @@ const port = APP.PORT;
 connectDb.redis();
 connectDb.pg();
 initAssociation(); // link all the tables
+
+createAdmin();
 
 server.listen(port, APP.HOST, () => {
   console.log(`Application started on ${BASE_URL}`);

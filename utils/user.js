@@ -6,6 +6,8 @@ const getUserData = async (userId) => {
     include: [{ model: Profile }],
   });
 
+  if (data === null) throw new Error("Invalid user Id");
+
   const userData = data.get({ plain: true });
   userData.profile = userData.Profile;
   delete userData.Profile;
