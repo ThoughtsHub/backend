@@ -4,7 +4,9 @@ import auth from "../middlewares/auth.js";
 
 const app = Router();
 
-app.get("/test", auth.verify, auth.login, (req, res) => {
+app.use(auth.verify);
+
+app.get("/test", auth.login, (req, res) => {
   console.log(req.user);
   res.sendFile("index.html", { root: APP.PUBLIC });
 });
