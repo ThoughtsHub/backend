@@ -55,6 +55,16 @@ export const PASSWORD = {
   SECRET: process.env.PASSWORD_SECRET_SALT,
 };
 
+// Whatsapp
+export const WHATSAPP = {
+  APP_ID: process.env.W_APP_ID,
+  APP_SECRET: process.env.W_APP_SECRET,
+  RECIPIENT_WAID: process.env.W_RECIPIENT_WAID,
+  VERSION: process.env.W_VERSION,
+  PHONE_NUMBER_ID: process.env.W_PHONE_NUMBER_ID,
+  ACCESS_TOKEN: process.env.W_ACCESS_TOKEN,
+};
+
 const env = {
   app: { ...APP, localUrl: APP_URL, publicUrl: BASE_URL },
   cache: REDIS,
@@ -62,6 +72,7 @@ const env = {
   nodemailer: NODEMAILER,
   admin: ADMIN,
   pass: PASSWORD,
+  whatsapp: WHATSAPP,
 };
 
 export default env;

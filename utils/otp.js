@@ -13,8 +13,8 @@ const transportEmail = {
 /**
  * Sends an OTP with predefined values to the recipient mail
  * @param {string} recipient Recipient's E-Mail address
- * @param {string} otp 
- * @returns {Promise<void>}
+ * @param {string} otp
+ * @returns {Promise<boolean>}
  */
 const sendOtpEmail = async (recipient, otp) => {
   const mailOptions = {
@@ -38,13 +38,25 @@ const sendOtpEmail = async (recipient, otp) => {
 };
 
 /**
+ * Sends a otp on the recipient's mobile number or whatsapp
+ * @param {string} recipient
+ * @param {string} otp
+ * @returns {Promise<boolean>}
+ */
+const sendOtpMobile = async (recipient, otp) => {
+  // TODO: add logic to send otp on mobile or whatsapp
+
+  return false;
+};
+
+/**
  * Generates an OTP
  * @param {number | 8} length
- * @param {boolean | true} allDigits 
- * @returns {string} 
+ * @param {boolean | true} allDigits
+ * @returns {string}
  */
 const generateOtp = (length = 8, allDigits = true) => {
-  const uniqStr = (uuidv4() + Date.now().toString()).replace("-", "");
+  const uniqStr = (uuidv4() + Date.now().toString()).replaceAll("-", "");
   const otp = allDigits ? uniqStr.replace(/[A-Za-z]/g, "") : uniqStr;
 
   return otp.substring(0, length > 0 ? length : 6).toUpperCase();
@@ -52,7 +64,8 @@ const generateOtp = (length = 8, allDigits = true) => {
 
 const otp = {
   generate: generateOtp,
-  send: sendOtpEmail,
+  sendEmail: sendOtpEmail,
+  sendMobile: sendOtpMobile,
 };
 
 export default otp;

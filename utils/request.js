@@ -4,6 +4,12 @@ const allNull = (...values) => {
   return result;
 };
 
+const anyNull = (...values) => {
+  let result = false;
+  for (const value of values) result = result || value === null;
+  return result;
+};
+
 /**
  * Creates an array with first to be the body after excluding
  * specified exclude fields
@@ -42,6 +48,7 @@ const getData_ = (body = {}, fields = []) => {
 
 const _req = {
   allNull,
+  anyNull,
   getDataWEx: getData,
   getDataO: getData_,
 };
