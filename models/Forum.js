@@ -1,6 +1,6 @@
 import { DataTypes as dt } from "sequelize";
-import { ID, INTEGER, STR_REQ, UNIQ_STR_REQ } from "../../constants/db.js";
-import { db } from "../../db/clients.js";
+import { ID, INTEGER, STR_REQ, UNIQ_STR_REQ } from "../constants/db.js";
+import { db } from "../db/clients.js";
 
 const Forum = db.define("Forum", {
   id: ID,

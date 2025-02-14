@@ -1,6 +1,6 @@
 import Comment from "../models/Comment.js";
-import Forum from "../models/Forum/Forum.js";
-import Vote from "../models/Forum/Vote.js";
+import Forum from "../models/Forum.js";
+import Vote from "../models/Vote.js";
 
 const F_KEY = "forumId";
 
