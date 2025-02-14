@@ -1,5 +1,5 @@
 import { DataTypes as dt } from "sequelize";
-import { ID } from "../constants/db.js";
+import ATTR from "../constants/db.js";
 import { db } from "../db/clients.js";
 
 export const TYPE = {
@@ -10,7 +10,7 @@ export const TYPE = {
 const Vote = db.define(
   "Vote",
   {
-    id: ID,
+    id: ATTR.ID,
     vote: dt.ENUM(Object.values(TYPE)),
   },
   { tableName: "ForumVotes" }

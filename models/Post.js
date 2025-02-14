@@ -1,10 +1,10 @@
 import { DataTypes as dt } from "sequelize";
-import { ID, INTEGER, STR_REQ, UNIQ_STR_REQ } from "../constants/db.js";
+import ATTR from "../constants/db.js";
 import { db } from "../db/clients.js";
 
 const Post = db.define("Post", {
-  id: ID,
-  title: STR_REQ,
+  id: ATTR.ID,
+  title: ATTR.STR_REQ,
   body: dt.TEXT,
   images: dt.ARRAY(dt.STRING),
   caption: dt.STRING,
@@ -12,10 +12,10 @@ const Post = db.define("Post", {
   genres: dt.STRING,
   color: dt.STRING,
   alignment: dt.STRING,
-  handle: UNIQ_STR_REQ,
-  likes: INTEGER,
-  downvotes: INTEGER,
-  shares: INTEGER,
+  handle: ATTR.UNIQ_STR_REQ,
+  likes: ATTR.INTEGER,
+  downvotes: ATTR.INTEGER,
+  shares: ATTR.INTEGER,
 });
 
 export default Post;

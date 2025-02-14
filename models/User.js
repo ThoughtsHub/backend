@@ -1,17 +1,17 @@
 import { DataTypes as dt } from "sequelize";
-import { FALSE_BOOL, ID, UNIQUE_STR } from "../constants/db.js";
+import ATTR from "../constants/db.js";
 import { db } from "../db/clients.js";
 import bcryptjs from "bcryptjs";
 import { PASSWORD } from "../constants/env.js";
 
 const User = db.define("User", {
-  id: ID,
-  username: UNIQUE_STR,
-  blocked: FALSE_BOOL,
-  verified: FALSE_BOOL,
-  email: { ...UNIQUE_STR, validate: { isEmail: true } },
-  mobile: UNIQUE_STR,
-  usernameSet: FALSE_BOOL,
+  id: ATTR.ID,
+  username: ATTR.UNIQUE_STR,
+  blocked: ATTR.FALSE_BOOL,
+  verified: ATTR.FALSE_BOOL,
+  email: { ...ATTR.UNIQUE_STR, validate: { isEmail: true } },
+  mobile: ATTR.UNIQUE_STR,
+  usernameSet: ATTR.FALSE_BOOL,
   password: {
     type: dt.STRING,
     allowNull: false,

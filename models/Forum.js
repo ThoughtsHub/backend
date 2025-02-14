@@ -1,16 +1,16 @@
 import { DataTypes as dt } from "sequelize";
-import { ID, INTEGER, STR_REQ, UNIQ_STR_REQ } from "../constants/db.js";
+import ATTR from "../constants/db.js";
 import { db } from "../db/clients.js";
 
 const Forum = db.define("Forum", {
-  id: ID,
-  title: STR_REQ,
+  id: ATTR.ID,
+  title: ATTR.STR_REQ,
   description: dt.TEXT,
   images: dt.ARRAY(dt.STRING),
-  handle: UNIQ_STR_REQ,
-  upvotes: INTEGER,
-  downvotes: INTEGER,
-  comments: INTEGER,
+  handle: ATTR.UNIQ_STR_REQ,
+  upvotes: ATTR.INTEGER,
+  downvotes: ATTR.INTEGER,
+  comments: ATTR.INTEGER,
 });
 
 export default Forum;
