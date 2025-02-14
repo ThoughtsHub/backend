@@ -2,12 +2,14 @@ import { Router } from "express";
 import { APP } from "../constants/env.js";
 import auth from "../middlewares/auth.js";
 import { LoginRouter } from "./login.js";
+import { LogoutRouter } from "./logout.js";
 
 const app = Router();
 
 app.use(auth.verify);
 
 app.use("/login", LoginRouter);
+app.use("/logout", auth.login, LogoutRouter);
 
 app.get("/test", auth.login, (req, res) => {
   console.log(req.user);

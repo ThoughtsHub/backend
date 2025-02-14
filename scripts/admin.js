@@ -5,7 +5,11 @@ const createAdmin = () => {
   setTimeout(async () => {
     const adminFound = await User.findOne({ where: { username: "admin" } });
     if (adminFound === null)
-      await User.create({ username: ADMIN.USERNAME, password: ADMIN.PASSWORD });
+      await User.create({
+        username: ADMIN.USERNAME,
+        password: ADMIN.PASSWORD,
+        verified: true,
+      });
   }, 4000);
 };
 

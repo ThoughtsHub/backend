@@ -13,7 +13,7 @@ const COOKIE_OPTIONS = {
   secure: true,
 };
 
-const SID = "sessionId";
+export const SID = "sessionId";
 
 const setupAuthentication = async (userId, res, keyVal) => {
   // generate tokens
