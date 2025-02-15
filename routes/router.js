@@ -4,6 +4,7 @@ import auth from "../middlewares/auth.js";
 import { LoginRouter } from "./login.js";
 import { LogoutRouter } from "./logout.js";
 import { OtpRouter } from "./otp.js";
+import { ProfileRouter } from "./profile.js";
 
 const app = Router();
 
@@ -12,6 +13,7 @@ app.use(auth.verify);
 app.use("/login", LoginRouter);
 app.use("/logout", auth.login, LogoutRouter);
 app.use("/", OtpRouter);
+app.use("/profile", ProfileRouter);
 
 app.get("/test", auth.login, (req, res) => {
   console.log(req.user);
