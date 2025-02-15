@@ -19,7 +19,6 @@
         "bcryptjs": "latest",
         "cookie-parser": "latest",
         "express": "latest",
-        "express-setup": "file:",
         "jsonwebtoken": "latest",
         "mongoose": "latest",
         "multer": "latest",
