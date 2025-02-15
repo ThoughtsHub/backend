@@ -9,7 +9,6 @@ const transportEmail = {
     pass: NODEMAILER.PASSWORD,
   },
 };
-
 /**
  * Sends an OTP with predefined values to the recipient mail
  * @param {string} recipient Recipient's E-Mail address
@@ -21,7 +20,20 @@ const sendOtpEmail = async (recipient, otp) => {
     from: NODEMAILER.EMAIL,
     to: recipient,
     subject: "Verification OTP | CampusVibe",
-    text: "OTP : " + otp,
+    html: `
+    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
+      <h2 style="color: #4CAF50; text-align: center;">CampusVibe Verification</h2>
+      <p style="font-size: 16px;">Hello,</p>
+      <p style="font-size: 16px;">Your One-Time Password (OTP) for verification is:</p>
+      <div style="background: #f4f4f4; padding: 10px; text-align: center; border-radius: 5px; margin: 20px 0;">
+        <h1 style="color: #4CAF50; margin: 0;">${otp}</h1>
+      </div>
+      <p style="font-size: 16px;">Please use this OTP to complete your verification process. Do not share this OTP with anyone.</p>
+      <p style="font-size: 16px;">If you did not request this OTP, please ignore this email.</p>
+      <hr style="border: 1px solid #ddd;">
+      <p style="font-size: 14px; color: #777; text-align: center;">&copy; ${new Date().getFullYear()} CampusVibe. All rights reserved.</p>
+    </div>
+  `,
   };
 
   const transporter = nodemailer.createTransport(transportEmail);
@@ -44,7 +56,7 @@ const sendOtpEmail = async (recipient, otp) => {
  * @returns {Promise<boolean>}
  */
 const sendOtpMobile = async (recipient, otp) => {
-  // TODO: add logic to send otp on mobile or whatsapp
+  // TODO: Create login to send otp on mobile
 
   return false;
 };
