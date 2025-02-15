@@ -10,7 +10,7 @@ export const TYPE = {
 const Vote = db.define(
   "Vote",
   {
-    id: ATTR.ID,
+    id: { ...ATTR.ID },
     vote: dt.ENUM(Object.values(TYPE)),
   },
   { tableName: "ForumVotes" }

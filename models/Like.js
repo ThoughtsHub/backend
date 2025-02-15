@@ -3,7 +3,7 @@ import ATTR from "../constants/db.js";
 import { db } from "../db/clients.js";
 
 const Like = db.define("Like", {
-  id: ATTR.ID,
+  id: { ...ATTR.ID },
 });
 
 export default Like;
