@@ -1,4 +1,4 @@
-const isNull = (value) => value === null;
+const isNull = (value) => [undefined, null].includes(value);
 
 const checks = {
   isNull,

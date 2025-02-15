@@ -4,7 +4,7 @@ import checks from "../utils/checks.js";
 import _req from "../utils/request.js";
 import p from "../utils/password.js";
 
-const LOGIN_FIELDS = ["username", "email", "mobile", "password"];
+const LOGIN_FIELDS = ["email", "mobile", "password"];
 
 const getUser = async (req, res, next) => {
   const { username, email, mobile, password } = _req.getDataO(
@@ -12,7 +12,7 @@ const getUser = async (req, res, next) => {
     LOGIN_FIELDS
   );
 
-  if (_req.allNull(username, email, mobile)) return res.noParams();
+  if (_req.allNull(email, mobile)) return res.noParams();
   if (_req.allNull(password)) return res.noParams();
 
   try {

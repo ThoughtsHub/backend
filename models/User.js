@@ -11,7 +11,6 @@ const User = db.define("User", {
   verified: { ...ATTR.FALSE_BOOL },
   email: { ...ATTR.UNIQUE_STR, validate: { isEmail: true } },
   mobile: { ...ATTR.UNIQUE_STR },
-  usernameSet: { ...ATTR.FALSE_BOOL },
   password: {
     type: dt.STRING,
     allowNull: false,

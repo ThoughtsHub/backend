@@ -8,7 +8,7 @@ import user from "../utils/user.js";
 
 const router = Router();
 
-const PROFILE_FIELDS = ["fullName", "about", "gender", "dob", "username"];
+const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
 
 const isProfile = async (req, res, next) => {
   const isProfile = req.user.isProfile;

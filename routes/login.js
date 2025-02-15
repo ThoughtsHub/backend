@@ -13,8 +13,7 @@ router.post("/", controller.login.getUser, async (req, res) => {
 
     res.ok("Login successfull", {
       sessionId,
-      isUsernameSet: user.usernameSet,
-      isfullNameSet: !checks.isNull(profile),
+      profileCreated: !checks.isNull(profile),
     });
   } catch (err) {
     console.log(err);
