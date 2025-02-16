@@ -5,22 +5,18 @@ import checks from "../utils/checks.js";
 import { db } from "../db/clients.js";
 import Profile from "../models/Profile.js";
 import user from "../utils/user.js";
+import School from "../models/School.js";
 
 const router = Router();
 
 const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
 
-const isProfile = async (req, res, next) => {
-  const isProfile = req.user.isProfile;
-  if (!isProfile) return res.bad("No profile for this user exist");
-  next();
-};
-
-router.get("/me", auth.login, isProfile, async (req, res) => {
+router.get("/me", auth.login, auth.profile, async (req, res) => {
   const profileId = req.user.profile?.id;
 
   let profile = await Profile.findByPk(profileId, {
     attributes: { exclude: ["userId", "id"] },
+    include: [{ model: School, attributes: { exclude: ["profileId", "id"] } }],
   });
 
   profile = {
@@ -34,7 +30,7 @@ router.get("/me", auth.login, isProfile, async (req, res) => {
 
 router.post("/", auth.login, async (req, res) => {
   const userId = req.user.id;
-  const isProfile = req.user.isProfile;
+  const profile = req.user.isProfile;
   const profileId = req.user.profile?.id;
 
   const {
@@ -45,7 +41,7 @@ router.post("/", auth.login, async (req, res) => {
     username,
   } = _req.getDataO(req.body, PROFILE_FIELDS);
 
-  if (checks.isNull(fullName) && !isProfile)
+  if (checks.isNull(fullName) && !auth.profile)
     return res.bad("Full Name is neccessary for creating profile");
 
   const t = await db.transaction();
@@ -60,7 +56,7 @@ router.post("/", auth.login, async (req, res) => {
       await user.updateUsername(userId, username, t);
     }
 
-    if (isProfile)
+    if (profile)
       await Profile.update(fields, {
         where: { id: profileId },
         transaction: t,
@@ -69,7 +65,7 @@ router.post("/", auth.login, async (req, res) => {
     else await Profile.create({ ...fields, userId }, { transaction: t });
 
     await t.commit();
-    res.ok(`Profile ${isProfile ? "upda" : "crea"}ted`, {});
+    res.ok(`Profile ${auth.profile ? "upda" : "crea"}ted`, {});
   } catch (err) {
     await t.rollback();
     console.log(err);
@@ -78,7 +74,7 @@ router.post("/", auth.login, async (req, res) => {
   }
 });
 
-router.patch("/", auth.login, isProfile, async (req, res) => {
+router.patch("/", auth.login, auth.profile, async (req, res) => {
   const userId = req.user.id;
   const profileId = req.user.profile?.id;
 
@@ -115,7 +111,7 @@ router.patch("/", auth.login, isProfile, async (req, res) => {
   }
 });
 
-router.put("/", auth.login, isProfile, async (req, res) => {
+router.put("/", auth.login, auth.profile, async (req, res) => {
   const userId = req.user.id;
   const profileId = req.user.profile?.id;
 

@@ -99,11 +99,18 @@ const isLoggedIn = (req, res, next) => {
   next();
 };
 
+const isProfile = async (req, res, next) => {
+  const isProfile = req.user.isProfile;
+  if (!isProfile) return res.bad("No profile for this user exist");
+  next();
+};
+
 const auth = {
   setup: setupAuthentication,
   verify: verifyConnection,
   admin,
   login: isLoggedIn,
+  profile: isProfile,
 };
 
 export default auth;
