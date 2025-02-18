@@ -6,6 +6,7 @@ import { db } from "../db/clients.js";
 import Profile from "../models/Profile.js";
 import user from "../utils/user.js";
 import School from "../models/School.js";
+import User from "../models/user.js";
 
 const router = Router();
 
@@ -34,8 +35,18 @@ router.get("/h/:handle", async (req, res) => {
   if (handle === null) return res.noParams();
 
   try {
-    const profile = await Profile.findOne({ where: { handle } });
+    let profile = await Profile.findOne({
+      where: { handle },
+      include: [{ model: User }],
+    });
     if (profile === null) return res.bad("Invalid profile handle");
+
+    profile = {
+      ...profile.get({ plain: true }),
+      username: profile.User.username,
+      isUsernameSet: !(profile.User.username === null),
+    };
+
     res.ok("Profile Found", { profile });
   } catch (err) {
     console.log(err);
