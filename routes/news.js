@@ -30,6 +30,7 @@ router.get("/", async (req, res) => {
     news = {
       ...news.get({ plain: true }),
       shareUrl: `${BASE_URL}/news/h/${news.handle}`,
+      images: news.images[0],
     };
     res.ok("News", { news });
   } catch (err) {
