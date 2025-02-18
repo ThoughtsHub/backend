@@ -28,6 +28,22 @@ router.get("/me", auth.login, auth.profile, async (req, res) => {
   res.ok("Your Profile", { profile });
 });
 
+router.get("/h/:handle", async (req, res) => {
+  const { handle = null } = req.params;
+
+  if (handle === null) return res.noParams();
+
+  try {
+    const profile = await Profile.findOne({ where: { handle } });
+    if (profile === null) return res.bad("Invalid profile handle");
+    res.ok("Profile Found", { profile });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+});
+
 router.post("/", auth.login, async (req, res) => {
   const userId = req.user.id;
   const profile = req.user.isProfile;

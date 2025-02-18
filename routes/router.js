@@ -6,6 +6,7 @@ import { LogoutRouter } from "./logout.js";
 import { OtpRouter } from "./otp.js";
 import { ProfileRouter } from "./profile.js";
 import { SchoolRouter } from "./school.js";
+import { NewsRouter } from "./news.js";
 
 const app = Router();
 
@@ -16,6 +17,7 @@ app.use("/logout", auth.login, LogoutRouter);
 app.use("/", OtpRouter);
 app.use("/profile", ProfileRouter);
 app.use("/school", SchoolRouter);
+app.use("/news", NewsRouter);
 
 app.get("/test", auth.login, (req, res) => {
   console.log(req.user);

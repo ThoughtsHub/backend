@@ -12,6 +12,7 @@ const Profile = db.define("Profile", {
   posts: { ...ATTR.INTEGER },
   followers: { ...ATTR.INTEGER },
   following: { ...ATTR.INTEGER },
+  handle: { ...ATTR.UNIQ_STR_REQ },
 });
 
 export default Profile;
