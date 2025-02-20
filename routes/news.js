@@ -14,6 +14,7 @@ const NEWS_FIELDS = [
   "tags",
   "category",
   "image",
+  "newsUrl",
 ];
 
 router.get("/", async (req, res) => {
@@ -40,16 +41,14 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", auth.login, auth.admin, async (req, res) => {
-  const { title, description, image, images, tags, category } = _req.getDataO(
-    req.body,
-    NEWS_FIELDS
-  );
+  const { title, description, image, images, tags, category, newsUrl } =
+    _req.getDataO(req.body, NEWS_FIELDS);
 
   if (typeof image === "string") images = [image];
 
   if (!Array.isArray(images)) return res.bad("No image given");
 
-  if (_req.anyNull(title, description, images)) return res.noParams();
+  if (_req.anyNull(title, description, images, newsUrl)) return res.noParams();
 
   const newsHandle = handle.create(title);
 
@@ -60,6 +59,7 @@ router.post("/", auth.login, auth.admin, async (req, res) => {
       images,
       tags,
       category,
+      newsUrl,
       handle: newsHandle,
     });
 

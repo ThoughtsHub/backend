@@ -12,6 +12,7 @@ const News = db.define(
     tags: dt.ARRAY(dt.STRING),
     category: dt.ARRAY(dt.STRING),
     handle: { ...ATTR.UNIQ_STR_REQ },
+    newsUrl: { ...ATTR.STR_REQ },
   },
   { tableName: "News" }
 );
