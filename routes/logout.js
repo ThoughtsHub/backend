@@ -1,20 +1,10 @@
 import { Router } from "express";
-import { client } from "../db/clients.js";
-import { SID } from "../middlewares/auth.js";
+import controller from "../controllers/controllers";
+
+const LoginController = controller.login;
 
 const router = Router();
 
-router.get("/", async (req, res) => {
-  try {
-    await client.del(req.sessionId); // remove from db
-    res.clearCookie(SID); // remove cookies
-
-    res.deleted();
-  } catch (err) {
-    console.log(err);
-
-    res.serverError();
-  }
-});
+router.get("/", LoginController.logout);
 
 export const LogoutRouter = router;

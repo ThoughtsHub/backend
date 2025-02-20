@@ -3,7 +3,8 @@ import User from "../models/user.js";
 import checks from "../utils/checks.js";
 import _req from "../utils/request.js";
 import p from "../utils/password.js";
-import auth from "../middlewares/auth.js";
+import auth, { SID } from "../middlewares/auth.js";
+import { client } from "../db/clients.js";
 
 const LOGIN_FIELDS = ["email", "mobile", "password"];
 
@@ -75,4 +76,22 @@ const login = async (req, res) => {
   }
 };
 
-export const LoginController = { getUser, login };
+/**
+ * logs out user if logged in
+ * @param {Request} req
+ * @param {Response} res
+ */
+const logout = async (req, res) => {
+  try {
+    await client.del(req.sessionId); // remove from db
+    res.clearCookie(SID); // remove cookies
+
+    res.deleted();
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+};
+
+export const LoginController = { getUser, login, logout };
