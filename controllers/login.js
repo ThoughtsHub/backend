@@ -3,9 +3,16 @@ import User from "../models/user.js";
 import checks from "../utils/checks.js";
 import _req from "../utils/request.js";
 import p from "../utils/password.js";
+import auth from "../middlewares/auth.js";
 
 const LOGIN_FIELDS = ["email", "mobile", "password"];
 
+/**
+ * get the user for logging in, by username and password w/ request
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
 const getUser = async (req, res, next) => {
   const { username, email, mobile, password } = _req.getDataO(
     req.body,
@@ -46,6 +53,26 @@ const getUser = async (req, res, next) => {
   }
 };
 
-export const LoginController = {
-  getUser,
+/**
+ * logs in user if credentials matches
+ * @param {Request} req
+ * @param {Response} res
+ */
+const login = async (req, res) => {
+  const { user, userId, profile, keyVal } = req.setParams;
+
+  try {
+    const sessionId = await auth.setup(userId, res, keyVal);
+
+    res.ok("Login successfull", {
+      sessionId,
+      profileCreated: !checks.isNull(profile),
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
 };
+
+export const LoginController = { getUser, login };

@@ -1,25 +1,10 @@
 import { Router } from "express";
-import checks from "../utils/checks.js";
-import auth from "../middlewares/auth.js";
 import controller from "../controllers/controllers.js";
+
+const LoginController = controller.login;
 
 const router = Router();
 
-router.post("/", controller.login.getUser, async (req, res) => {
-  const { user, userId, profile, keyVal } = req.setParams;
-
-  try {
-    const sessionId = await auth.setup(userId, res, keyVal);
-
-    res.ok("Login successfull", {
-      sessionId,
-      profileCreated: !checks.isNull(profile),
-    });
-  } catch (err) {
-    console.log(err);
-
-    res.serverError();
-  }
-});
+router.post("/", LoginController.getUser, LoginController.login);
 
 export const LoginRouter = router;
