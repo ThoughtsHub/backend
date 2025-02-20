@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
 
   try {
     let profile = await Profile.findByPk(id, {
-      attributes: { exclude: ["userId", "id"] },
+      attributes: { exclude: ["userId"] },
       include: [
         { model: School, attributes: { exclude: ["profileId", "id"] } },
       ],
@@ -44,7 +44,7 @@ router.get("/me", auth.login, auth.profile, async (req, res) => {
 
   try {
     let profile = await Profile.findByPk(profileId, {
-      attributes: { exclude: ["userId", "id"] },
+      attributes: { exclude: ["userId"] },
       include: [
         { model: School, attributes: { exclude: ["profileId", "id"] } },
       ],
