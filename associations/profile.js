@@ -1,7 +1,7 @@
 import Comment from "../models/Comment.js";
 import Vote from "../models/Vote.js";
 import Like from "../models/Like.js";
-import Post from "../models/Post.js";
+import PoemPost from "../models/PoemPost.js";
 import Profile from "../models/Profile.js";
 import School from "../models/School.js";
 
@@ -20,8 +20,8 @@ const profileAssociation = () => {
   Profile.hasMany(Like, { foreignKey: F_KEY, onDelete: "SET NULL" });
   Like.belongsTo(Profile, { foreignKey: F_KEY });
 
-  Profile.hasMany(Post, { foreignKey: F_KEY, onDelete: "CASCADE" });
-  Post.belongsTo(Profile, { foreignKey: F_KEY });
+  Profile.hasMany(PoemPost, { foreignKey: F_KEY, onDelete: "CASCADE" });
+  PoemPost.belongsTo(Profile, { foreignKey: F_KEY });
 };
 
 export default profileAssociation;

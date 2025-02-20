@@ -2,7 +2,7 @@ import { DataTypes as dt } from "sequelize";
 import ATTR from "../constants/db.js";
 import { db } from "../db/clients.js";
 
-const Post = db.define("Post", {
+const PoemPost = db.define("PoemPost", {
   id: { ...ATTR.ID },
   title: { ...ATTR.STR_REQ },
   body: dt.TEXT,
@@ -18,4 +18,4 @@ const Post = db.define("Post", {
   shares: { ...ATTR.INTEGER },
 });
 
-export default Post;
+export default PoemPost;
