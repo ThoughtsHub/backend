@@ -7,14 +7,16 @@ import { OtpRouter } from "./otp.js";
 import { ProfileRouter } from "./profile.js";
 import { SchoolRouter } from "./school.js";
 import { NewsRouter } from "./news.js";
+import { SignupRouter } from "./signup.js";
 
 const app = Router();
 
 app.use(auth.verify);
 
+app.use("/signup", SignupRouter);
 app.use("/login", LoginRouter);
 app.use("/logout", auth.login, LogoutRouter);
-app.use("/", OtpRouter);
+app.use("/otp", OtpRouter);
 app.use("/profile", ProfileRouter);
 app.use("/school", SchoolRouter);
 app.use("/news", NewsRouter);
