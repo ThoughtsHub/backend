@@ -72,6 +72,33 @@ router.post("/", auth.login, auth.admin, async (req, res) => {
   }
 });
 
+router.put("/", auth.login, auth.admin, async (req, res) => {
+  const { title, description, image, images, tags, category, id } =
+    _req.getDataO(req.body, [...NEWS_FIELDS, "id"]);
+
+  if (typeof image === "string") images = [image];
+
+  if (!Array.isArray(images)) return res.bad("No image given");
+
+  if (_req.anyNull(title, description, images, id)) return res.noParams();
+
+  try {
+    const [updated] = await News.update(
+      { title, description, images, tags, category },
+      { where: { id }, individualHooks: true }
+    );
+
+    if (updated !== 1) return res.bad("Invalid news id");
+
+    const news = await News.findOne({ where: { id } });
+    res.ok("News updated", { news });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+});
+
 router.delete("/:handle", auth.login, auth.admin, async (req, res) => {
   const { handle = null } = req.params;
 
