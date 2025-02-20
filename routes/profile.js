@@ -12,21 +12,56 @@ const router = Router();
 
 const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
 
+router.get("/", async (req, res) => {
+  const { id = null } = req.query;
+
+  if (id === null) return res.noParams();
+
+  try {
+    let profile = await Profile.findByPk(id, {
+      attributes: { exclude: ["userId", "id"] },
+      include: [
+        { model: School, attributes: { exclude: ["profileId", "id"] } },
+      ],
+    });
+
+    profile = {
+      ...profile.get({ plain: true }),
+      username: req.user.username,
+      isUsernameSet: req.user.usernameSet,
+    };
+
+    res.ok("Requested Profile", { profile });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+});
+
 router.get("/me", auth.login, auth.profile, async (req, res) => {
   const profileId = req.user.profile?.id;
 
-  let profile = await Profile.findByPk(profileId, {
-    attributes: { exclude: ["userId", "id"] },
-    include: [{ model: School, attributes: { exclude: ["profileId", "id"] } }],
-  });
+  try {
+    let profile = await Profile.findByPk(profileId, {
+      attributes: { exclude: ["userId", "id"] },
+      include: [
+        { model: School, attributes: { exclude: ["profileId", "id"] } },
+      ],
+    });
 
-  profile = {
-    ...profile.get({ plain: true }),
-    username: req.user.username,
-    isUsernameSet: req.user.usernameSet,
-  };
+    profile = {
+      ...profile.get({ plain: true }),
+      username: req.user.username,
+      isUsernameSet: req.user.usernameSet,
+    };
 
-  res.ok("Your Profile", { profile });
+    res.ok("Your Profile", { profile });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
 });
 
 router.get("/h/:handle", async (req, res) => {
