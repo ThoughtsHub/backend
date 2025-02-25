@@ -1,5 +1,6 @@
 import { LoginController } from "./login.js";
 import { OtpController } from "./otp.js";
+import { ProfileController } from "./profile.js";
 import { SchoolController } from "./school.js";
 import { SignupController } from "./signup.js";
 
@@ -10,7 +11,8 @@ const controller = {
   login: LoginController,
   signup: SignupController,
   otp: OtpController,
-  school: SchoolController
+  school: SchoolController,
+  profile: ProfileController,
 };
 
 export default controller;
