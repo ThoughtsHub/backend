@@ -1,6 +1,5 @@
 import { Router } from "express";
 import News from "../models/News.js";
-import { BASE_URL } from "../constants/env";
 import auth from "../middlewares/auth";
 import _req from "../utils/request.js";
 import handle from "../utils/handle.js";
