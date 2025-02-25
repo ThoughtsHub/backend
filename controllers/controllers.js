@@ -1,4 +1,5 @@
 import { LoginController } from "./login.js";
+import { NewsController } from "./news.js";
 import { OtpController } from "./otp.js";
 import { ProfileController } from "./profile.js";
 import { SchoolController } from "./school.js";
@@ -13,6 +14,7 @@ const controller = {
   otp: OtpController,
   school: SchoolController,
   profile: ProfileController,
+  news: NewsController,
 };
 
 export default controller;
