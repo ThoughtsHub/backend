@@ -1,4 +1,4 @@
-import { APP, BASE_URL } from "./constants/env.js"; // env variables
+import { APP, BASE_URL, REMOTE_URL } from "./constants/env.js"; // env variables
 import connectDb from "./db/connect.js";
 import closeDb from "./db/close.js";
 import initAssociation from "./associations/association.js";
@@ -15,7 +15,9 @@ initAssociation(); // link all the tables
 createAdmin();
 
 server.listen(port, APP.HOST, () => {
-  console.log(`Application started on ${BASE_URL}`);
+  console.log(`Application started locally on ${BASE_URL}`);
+  if (REMOTE_URL !== undefined)
+    console.log(`Application started remotely on ${REMOTE_URL}`);
 });
 
 // shutdown of the application

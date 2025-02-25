@@ -9,6 +9,9 @@ export const APP = {
 
 export const APP_URL = `http://${APP.HOST}:${APP.PORT}`;
 export const BASE_URL = process.env.BASE_URL;
+export const REMOTE_URL = process.env.REMOTE_URL;
+
+export const NODE_ENV = process.env.NODE_ENV || "dev";
 
 // Authentication
 export const JWT = {
