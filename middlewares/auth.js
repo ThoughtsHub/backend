@@ -15,6 +15,15 @@ const COOKIE_OPTIONS = {
 
 export const SID = "sessionId";
 
+/**
+ * sets up the authentication for the connected user
+ * with its profile and user id \
+ * should be applied after login/signup or during regeneration of cookies
+ * @param {String} userId
+ * @param {Response} res
+ * @param {String} keyVal
+ * @returns {Promise<String>} sessionId
+ */
 const setupAuthentication = async (userId, res, keyVal) => {
   // generate tokens
   const tokens = {
@@ -33,6 +42,11 @@ const setupAuthentication = async (userId, res, keyVal) => {
   return sessionId;
 };
 
+/**
+ * checks if the tokens associated with connection are valid
+ * @param {tokens} tokens {access, refresh}
+ * @returns {Error | Object}
+ */
 const verifyTokens = async ({ access, refresh }) => {
   try {
     // check the access token first
@@ -54,6 +68,15 @@ const verifyTokens = async ({ access, refresh }) => {
   throw new Error("Token verification failed");
 };
 
+/**
+ * creates a user object in req
+ * for easier access and writing in changing
+ * or requesting data for/of the connected user
+ * @param {Request} req
+ * @param {Response} res
+ * @param {Function} next
+ * @returns
+ */
 const verifyConnection = async (req, res, next) => {
   try {
     const sessionId = req.cookies?.[SID] ?? req.headers?.["auth_token"] ?? null; // get session Id
@@ -86,6 +109,14 @@ const verifyConnection = async (req, res, next) => {
   next();
 };
 
+/**
+ * checks if the current connection/user
+ * is an admin
+ * @param {Request} req
+ * @param {Response} res
+ * @param {Function} next
+ * @returns
+ */
 const admin = (req, res, next) => {
   const username = req.user.username;
   if (username !== ADMIN.USERNAME)
@@ -94,11 +125,26 @@ const admin = (req, res, next) => {
   next();
 };
 
+/**
+ * checks if the current connection is logged in
+ * @param {Request} req
+ * @param {Response} res
+ * @param {Function} next
+ * @returns
+ */
 const isLoggedIn = (req, res, next) => {
   if (req.user === undefined) return res.unauth("You are not logged in");
   next();
 };
 
+/**
+ * Checks if the current connection/user
+ * has a profile associated with them
+ * @param {Request} req
+ * @param {Response} res
+ * @param {Function} next
+ * @returns
+ */
 const isProfile = async (req, res, next) => {
   const isProfile = req.user.isProfile;
   if (!isProfile) return res.bad("No profile for this user exist");
