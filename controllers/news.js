@@ -28,10 +28,17 @@ const getNews = async (req, res) => {
       order: [["createdAt", "desc"]],
     });
 
-    news = {
-      ...news.get({ plain: true }),
-      image: news.images[0],
-    };
+    const _news = [];
+    for (const n of news) {
+      let nData = {
+        ...n.get({ plain: true }),
+        image: news.images[0],
+      };
+      _news.push(nData);
+    }
+
+    news = _news;
+
     res.ok("News", { news });
   } catch (err) {
     console.log(err);
