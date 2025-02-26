@@ -21,7 +21,7 @@ router.get("/reload-website", async (_, res) => {
     env: { ...env.app },
     detached: true,
     stdio: "ignore",
-    shell: isWindows,
+    shell: isWindows, // necessary in windows to run a detached process
   });
 
   // detach process
