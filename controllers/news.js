@@ -32,8 +32,9 @@ const getNews = async (req, res) => {
     for (const n of news) {
       let nData = {
         ...n.get({ plain: true }),
-        image: news.images[0],
+        image: n.images[0],
       };
+      delete nData.images;
       _news.push(nData);
     }
 
@@ -53,8 +54,16 @@ const getNews = async (req, res) => {
  * @param {Response} res
  */
 const createNews = async (req, res) => {
-  const { title, description, image, images, tags, category, newsUrl, news } =
-    _req.getDataO(req.body, [...NEWS_FIELDS, "news"]);
+  const {
+    title,
+    description,
+    image,
+    images: _images,
+    tags,
+    category,
+    newsUrl,
+    news,
+  } = _req.getDataO(req.body, [...NEWS_FIELDS, "news"]);
 
   const _news = [];
   if (Array.isArray(news)) {
@@ -81,6 +90,7 @@ const createNews = async (req, res) => {
       _news.push(newsData);
     }
   } else {
+    let images = _images;
     if (typeof image === "string") images = [image];
 
     if (!Array.isArray(images)) return res.bad("No image given");
