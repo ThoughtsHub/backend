@@ -19,10 +19,10 @@ const sendOtpEmail = async (recipient, otp) => {
   const mailOptions = {
     from: NODEMAILER.EMAIL,
     to: recipient,
-    subject: "Verification OTP | CampusVibe",
+    subject: "Verification OTP | ThoughtsHub",
     html: `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
-      <h2 style="color: #4CAF50; text-align: center;">CampusVibe Verification</h2>
+      <h2 style="color: #4CAF50; text-align: center;">ThoughtsHub Verification</h2>
       <p style="font-size: 16px;">Hello,</p>
       <p style="font-size: 16px;">Your One-Time Password (OTP) for verification is:</p>
       <div style="background: #f4f4f4; padding: 10px; text-align: center; border-radius: 5px; margin: 20px 0;">
