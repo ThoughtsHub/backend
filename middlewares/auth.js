@@ -79,7 +79,7 @@ const verifyTokens = async ({ access, refresh }) => {
  */
 const verifyConnection = async (req, res, next) => {
   try {
-    const sessionId = req.cookies?.[SID] ?? req.headers?.["auth_token"] ?? null; // get session Id
+    const sessionId = req.cookies[SID] ?? req.headers["auth_token"] ?? null; // get session Id
 
     if (typeof sessionId !== "string") return next(); // verification failed
 
