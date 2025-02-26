@@ -26,8 +26,7 @@ app.use("/school", SchoolRouter);
 app.use("/news", NewsRouter);
 
 app.get("/test", auth.login, (req, res) => {
-  console.log(req.user);
-  res.sendFile("index.html", { root: APP.PUBLIC });
+  res.json({ user: req.user });
 });
 
 app.get("/reload-website", async (_, res) => {
