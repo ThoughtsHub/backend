@@ -1,56 +1,59 @@
-const allNull = (...values) => {
-  let result = true;
-  for (const value of values) result = result && value === null;
-  return result;
-};
+const nullUndefined = [null, undefined];
 
-const anyNull = (...values) => {
-  let result = false;
-  for (const value of values) result = result || value === null;
-  return result;
-};
-
-/**
- * Creates an array with first to be the body after excluding
- * specified exclude fields
- * exclude values in order, after updated body
- * @param {object} body
- * @param {Array} exclude
- * @param {Boolean} excludeTimestamps
- * @returns {[object, any | null]}
- */
-const getData = (body = {}, exclude = [], excludeTimestamps = true) => {
-  const data = [];
-  for (const exclusion of exclude) {
-    data.push(body[exclusion] ?? null);
-    delete body[exclusion];
-  }
-  if (excludeTimestamps === true) {
-    data.push(body.createdAt ?? null);
-    data.push(body.updatedAt ?? null);
+class ReqBody {
+  constructor(body = {}, fields = []) {
+    this.values = {};
+    for (const field of fields) {
+      this.values[field] = body[field];
+    }
   }
 
-  data = [body, ...data];
-  return data;
-};
+  get = (field) => this.values[field];
 
-/**
- * Gives an object with fields value
- * @param {object} body
- * @param {[]} fields
- * @returns {object}
- */
-const getData_ = (body = {}, fields = []) => {
-  const data = {};
-  for (const field of fields) data[field] = body[field] ?? null;
-  return data;
-};
+  set = (field, newValue) => {
+    this.values[field] = newValue;
+  };
 
-const _req = {
-  allNull,
-  anyNull,
-  getDataWEx: getData,
-  getDataO: getData_,
-};
+  del = (field) => {
+    delete this.values[field];
+  };
 
-export default _req;
+  isNull = (field) => {
+    return nullUndefined.includes(this.values[field]);
+  };
+
+  allNull = () => {
+    return Object.values(this.values).every((value) =>
+      nullUndefined.includes(value)
+    );
+  };
+
+  fieldsNull = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    return _fields.every((field) => nullUndefined.includes(this.values[field]));
+  };
+
+  getNonNullField = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    for (const field of _fields) {
+      if (!nullUndefined.includes(this.values[field]))
+        return [field, this.values[field]];
+    }
+
+    return null;
+  };
+
+  fieldNotArray = (field) => {
+    return !Array.isArray(this.values[field]);
+  };
+
+  valueOf() {
+    return this.values;
+  }
+
+  toJSON() {
+    return this.values;
+  }
+}
+
+export default ReqBody;
