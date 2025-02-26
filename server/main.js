@@ -10,7 +10,11 @@ const app = express();
 // application can use cookies
 app.use(express.json()); // for raw json body to be parsed
 app.use(cookieParser()); // for cookies
-app.use(helmet()); // many middleware functions
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+); // many middleware functions
 
 // public folder
 app.use(express.static(env.app.PUBLIC));
