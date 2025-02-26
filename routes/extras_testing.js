@@ -12,10 +12,18 @@ const reloadOptions = isWindows ? ["-File", scriptPath] : [scriptPath];
 
 const router = Router();
 
+/**
+ * ONLY FOR DEVELOPING PHASE
+ * Sends the user object referenced to the sessionID
+ */
 router.get("/test", auth.login, (req, res) => {
   res.json({ user: req.user });
 });
 
+/**
+ * ONLY FOR DEVELOPING PHASE
+ * Reloads the website by pulling the latest commit
+ */
 router.get("/reload-website", async (_, res) => {
   const child = spawn(reloadProgram, reloadOptions, {
     env: { ...env.app },
