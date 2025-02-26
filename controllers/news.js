@@ -1,6 +1,6 @@
 import News from "../models/News.js";
-import _req from "../utils/request.js";
 import handle from "../utils/handle.js";
+import ReqBody from "../utils/request.js";
 
 const NEWS_FIELDS = [
   "title",
@@ -54,67 +54,44 @@ const getNews = async (req, res) => {
  * @param {Response} res
  */
 const createNews = async (req, res) => {
-  const {
-    title,
-    description,
-    image,
-    images: _images,
-    tags,
-    category,
-    newsUrl,
-    news,
-  } = _req.getDataO(req.body, [...NEWS_FIELDS, "news"]);
+  const body = new ReqBody(req.body, [...NEWS_FIELDS, "news"]);
 
-  const _news = [];
-  if (Array.isArray(news)) {
-    for (const n of news) {
-      const newsData = _req.getDataO(n, NEWS_FIELDS);
+  const news = [];
+  if (Array.isArray(body.get("news"))) {
+    for (const n of body.get("news")) {
+      const newsData = new ReqBody(n, NEWS_FIELDS);
 
-      if (typeof newsData.image === "string") newsData.images = [image];
-      delete newsData.image;
+      const image = newsData.get("image");
+      if (typeof image === "string") newsData.set("images", [image]);
+      newsData.del("image");
 
-      if (!Array.isArray(newsData.images)) return res.bad("No image given");
+      if (newsData.fieldNotArray("images")) return res.bad("No image given");
 
-      if (
-        _req.anyNull(
-          newsData.title,
-          newsData.description,
-          newsData.images,
-          newsData.newsUrl
-        )
-      )
+      if (newsData.anyFieldNull("title description images newsUrl"))
         return res.noParams();
 
-      newsData.handle = handle.create(newsData.title);
+      newsData.set("handle", handle.create(newsData.get("title")));
 
-      _news.push(newsData);
+      news.push(newsData);
     }
   } else {
-    let images = _images;
-    if (typeof image === "string") images = [image];
+    const image = body.get("image");
+    if (typeof image === "string") body.set("images", [image]);
 
-    if (!Array.isArray(images)) return res.bad("No image given");
+    if (body.fieldNotArray("images")) return res.bad("No image given");
 
-    if (_req.anyNull(title, description, images, newsUrl))
+    if (body.anyFieldNull("title description images newsUrl"))
       return res.noParams();
 
-    const newsHandle = handle.create(title);
+    body.set("handle", handle.create(body.get("title")));
 
-    _news.push({
-      title,
-      description,
-      images,
-      tags,
-      category,
-      newsUrl,
-      handle: newsHandle,
-    });
+    news.push(body);
   }
 
   try {
-    const news = await News.bulkCreate(_news);
+    const createResult = await News.bulkCreate(news);
 
-    res.created("News Created", { news: _news });
+    res.created("News Created", { news });
   } catch (err) {
     console.log(err);
 
