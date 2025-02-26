@@ -16,7 +16,7 @@ const initAssociation = () => {
   companyAssociation();
   savedAssociation();
 
-  db.sync({ force: true });
+  db.sync({ alter: true });
 };
 
 export default initAssociation;
