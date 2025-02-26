@@ -14,6 +14,7 @@ const COOKIE_OPTIONS = {
 };
 
 export const SID = "sessionId";
+export const HSID = "auth_token";
 
 /**
  * sets up the authentication for the connected user
@@ -79,7 +80,7 @@ const verifyTokens = async ({ access, refresh }) => {
  */
 const verifyConnection = async (req, res, next) => {
   try {
-    const sessionId = req.cookies[SID] ?? req.headers["auth_token"] ?? null; // get session Id
+    const sessionId = req.headers[HSID] ?? req.cookies[SID] ?? null; // get session Id
 
     if (typeof sessionId !== "string") return next(); // verification failed
 
