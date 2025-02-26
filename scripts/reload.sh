@@ -1,12 +1,12 @@
 echo "Pulling from the latest commit"
-git pull
+git pull origin main
 echo "Pull complete"
-echo
 
-echo "Killing on running port"
-npx kill-port 3002
+echo "Killing on running port $PORT"
+npx kill-port $PORT
 echo "Kill complete"
-echo
 
 echo "Restarting application"
 npm run rstart
+
+read -p "Press Enter to exit"
