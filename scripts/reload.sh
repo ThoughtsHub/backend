@@ -8,5 +8,3 @@ echo "Kill complete"
 
 echo "Restarting application"
 npm run start
-
-read -p "Press Enter to exit"
