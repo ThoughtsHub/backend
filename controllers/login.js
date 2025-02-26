@@ -20,7 +20,7 @@ const getUser = async (req, res, next) => {
     LOGIN_FIELDS
   );
 
-  if (_req.allNull(email, mobile)) return res.noParams();
+  if (_req.allNull(username, email, mobile)) return res.noParams();
   if (_req.allNull(password)) return res.noParams();
 
   try {
