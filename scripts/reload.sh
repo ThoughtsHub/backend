@@ -7,4 +7,4 @@ npx kill-port $PORT
 echo "Kill complete"
 
 echo "Restarting application"
-npm run start
+sudo npm run start
