@@ -22,6 +22,11 @@ class ReqBody {
     return nullUndefined.includes(this.values[field]);
   };
 
+  anyFieldNull = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    return _fields.some((field) => nullUndefined.includes(this.values[field]));
+  };
+
   allNull = () => {
     return Object.values(this.values).every((value) =>
       nullUndefined.includes(value)
