@@ -1,6 +1,7 @@
 import { DataTypes as dt } from "sequelize";
 import ATTR from "../constants/db.js";
 import { db } from "../db/clients.js";
+import baseModel from "./BaseModel.js";
 
 export const TYPE = {
   UPVOTE: "Upvote",
@@ -12,8 +13,9 @@ const Vote = db.define(
   {
     id: { ...ATTR.ID },
     vote: dt.ENUM(Object.values(TYPE)),
+    ...baseModel.config,
   },
-  { tableName: "ForumVotes" }
+  { tableName: "ForumVotes", ...baseModel.options }
 );
 
 export default Vote;
