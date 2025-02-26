@@ -60,14 +60,17 @@ const getUser = async (req, res, next) => {
  * @param {Response} res
  */
 const login = async (req, res) => {
-  const { user, userId, profile, keyVal } = req.setParams;
+  const { user, userId, profile: isProfile, keyVal } = req.setParams;
+
+  const profile = await Profile.findOne({ where: { userId } });
 
   try {
     const sessionId = await auth.setup(userId, res, keyVal);
 
     res.ok("Login successfull", {
       sessionId,
-      profileCreated: !checks.isNull(profile),
+      profileCreated: !checks.isNull(isProfile),
+      profile,
     });
   } catch (err) {
     console.log(err);
