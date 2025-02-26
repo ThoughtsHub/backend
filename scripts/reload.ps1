@@ -7,6 +7,6 @@ npx kill-port $env:PORT
 Write-Output "Kill complete"
 
 Write-Output "Restarting application"
-npm run rstart
+npm run start
 
 Read-Host -Prompt "Press Enter to exit"

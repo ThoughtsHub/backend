@@ -7,6 +7,6 @@ npx kill-port $PORT
 echo "Kill complete"
 
 echo "Restarting application"
-npm run rstart
+npm run start
 
 read -p "Press Enter to exit"
