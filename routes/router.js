@@ -8,6 +8,7 @@ import { SchoolRouter } from "./school.js";
 import { NewsRouter } from "./news.js";
 import { SignupRouter } from "./signup.js";
 import { TestRouter } from "./extras_testing.js";
+import { ForumsRouter } from "./forums.js";
 
 const app = Router();
 
@@ -20,6 +21,7 @@ app.use("/otp", OtpRouter);
 app.use("/profile", ProfileRouter);
 app.use("/school", SchoolRouter);
 app.use("/news", NewsRouter);
+app.use("/forums", ForumsRouter);
 
 // for testing purposes
 app.use("/", TestRouter);
