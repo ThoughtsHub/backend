@@ -6,7 +6,7 @@ import p from "../utils/password.js";
 import auth, { SID } from "../middlewares/auth.js";
 import { client } from "../db/clients.js";
 
-const LOGIN_FIELDS = ["email", "mobile", "password"];
+const LOGIN_FIELDS = ["username", "email", "mobile", "password"];
 
 /**
  * get the user for logging in, by username and password w/ request
