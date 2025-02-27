@@ -31,6 +31,19 @@ class ReqBody {
   };
 
   /**
+   * Same as bulkGet but returns a map containing fields as keys and thier
+   * getResult as thier value
+   * @param {string | string[]} fields
+   * @returns {Map}
+   */
+  bulkGetMap = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    let getResults = [];
+    _fields.forEach((field) => (getResults[field] = this.values[field]));
+    return getResults;
+  };
+
+  /**
    * Sets a new value in a field of body
    * @param {string} field
    * @param {any} newValue
@@ -109,6 +122,14 @@ class ReqBody {
    */
   fieldNotArray = (field) => {
     return !Array.isArray(this.values[field]);
+  };
+
+  /**
+   * Removes all the null values from the body
+   */
+  clearNulls = () => {
+    const keys = Object.keys(this.values);
+    keys.forEach((field) => (this.isNull(field) ? this.del(field) : null));
   };
 
   valueOf() {
