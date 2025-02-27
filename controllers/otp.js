@@ -1,7 +1,7 @@
-import _req from "../utils/request.js";
 import otp from "../utils/otp.js";
 import { client } from "../db/clients.js";
 import { v4 } from "uuid";
+import ReqBody from "../utils/request.js";
 
 const OTP_FIELDS = ["mobile", "email", "isMobile", "otp", "confirmationId"];
 
@@ -13,13 +13,13 @@ const OTP_FIELDS = ["mobile", "email", "isMobile", "otp", "confirmationId"];
  * @returns {Response | null}
  */
 const getOtp = async (req, res) => {
-  const { mobile, email, isMobile } = _req.getDataO(req.body, OTP_FIELDS);
+  const body = new ReqBody(req.body, OTP_FIELDS);
 
-  if (_req.allNull(mobile, email)) return res.noParams();
+  if (body.fieldsNull("email mobile")) return res.noParams();
 
   // TODO: check if email or mobile available
-
-  const key = isMobile === true ? mobile : email;
+  const isMobile = body.get("isMobile");
+  const key = isMobile === true ? body.get("mobile") : body.get("email");
   const generatedOtp = otp.generate(6);
   const confirmationId = `${key}:${v4()}`;
 
@@ -51,10 +51,11 @@ const getOtp = async (req, res) => {
  * @returns {Response | null}
  */
 const verifyOtp = async (req, res) => {
-  const { otp, confirmationId } = _req.getDataO(req.body, OTP_FIELDS);
+  const body = new ReqBody(req.body, OTP_FIELDS);
 
-  if (_req.anyNull(otp, confirmationId)) return res.noParams();
+  if (body.fieldsNull("otp confirmationId")) return res.noParams();
 
+  const [otp, confirmationId] = body.bulkGet("otp confirmationId");
   try {
     const key = await client.get(confirmationId);
     if (key === null) return res.bad("Invalid confirmation Id");
