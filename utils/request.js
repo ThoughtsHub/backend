@@ -71,6 +71,13 @@ class ReqBody {
   };
 
   /**
+   * Returns true if value of field is of type string
+   * @param {string} field 
+   * @returns {boolean}
+   */
+  isString = (field) => typeof this.values[field] === 'string';
+ 
+  /**
    * Returns true if any field from given fields is null or undefined
    * @param {string | string[]} fields
    * @returns {boolean}
