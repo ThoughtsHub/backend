@@ -1,7 +1,7 @@
 import { client } from "../db/clients.js";
 import auth from "../middlewares/auth.js";
 import User from "../models/user.js";
-import _req from "../utils/request.js";
+import ReqBody from "../utils/request.js";
 
 const EMAIL_REGEXP = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASS_FIELDS = ["password", "confirmationId"];
@@ -13,9 +13,11 @@ const PASS_FIELDS = ["password", "confirmationId"];
  * @returns {Response | null}
  */
 const createPassword = async (req, res) => {
-  const { password, confirmationId } = _req.getDataO(req.body, PASS_FIELDS);
+  const body = new ReqBody(req.body, PASS_FIELDS);
 
-  if (_req.anyNull(password, confirmationId)) return res.noParams();
+  if (body.anyFieldNull("password confirmationId")) return res.noParams();
+
+  const [password, confirmationId] = body.bulkGet("password confirmationId");
   if (typeof password !== "string") return res.bad("Invalid type of password");
 
   try {
