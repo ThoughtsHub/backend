@@ -19,6 +19,18 @@ class ReqBody {
   get = (field) => this.values[field];
 
   /**
+   * Returns an array of result for multiple fields in order asked for
+   * @param {string | string[]} fields
+   * @returns {any[]}
+   */
+  bulkGet = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    let getResults = [];
+    _fields.forEach((field) => getResults.push(this.values[field]));
+    return getResults;
+  };
+
+  /**
    * Sets a new value in a field of body
    * @param {string} field
    * @param {any} newValue
@@ -46,7 +58,7 @@ class ReqBody {
 
   /**
    * Returns true if any field from given fields is null or undefined
-   * @param {string | [string]} fields
+   * @param {string | string[]} fields
    * @returns {boolean}
    */
   anyFieldNull = (fields) => {
@@ -66,7 +78,7 @@ class ReqBody {
 
   /**
    * Returns true if all field in the given fields have value null or undefined
-   * @param {string | [string]} fields
+   * @param {string | string[]} fields
    * @returns {boolean}
    */
   fieldsNull = (fields) => {
@@ -77,7 +89,7 @@ class ReqBody {
   /**
    * Returns the first non null field from the given fields \
    * with its fieldName as 'key' and its fieldValue as 'keyVal'
-   * @param {string | [string]} fields
+   * @param {string | string[]} fields
    * @returns {[key, keyVal]}
    */
   getNonNullField = (fields) => {
