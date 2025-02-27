@@ -2,8 +2,8 @@ import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import { spawn } from "child_process";
 import env from "../constants/env.js";
-import _req from "../utils/request.js";
 import User from "../models/user.js";
+import ReqBody from "../utils/request.js";
 
 const isWindows = process.platform === "win32";
 
@@ -48,10 +48,11 @@ router.get("/reload-website", async (_, res) => {
  * if both given, email will be given preference, then mobile
  */
 router.get("/delete-user", async (req, res) => {
-  const { email = null, mobile = null } = req.query;
+  const body = new ReqBody(req.query);
 
-  if (_req.allNull(email, mobile)) return res.noParams();
+  if (body.fieldsNull("email mobile")) return res.noParams();
 
+  const [email, mobile] = body.bulkGet("email mobile");
   try {
     let user = null;
     if (user === null) user = await User.findOne({ where: { email } });
