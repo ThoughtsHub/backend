@@ -1,56 +1,162 @@
-const allNull = (...values) => {
-  let result = true;
-  for (const value of values) result = result && value === null;
-  return result;
-};
+import util from "util";
 
-const anyNull = (...values) => {
-  let result = false;
-  for (const value of values) result = result || value === null;
-  return result;
-};
+const nullUndefined = [null, undefined];
 
 /**
- * Creates an array with first to be the body after excluding
- * specified exclude fields
- * exclude values in order, after updated body
- * @param {object} body
- * @param {Array} exclude
- * @param {Boolean} excludeTimestamps
- * @returns {[object, any | null]}
+ * A convinient way to handle request body
  */
-const getData = (body = {}, exclude = [], excludeTimestamps = true) => {
-  const data = [];
-  for (const exclusion of exclude) {
-    data.push(body[exclusion] ?? null);
-    delete body[exclusion];
-  }
-  if (excludeTimestamps === true) {
-    data.push(body.createdAt ?? null);
-    data.push(body.updatedAt ?? null);
+class ReqBody {
+  constructor(body = {}, fields = []) {
+    this.values = {};
+    if (fields.length === 0) fields = Object.keys(body);
+    for (const field of fields) {
+      this.values[field] = body[field];
+    }
   }
 
-  data = [body, ...data];
-  return data;
-};
+  /**
+   * Gets the value of a field in the body
+   * @param {string} field
+   * @returns {any}
+   */
+  get = (field) => this.values[field];
 
-/**
- * Gives an object with fields value
- * @param {object} body
- * @param {[]} fields
- * @returns {object}
- */
-const getData_ = (body = {}, fields = []) => {
-  const data = {};
-  for (const field of fields) data[field] = body[field] ?? null;
-  return data;
-};
+  /**
+   * Returns an array of result for multiple fields in order asked for
+   * @param {string | string[]} fields
+   * @returns {any[]}
+   */
+  bulkGet = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    let getResults = [];
+    _fields.forEach((field) => getResults.push(this.values[field]));
+    return getResults;
+  };
 
-const _req = {
-  allNull,
-  anyNull,
-  getDataWEx: getData,
-  getDataO: getData_,
-};
+  /**
+   * Same as bulkGet but returns a map containing fields as keys and thier
+   * getResult as thier value
+   * @param {string | string[]} fields
+   * @returns {Map}
+   */
+  bulkGetMap = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    let getResults = [];
+    _fields.forEach((field) => (getResults[field] = this.values[field]));
+    return getResults;
+  };
 
-export default _req;
+  /**
+   * Sets a new value in a field of body
+   * @param {string} field
+   * @param {any} newValue
+   */
+  set = (field, newValue) => {
+    this.values[field] = newValue;
+  };
+
+  /**
+   * Deletes a field
+   * @param {string} field
+   */
+  del = (field) => {
+    delete this.values[field];
+  };
+
+  /**
+   * Returns true if field is null or undefined
+   * @param {string} field
+   * @returns {boolean}
+   */
+  isNull = (field) => {
+    return nullUndefined.includes(this.values[field]);
+  };
+
+  /**
+   * Returns true if value of field is of type string
+   * @param {string} field
+   * @returns {boolean}
+   */
+  isString = (field) => typeof this.values[field] === "string";
+
+  /**
+   * Returns true if any field from given fields is null or undefined
+   * @param {string | string[]} fields
+   * @returns {boolean}
+   */
+  anyFieldNull = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    return _fields.some((field) => nullUndefined.includes(this.values[field]));
+  };
+
+  /**
+   * Returns true if all values in the body are null or undefined
+   * @returns {boolean}
+   */
+  allNull = () => {
+    return Object.values(this.values).every((value) =>
+      nullUndefined.includes(value)
+    );
+  };
+
+  /**
+   * Returns true if all field in the given fields have value null or undefined
+   * @param {string | string[]} fields
+   * @returns {boolean}
+   */
+  fieldsNull = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    return _fields.every((field) => nullUndefined.includes(this.values[field]));
+  };
+
+  /**
+   * Returns the first non null field from the given fields \
+   * with its fieldName as 'key' and its fieldValue as 'keyVal'
+   * @param {string | string[]} fields
+   * @returns {[key, keyVal]}
+   */
+  getNonNullField = (fields) => {
+    const _fields = typeof fields === "string" ? fields.split(" ") : fields;
+    for (const field of _fields) {
+      if (!nullUndefined.includes(this.values[field]))
+        return [field, this.values[field]];
+    }
+
+    return null;
+  };
+
+  /**
+   * Returns true if field is not an array
+   * @param {string} field
+   * @returns {boolean}
+   */
+  fieldNotArray = (field) => {
+    return !Array.isArray(this.values[field]);
+  };
+
+  /**
+   * Removes all the null values from the body
+   */
+  clearNulls = () => {
+    const keys = Object.keys(this.values);
+    keys.forEach((field) => (this.isNull(field) ? this.del(field) : null));
+  };
+
+  /**
+   * Customize JSON serialization
+   * @returns {Object}
+   */
+  toJSON() {
+    return this.values; // Ensures JSON.stringify returns the values
+  }
+
+  /**
+   * Customize Node.js inspection
+   * @returns {Object}
+   */
+  [util.inspect.custom](depth, options) {
+    return this.values; // Makes console.log show the values
+  }
+}
+
+export default ReqBody;

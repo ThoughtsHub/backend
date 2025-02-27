@@ -1,10 +1,9 @@
-import _req from "../utils/request.js";
-import checks from "../utils/checks.js";
 import { db } from "../db/clients.js";
 import Profile from "../models/Profile.js";
 import user from "../utils/user.js";
 import School from "../models/School.js";
 import User from "../models/user.js";
+import ReqBody from "../utils/request.js";
 
 const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
 
@@ -15,10 +14,11 @@ const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
  * @returns
  */
 const getProfile = async (req, res) => {
-  const { id = null } = req.query;
+  const query = new ReqBody(req.query);
 
-  if (id === null) return res.noParams();
+  if (query.isNull("id")) return res.noParams();
 
+  const id = query.get("id");
   try {
     let profile = await Profile.findByPk(id, {
       attributes: { exclude: ["userId"] },
@@ -27,6 +27,7 @@ const getProfile = async (req, res) => {
       ],
     });
 
+    // set profile readable
     profile = {
       ...profile.get({ plain: true }),
       username: req.user.username,
@@ -80,10 +81,10 @@ const getMyProfile = async (req, res) => {
  * @returns
  */
 const getProfileByHandle = async (req, res) => {
-  const { handle = null } = req.params;
+  const params = new ReqBody(req.params);
+  if (params.isNull("handle")) return res.noParams();
 
-  if (handle === null) return res.noParams();
-
+  const handle = params.get("handle");
   try {
     let profile = await Profile.findOne({
       where: { handle },
@@ -94,7 +95,7 @@ const getProfileByHandle = async (req, res) => {
     profile = {
       ...profile.get({ plain: true }),
       username: profile.User.username,
-      isUsernameSet: !(profile.User.username === null),
+      isUsernameSet: profile.User.username !== null,
     };
 
     res.ok("Profile Found", { profile });
@@ -116,22 +117,16 @@ const createProfile = async (req, res) => {
   const profile = req.user.isProfile;
   const profileId = req.user.profile?.id;
 
-  const {
-    fullName,
-    about,
-    gender,
-    dob: rawDob,
-    username,
-  } = _req.getDataO(req.body, PROFILE_FIELDS);
+  const body = new ReqBody(req.body, PROFILE_FIELDS);
+  const username = body.get("username");
 
-  if (checks.isNull(fullName) && !auth.profile)
+  if (body.isNull("fullName"))
     return res.bad("Full Name is neccessary for creating profile");
 
   const t = await db.transaction();
   try {
-    let dob;
-    if (rawDob !== null) dob = Date(rawDob);
-    const fields = { fullName, about, gender, dob };
+    if (!body.isNull("dob")) body.set("dob", Date(body.get("dob")));
+    const fields = body.bulkGetMap("fullName gender about dob");
 
     if (!checks.isNull(username)) {
       // TODO: check if username exists
@@ -148,7 +143,7 @@ const createProfile = async (req, res) => {
     else await Profile.create({ ...fields, userId }, { transaction: t });
 
     await t.commit();
-    res.ok(`Profile ${auth.profile ? "upda" : "crea"}ted`, {});
+    res.ok(`Profile ${profile ? "upda" : "crea"}ted`, {});
   } catch (err) {
     await t.rollback();
     console.log(err);
@@ -168,22 +163,22 @@ const replaceProfile = async (req, res) => {
   const userId = req.user.id;
   const profileId = req.user.profile?.id;
 
-  const data = _req.getDataO(req.body, PROFILE_FIELDS);
+  const body = new ReqBody(req.body, PROFILE_FIELDS);
 
-  if (checks.isNull(data.fullName))
+  if (body.isNull("fullName"))
     return res.bad("Full name cannot be set to nothing");
 
   const t = await db.transaction();
 
   try {
-    if (!checks.isNull(data.username)) {
+    if (!body.isNull("username")) {
       // TODO: check if username exists
 
-      await user.updateUsername(userId, username, t);
+      await user.updateUsername(userId, body.get("username"), t);
+      body.del("username");
     }
-    delete data.username;
 
-    await Profile.update(data, {
+    await Profile.update(body, {
       where: { id: profileId },
       transaction: t,
       individualHooks: true,
@@ -210,24 +205,24 @@ const fixProfile = async (req, res) => {
   const userId = req.user.id;
   const profileId = req.user.profile?.id;
 
-  const data = _req.getDataO(req.body, PROFILE_FIELDS);
+  const body = new ReqBody(req.body, PROFILE_FIELDS);
 
-  for (const field of PROFILE_FIELDS)
-    if (data[field] === null) delete data[field];
+  body.clearNulls();
 
-  if (checks.isNull(data.fullName))
+  if (body.isNull("fullName"))
     return res.bad("Full name cannot be set to nothing");
 
   const t = await db.transaction();
 
   try {
-    if (!checks.isNull(data.username)) {
+    if (!body.isNull("username")) {
       // TODO: check if username exists
 
-      await user.updateUsername(userId, username, t);
+      await user.updateUsername(userId, body.get("username"), t);
+      body.del("username");
     }
 
-    await Profile.update(data, {
+    await Profile.update(body, {
       where: { id: profileId },
       transaction: t,
       individualHooks: true,

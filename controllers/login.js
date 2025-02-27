@@ -1,10 +1,9 @@
 import Profile from "../models/Profile.js";
 import User from "../models/user.js";
-import checks from "../utils/checks.js";
-import _req from "../utils/request.js";
-import p from "../utils/password.js";
+import password from "../utils/password.js";
 import auth, { SID } from "../middlewares/auth.js";
 import { client } from "../db/clients.js";
+import ReqBody from "../utils/request.js";
 
 const LOGIN_FIELDS = ["username", "email", "mobile", "password"];
 
@@ -15,36 +14,24 @@ const LOGIN_FIELDS = ["username", "email", "mobile", "password"];
  * @param {NextFunction} next
  */
 const getUser = async (req, res, next) => {
-  const { username, email, mobile, password } = _req.getDataO(
-    req.body,
-    LOGIN_FIELDS
-  );
+  const body = new ReqBody(req.body, LOGIN_FIELDS);
 
-  if (_req.allNull(username, email, mobile)) return res.noParams();
-  if (_req.allNull(password)) return res.noParams();
+  if (body.fieldsNull("username mobile email")) return res.noParams();
+  if (body.isNull("password")) return res.noParams();
+  if (!body.isString("password")) return res.bad("Invalid type of password");
 
   try {
-    let user = null,
-      uniqueKeyVal;
-    if (!checks.isNull(username)) {
-      user = await User.findOne({ where: { username } });
-      uniqueKeyVal = username;
-    } else if (!checks.isNull(email)) {
-      user = await User.findOne({ where: { email } });
-      uniqueKeyVal = email;
-    } else if (!checks.isNull(mobile)) {
-      user = await User.findOne({ where: { mobile } });
-      uniqueKeyVal = mobile;
-    }
+    const [key, keyVal] = body.getNonNullField("username email mobile");
+    let user = await User.findOne({ where: { [key]: keyVal } });
 
-    if (checks.isNull(user)) return res.bad("Invalid user");
-    if (!p.compare(password, user.password))
+    if (user === null) return res.bad("Invalid user");
+    if (!password.compare(body.get("password"), user.password))
       return res.unauth("Wrong Password");
 
     const userId = user.id;
     const profile = await Profile.findOne({ where: { userId } });
 
-    req.setParams = { user, userId, profile, keyVal: uniqueKeyVal };
+    req.setParams = { user, userId, profile, keyVal };
 
     next();
   } catch (err) {
@@ -60,16 +47,14 @@ const getUser = async (req, res, next) => {
  * @param {Response} res
  */
 const login = async (req, res) => {
-  const { user, userId, profile: isProfile, keyVal } = req.setParams;
-
-  const profile = await Profile.findOne({ where: { userId } });
+  const { user, userId, profile, keyVal } = req.setParams;
 
   try {
     const sessionId = await auth.setup(userId, res, keyVal);
 
     res.ok("Login successfull", {
       sessionId,
-      profileCreated: !checks.isNull(isProfile),
+      profileCreated: profile !== null,
       profile,
     });
   } catch (err) {

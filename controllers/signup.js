@@ -1,7 +1,7 @@
 import { client } from "../db/clients.js";
 import auth from "../middlewares/auth.js";
 import User from "../models/user.js";
-import _req from "../utils/request.js";
+import ReqBody from "../utils/request.js";
 
 const EMAIL_REGEXP = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASS_FIELDS = ["password", "confirmationId"];
@@ -13,15 +13,19 @@ const PASS_FIELDS = ["password", "confirmationId"];
  * @returns {Response | null}
  */
 const createPassword = async (req, res) => {
-  const { password, confirmationId } = _req.getDataO(req.body, PASS_FIELDS);
+  const body = new ReqBody(req.body, PASS_FIELDS);
 
-  if (_req.anyNull(password, confirmationId)) return res.noParams();
-  if (typeof password !== "string") return res.bad("Invalid type of password");
+  if (body.anyFieldNull("password confirmationId")) return res.noParams();
+
+  const [password, confirmationId] = body.bulkGet("password confirmationId");
+  if (!body.isString("password")) return res.bad("Invalid type of password");
 
   try {
+    // check confirmationId for the creating password
     const key = await client.get(confirmationId);
     if (key === null) return res.bad("Invalid confirmation Id");
 
+    // check if email or mobile
     const isEmail = EMAIL_REGEXP.test(key);
     const updateWith = isEmail ? { email: key } : { mobile: key };
 
@@ -33,7 +37,7 @@ const createPassword = async (req, res) => {
 
     res.ok("User created and logged In", { sessionId });
 
-    client.del(confirmationId);
+    client.del(confirmationId); // delete the used confirmationId
   } catch (err) {
     console.log(err);
 
