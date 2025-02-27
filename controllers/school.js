@@ -1,6 +1,6 @@
-import _req from "../utils/request.js";
 import checks from "../utils/checks.js";
 import School from "../models/School.js";
+import ReqBody from "../utils/request.js";
 
 const SCHOOL_FIELDS = [
   "schoolName",
@@ -21,27 +21,23 @@ const SCHOOL_FIELDS = [
 const createSchools = async (req, res) => {
   const profileId = req.user.profile.id;
 
+  const body = new ReqBody(req.body, [...SCHOOL_FIELDS, "schools"]);
+
   const schools = [];
-  if (!Array.isArray(req.body.schools)) return res.noParams();
+  if (body.fieldNotArray("schools")) return res.noParams();
 
   try {
-    for (const school of req.body.schools) {
-      const data = _req.getDataO(school, SCHOOL_FIELDS);
+    for (const school of body.get("schools")) {
+      const data = new ReqBody(school, SCHOOL_FIELDS);
 
-      if (!checks.isNull(data.startDate)) data.startDate = Date(data.startDate);
-      if (!checks.isNull(data.endDate)) data.endDate = Date(data.endDate);
+      if (!data.isNull("startDate"))
+        data.set("startDate", data.get("startDate"));
+      if (!data.isNull("endDate")) data.set("endDate", data.get("endDate"));
 
-      if (
-        _req.anyNull(
-          data.schoolName,
-          data.studyCourse,
-          data.startYear,
-          data.endYear
-        )
-      )
+      if (data.anyFieldNull("schoolName studyCourse startYear endYear"))
         return res.noParams();
 
-      data.profileId = profileId; // add profile Id in the school
+      data.set("profileId", profileId); // add profile Id in the school
       schools.push(data);
     }
 
