@@ -15,7 +15,7 @@ const OTP_FIELDS = ["mobile", "email", "isMobile", "otp", "confirmationId"];
 const getOtp = async (req, res) => {
   const body = new ReqBody(req.body, OTP_FIELDS);
 
-  if (body.anyFieldNull("email mobile")) return res.noParams();
+  if (body.fieldsNull("email mobile")) return res.noParams();
 
   // TODO: check if email or mobile available
   const isMobile = body.get("isMobile");
