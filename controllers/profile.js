@@ -1,4 +1,3 @@
-import checks from "../utils/checks.js";
 import { db } from "../db/clients.js";
 import Profile from "../models/Profile.js";
 import user from "../utils/user.js";
@@ -15,10 +14,11 @@ const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
  * @returns
  */
 const getProfile = async (req, res) => {
-  const { id = null } = req.query;
+  const query = new ReqBody(req.query);
 
-  if (id === null) return res.noParams();
+  if (query.isNull("id")) return res.noParams();
 
+  const id = query.get("id");
   try {
     let profile = await Profile.findByPk(id, {
       attributes: { exclude: ["userId"] },
@@ -27,6 +27,7 @@ const getProfile = async (req, res) => {
       ],
     });
 
+    // set profile readable
     profile = {
       ...profile.get({ plain: true }),
       username: req.user.username,
@@ -80,10 +81,10 @@ const getMyProfile = async (req, res) => {
  * @returns
  */
 const getProfileByHandle = async (req, res) => {
-  const { handle = null } = req.params;
+  const params = new ReqBody(req.params);
+  if (params.isNull("handle")) return res.noParams();
 
-  if (handle === null) return res.noParams();
-
+  const handle = params.get("handle");
   try {
     let profile = await Profile.findOne({
       where: { handle },
@@ -94,7 +95,7 @@ const getProfileByHandle = async (req, res) => {
     profile = {
       ...profile.get({ plain: true }),
       username: profile.User.username,
-      isUsernameSet: !(profile.User.username === null),
+      isUsernameSet: profile.User.username !== null,
     };
 
     res.ok("Profile Found", { profile });

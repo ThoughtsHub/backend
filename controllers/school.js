@@ -1,4 +1,3 @@
-import checks from "../utils/checks.js";
 import School from "../models/School.js";
 import ReqBody from "../utils/request.js";
 
@@ -27,12 +26,14 @@ const createSchools = async (req, res) => {
   if (body.fieldNotArray("schools")) return res.noParams();
 
   try {
+    // put all the schools in an array by getting only the selected fixed fields
     for (const school of body.get("schools")) {
       const data = new ReqBody(school, SCHOOL_FIELDS);
 
-      if (!data.isNull("startDate"))
-        data.set("startDate", data.get("startDate"));
-      if (!data.isNull("endDate")) data.set("endDate", data.get("endDate"));
+      // set the dates to thier preffered datatypes
+      const [startDate, endDate] = data.bulkGet("startDate endDate");
+      if (!data.isNull("startDate")) data.set("startDate", Date(startDate));
+      if (!data.isNull("endDate")) data.set("endDate", Date(endDate));
 
       if (data.anyFieldNull("schoolName studyCourse startYear endYear"))
         return res.noParams();

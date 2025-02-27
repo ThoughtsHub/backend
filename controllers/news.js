@@ -18,29 +18,29 @@ const NEWS_FIELDS = [
  * @param {Response} res
  */
 const getNews = async (req, res) => {
-  const { offset = 0 } = req.query;
+  const query = new ReqBody(req.query);
+  if (query.isNull("offset")) query.set("offset", 0);
 
   try {
     let news = await News.findAll({
       attributes: { exclude: ["id"] },
-      offset,
+      offset: Number(query.get("offset")),
       limit: 30,
       order: [["createdAt", "desc"]],
     });
 
+    // convert the news to readable format
     const _news = [];
     for (const n of news) {
-      let nData = {
+      const newsData = {
         ...n.get({ plain: true }),
-        image: n.images[0],
+        image: n.images[0], // set only one news for frontend
       };
-      delete nData.images;
-      _news.push(nData);
+      delete newsData.images;
+      _news.push(newsData);
     }
 
-    news = _news;
-
-    res.ok("News", { news });
+    res.ok("News", { news: _news });
   } catch (err) {
     console.log(err);
 
@@ -57,7 +57,8 @@ const createNews = async (req, res) => {
   const body = new ReqBody(req.body, [...NEWS_FIELDS, "news"]);
 
   const news = [];
-  if (Array.isArray(body.get("news"))) {
+  if (!body.fieldNotArray("news")) {
+    // when the news field is given and is array
     for (const n of body.get("news")) {
       const newsData = new ReqBody(n, NEWS_FIELDS);
 
@@ -75,6 +76,7 @@ const createNews = async (req, res) => {
       news.push(newsData);
     }
   } else {
+    // if only one news given then put it also in the news array
     const image = body.get("image");
     if (typeof image === "string") body.set("images", [image]);
 
@@ -105,24 +107,27 @@ const createNews = async (req, res) => {
  * @param {Response} res
  */
 const updateNews = async (req, res) => {
-  const { title, description, image, images, tags, category, id } =
-    _req.getDataO(req.body, [...NEWS_FIELDS, "id"]);
+  const body = new ReqBody(req.body, [...NEWS_FIELDS, "id"]);
 
-  if (typeof image === "string") images = [image];
+  {
+    // set to only image if an image is given
+    const image = body.get("image");
+    if (typeof image === "string") body.set("images", [image]);
+  }
 
-  if (!Array.isArray(images)) return res.bad("No image given");
+  if (body.fieldNotArray("images")) return res.bad("No image given");
 
-  if (_req.anyNull(title, description, images, id)) return res.noParams();
+  if (body.anyFieldNull("title description images id")) return res.noParams();
 
   try {
     const [updated] = await News.update(
-      { title, description, images, tags, category },
-      { where: { id }, individualHooks: true }
+      body.bulkGetMap("title description images tags category"),
+      { where: { id: body.get("id") }, individualHooks: true }
     );
 
     if (updated !== 1) return res.bad("Invalid news id");
 
-    const news = await News.findOne({ where: { id } });
+    const news = await News.findOne({ where: { id: body.get("id") } });
     res.ok("News updated", { news });
   } catch (err) {
     console.log(err);
@@ -137,10 +142,11 @@ const updateNews = async (req, res) => {
  * @param {Response} res
  */
 const deleteNews = async (req, res) => {
-  const { handle = null } = req.params;
+  const params = new ReqBody(req.params);
 
-  if (handle === null) res.noParams();
+  if (params.isNull("handle")) return res.noParams();
 
+  const handle = params.get("handle");
   try {
     const destoryResult = await News.destroy({
       where: { handle },
