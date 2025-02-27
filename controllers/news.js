@@ -73,12 +73,12 @@ const createNews = async (req, res) => {
 
       newsData.set("handle", handle.create(newsData.get("title")));
 
-      news.push(newsData);
+      news.push(newsData.values);
     }
   } else {
     // if only one news given then put it also in the news array
     const image = body.get("image");
-    if (typeof image === "string") body.set("images", [image]);
+    if (body.isString("image")) body.set("images", [image]);
 
     if (body.fieldNotArray("images")) return res.bad("No image given");
 
@@ -87,7 +87,11 @@ const createNews = async (req, res) => {
 
     body.set("handle", handle.create(body.get("title")));
 
-    news.push(body);
+    // remove unneccesary information
+    body.del("news");
+    body.del("image");
+
+    news.push(body.values);
   }
 
   try {

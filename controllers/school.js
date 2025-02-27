@@ -39,7 +39,7 @@ const createSchools = async (req, res) => {
         return res.noParams();
 
       data.set("profileId", profileId); // add profile Id in the school
-      schools.push(data);
+      schools.push(data.values);
     }
 
     const updateResult = await School.bulkCreate(schools, { validate: true });
