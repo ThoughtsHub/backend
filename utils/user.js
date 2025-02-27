@@ -12,18 +12,19 @@ const getUserData = async (userId) => {
   userData.profile = userData.Profile;
   delete userData.Profile;
   userData.isProfile = userData.profile !== null;
+  userData.usernameSet = userData.username !== null;
 
   return userData;
 };
 
 const updateUsername = async (userId, username, t) => {
   await User.update(
-    { username, usernameSet: true },
+    { username },
     {
       where: { id: userId },
       transaction: t,
       individualHooks: true,
-      fields: ["username", "usernameSet"],
+      fields: ["username"],
     }
   );
 };
