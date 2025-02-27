@@ -6,6 +6,7 @@ const nullUndefined = [null, undefined];
 class ReqBody {
   constructor(body = {}, fields = []) {
     this.values = {};
+    if (fields.length === 0) fields = Object.keys(body);
     for (const field of fields) {
       this.values[field] = body[field];
     }
