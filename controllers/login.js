@@ -18,7 +18,7 @@ const getUser = async (req, res, next) => {
 
   if (body.fieldsNull("username mobile email")) return res.noParams();
   if (body.isNull("password")) return res.noParams();
-  if (body.isString("password")) return res.bad("Invalid type of password");
+  if (!body.isString("password")) return res.bad("Invalid type of password");
 
   try {
     const [key, keyVal] = body.getNonNullField("username email mobile");

@@ -18,7 +18,7 @@ const createPassword = async (req, res) => {
   if (body.anyFieldNull("password confirmationId")) return res.noParams();
 
   const [password, confirmationId] = body.bulkGet("password confirmationId");
-  if (body.isString("password")) return res.bad("Invalid type of password");
+  if (!body.isString("password")) return res.bad("Invalid type of password");
 
   try {
     // check confirmationId for the creating password
