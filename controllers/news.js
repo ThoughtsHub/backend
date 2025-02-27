@@ -56,7 +56,7 @@ const getNews = async (req, res) => {
 const createNews = async (req, res) => {
   const body = new ReqBody(req.body, [...NEWS_FIELDS, "news"]);
 
-  const news = [];
+  let news = [];
   if (!body.fieldNotArray("news")) {
     // when the news field is given and is array
     for (const n of body.get("news")) {
@@ -97,6 +97,11 @@ const createNews = async (req, res) => {
   try {
     const createResult = await News.bulkCreate(news);
 
+    news = news.map((instance) => {
+      instance.image = instance.images[0];
+      delete instance.images;
+      return instance;
+    });
     res.created("News Created", { news });
   } catch (err) {
     console.log(err);
