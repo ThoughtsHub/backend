@@ -6,6 +6,12 @@ const nullUndefined = [null, undefined];
  * A convinient way to handle request body
  */
 class ReqBody {
+  /**
+   * creates an object with the given fields,\
+   * if no fields given, copies the object
+   * @param {object} body
+   * @param {string[] | []} fields
+   */
   constructor(body = {}, fields = []) {
     this.values = {};
     if (fields.length === 0) fields = Object.keys(body);
