@@ -147,7 +147,7 @@ class ReqBody {
    * @param {string} field
    */
   toString = (field) =>
-    !this.isNull(field) && this.set(field, String(this.values[field]));
+    !this.isNull(field) && this.set(field, String(this.get(field)));
 
   /**
    * Converts the value of field to its number equivalent, if not possible, sets the value to default value
@@ -155,12 +155,9 @@ class ReqBody {
    * @param {number} defaultValue
    */
   toNumber = (field, defaultValue = 0) => {
-    const value = this.values[field];
-    try {
-      this.set(field, Number(value));
-    } catch {
-      this.set(field, defaultValue);
-    }
+    const value = this.get(field);
+    this.set(field, Number(value));
+    if (isNaN(this.get(field))) this.set(field, defaultValue);
   };
 
   /**
