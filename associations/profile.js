@@ -4,12 +4,16 @@ import Like from "../models/Like.js";
 import PoemPost from "../models/PoemPost.js";
 import Profile from "../models/Profile.js";
 import School from "../models/School.js";
+import Forum from "../models/Forum.js";
 
 export const F_KEY = "profileId";
 
 const profileAssociation = () => {
   Profile.hasMany(School, { foreignKey: F_KEY, onDelete: "CASCADE" });
   School.belongsTo(Profile, { foreignKey: F_KEY });
+
+  Profile.hasMany(Forum, { foreignKey: F_KEY, onDelete: "SET NULL" });
+  Forum.belongsTo(Profile, { foreignKey: F_KEY });
 
   Profile.hasMany(Vote, { foreignKey: F_KEY, onDelete: "SET NULL" });
   Vote.belongsTo(Profile, { foreignKey: F_KEY });
