@@ -28,8 +28,9 @@ response.serverError = function (message = "Internal server error") {
   this.failure(c.INTERNAL_SERVER_ERROR, message);
 };
 
-response.noParams = function () {
-  this.failure(c.BAD_REQUEST, "Required parameters not given");
+response.noParams = function (attributes = []) {
+  let message = "Required parameters not given : " + attributes.join("\n");
+  return this.failure(c.BAD_REQUEST, message);
 };
 
 response.invalidParams = function () {

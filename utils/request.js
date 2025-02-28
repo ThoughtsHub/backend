@@ -141,6 +141,13 @@ class ReqBody {
   };
 
   /**
+   * Returns true if given field is an array
+   * @param {string} field
+   * @returns {boolean}
+   */
+  isArray = (field) => Array.isArray(this.get(field));
+
+  /**
    * Removes all the null values from the body
    */
   clearNulls = () => {
