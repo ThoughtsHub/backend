@@ -143,6 +143,27 @@ class ReqBody {
   };
 
   /**
+   * Converts the value of a field to string
+   * @param {string} field
+   */
+  toString = (field) =>
+    !this.isNull(field) && this.set(field, String(this.values[field]));
+
+  /**
+   * Converts the value of field to its number equivalent, if not possible, sets the value to default value
+   * @param {string} field
+   * @param {number} defaultValue
+   */
+  toNumber = (field, defaultValue = 0) => {
+    const value = this.values[field];
+    try {
+      this.set(field, Number(value));
+    } catch {
+      this.set(field, defaultValue);
+    }
+  };
+
+  /**
    * Customize JSON serialization
    * @returns {Object}
    */
