@@ -3,7 +3,6 @@ import Profile from "../models/Profile.js";
 import user from "../utils/user.js";
 import School from "../models/School.js";
 import User from "../models/user.js";
-import ReqBody from "../utils/request.js";
 
 const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
 
@@ -14,7 +13,7 @@ const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
  * @returns
  */
 const getProfile = async (req, res) => {
-  const query = new ReqBody(req.query);
+  const query = req.query;
 
   if (query.isNull("id")) return res.noParams();
 
@@ -81,7 +80,7 @@ const getMyProfile = async (req, res) => {
  * @returns
  */
 const getProfileByHandle = async (req, res) => {
-  const params = new ReqBody(req.params);
+  const params = req.params;
   if (params.isNull("handle")) return res.noParams();
 
   const handle = params.get("handle");
@@ -117,7 +116,8 @@ const createProfile = async (req, res) => {
   const profile = req.user.isProfile;
   const profileId = req.user.profile?.id;
 
-  const body = new ReqBody(req.body, PROFILE_FIELDS);
+  const body = req.body;
+  body.setFields(PROFILE_FIELDS);
   const username = body.get("username");
 
   if (body.isNull("fullName"))
@@ -163,7 +163,8 @@ const replaceProfile = async (req, res) => {
   const userId = req.user.id;
   const profileId = req.user.profile?.id;
 
-  const body = new ReqBody(req.body, PROFILE_FIELDS);
+  const body = req.body;
+  body.setFields(PROFILE_FIELDS);
 
   if (body.isNull("fullName"))
     return res.bad("Full name cannot be set to nothing");
@@ -205,7 +206,8 @@ const fixProfile = async (req, res) => {
   const userId = req.user.id;
   const profileId = req.user.profile?.id;
 
-  const body = new ReqBody(req.body, PROFILE_FIELDS);
+  const body = req.body;
+  body.setFields(PROFILE_FIELDS);
 
   body.clearNulls();
 

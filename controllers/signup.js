@@ -1,7 +1,6 @@
 import { client } from "../db/clients.js";
 import auth from "../middlewares/auth.js";
 import User from "../models/user.js";
-import ReqBody from "../utils/request.js";
 
 const EMAIL_REGEXP = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASS_FIELDS = ["password", "confirmationId"];
@@ -13,7 +12,8 @@ const PASS_FIELDS = ["password", "confirmationId"];
  * @returns {Response | null}
  */
 const createPassword = async (req, res) => {
-  const body = new ReqBody(req.body, PASS_FIELDS);
+  const body = req.body;
+  body.setFields(PASS_FIELDS);
 
   if (body.anyFieldNull("password confirmationId")) return res.noParams();
 

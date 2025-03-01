@@ -48,7 +48,7 @@ router.get("/reload-website", async (_, res) => {
  * if both given, email will be given preference, then mobile
  */
 router.get("/delete-user", async (req, res) => {
-  const body = new ReqBody(req.query);
+  const body = req.query;
 
   if (body.fieldsNull("email mobile")) return res.noParams();
 

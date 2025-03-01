@@ -5,7 +5,7 @@ const nullUndefined = [null, undefined];
 /**
  * A convinient way to handle request body
  */
-class ReqBody {
+class UpgradedBody {
   /**
    * creates an object with the given fields,\
    * if no fields given, copies the object
@@ -19,6 +19,19 @@ class ReqBody {
       this.values[field] = body[field];
     }
   }
+
+  /**
+   * Sets up the body with fields if previously not set up \
+   * removes the prev created body
+   * @param {string[]} fields
+   */
+  setFields = (fields = []) => {
+    const body = this.values;
+    this.values = {};
+    for (const field of fields) {
+      this.values[field] = body[field];
+    }
+  };
 
   /**
    * Gets the value of a field in the body
@@ -190,4 +203,4 @@ class ReqBody {
   }
 }
 
-export default ReqBody;
+export default UpgradedBody;

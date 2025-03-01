@@ -3,7 +3,6 @@ import User from "../models/user.js";
 import password from "../utils/password.js";
 import auth, { SID } from "../middlewares/auth.js";
 import { client } from "../db/clients.js";
-import ReqBody from "../utils/request.js";
 
 const LOGIN_FIELDS = ["username", "email", "mobile", "password"];
 
@@ -14,7 +13,8 @@ const LOGIN_FIELDS = ["username", "email", "mobile", "password"];
  * @param {NextFunction} next
  */
 const getUser = async (req, res, next) => {
-  const body = new ReqBody(req.body, LOGIN_FIELDS);
+  const body = req.body;
+  body.setFields(LOGIN_FIELDS);
 
   if (body.fieldsNull("username mobile email")) return res.noParams();
   if (body.isNull("password")) return res.noParams();
