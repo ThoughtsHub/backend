@@ -9,7 +9,6 @@ const PASS_FIELDS = ["password", "confirmationId"];
  * creates a new user with the sent unique source and the desired password
  * @param {Request} req
  * @param {Response} res
- * @returns {Response | null}
  */
 const createPassword = async (req, res) => {
   const body = req.body;

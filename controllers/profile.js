@@ -10,7 +10,6 @@ const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
  * gets the profile with the requested profile Id
  * @param {Request} req
  * @param {Response} res
- * @returns
  */
 const getProfile = async (req, res) => {
   const query = req.query;
@@ -45,7 +44,6 @@ const getProfile = async (req, res) => {
  * gets the user's profile
  * @param {Request} req
  * @param {Response} res
- * @returns
  */
 const getMyProfile = async (req, res) => {
   const profileId = req.user.profile?.id;
@@ -77,7 +75,6 @@ const getMyProfile = async (req, res) => {
  * profile's handle
  * @param {Request} req
  * @param {Response} res
- * @returns
  */
 const getProfileByHandle = async (req, res) => {
   const params = req.params;
@@ -109,7 +106,6 @@ const getProfileByHandle = async (req, res) => {
  * creates a profile for user
  * @param {Request} req
  * @param {Response} res
- * @returns
  */
 const createProfile = async (req, res) => {
   const userId = req.user.id;
@@ -157,7 +153,6 @@ const createProfile = async (req, res) => {
  * new information
  * @param {Request} req
  * @param {Response} res
- * @returns
  */
 const replaceProfile = async (req, res) => {
   const userId = req.user.id;
@@ -200,7 +195,6 @@ const replaceProfile = async (req, res) => {
  * with given values
  * @param {Request} req
  * @param {Response} res
- * @returns
  */
 const fixProfile = async (req, res) => {
   const userId = req.user.id;

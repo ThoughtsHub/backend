@@ -9,7 +9,6 @@ const OTP_FIELDS = ["mobile", "email", "isMobile", "otp", "confirmationId"];
  * target [email | mobile]
  * @param {Request} req
  * @param {Response} res
- * @returns {Response | null}
  */
 const getOtp = async (req, res) => {
   const body = req.body;
@@ -51,7 +50,6 @@ const getOtp = async (req, res) => {
  * verifies the sent otp
  * @param {Request} req
  * @param {Response} res
- * @returns {Response | null}
  */
 const verifyOtp = async (req, res) => {
   const body = req.body;

@@ -15,7 +15,6 @@ const SCHOOL_FIELDS = [
  * Adds the schools given as parameters
  * @param {Request} req
  * @param {Response} res
- * @returns
  */
 const createSchools = async (req, res) => {
   const profileId = req.user.profile.id;
