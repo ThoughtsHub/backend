@@ -1,3 +1,4 @@
+import { ForumController } from "./forums.js";
 import { LoginController } from "./login.js";
 import { NewsController } from "./news.js";
 import { OtpController } from "./otp.js";
@@ -15,6 +16,7 @@ const controller = {
   school: SchoolController,
   profile: ProfileController,
   news: NewsController,
+  forums: ForumController,
 };
 
 export default controller;

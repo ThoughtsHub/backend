@@ -6,6 +6,12 @@ const nullUndefined = [null, undefined];
  * A convinient way to handle request body
  */
 class ReqBody {
+  /**
+   * creates an object with the given fields,\
+   * if no fields given, copies the object
+   * @param {object} body
+   * @param {string[] | []} fields
+   */
   constructor(body = {}, fields = []) {
     this.values = {};
     if (fields.length === 0) fields = Object.keys(body);
@@ -135,11 +141,36 @@ class ReqBody {
   };
 
   /**
+   * Returns true if given field is an array
+   * @param {string} field
+   * @returns {boolean}
+   */
+  isArray = (field) => Array.isArray(this.get(field));
+
+  /**
    * Removes all the null values from the body
    */
   clearNulls = () => {
     const keys = Object.keys(this.values);
     keys.forEach((field) => (this.isNull(field) ? this.del(field) : null));
+  };
+
+  /**
+   * Converts the value of a field to string
+   * @param {string} field
+   */
+  toString = (field) =>
+    !this.isNull(field) && this.set(field, String(this.get(field)));
+
+  /**
+   * Converts the value of field to its number equivalent, if not possible, sets the value to default value
+   * @param {string} field
+   * @param {number} defaultValue
+   */
+  toNumber = (field, defaultValue = 0) => {
+    const value = this.get(field);
+    this.set(field, Number(value));
+    if (isNaN(this.get(field))) this.set(field, defaultValue);
   };
 
   /**
