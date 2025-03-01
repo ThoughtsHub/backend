@@ -37,6 +37,11 @@ const getForums = async (req, res) => {
   }
 };
 
+/**
+ * Gets the currenly logged user's forums
+ * @param {Request} req
+ * @param {Response} res
+ */
 const getMyForums = async (req, res) => {
   const profileId = req.user.profile.id;
 
@@ -64,6 +69,11 @@ const getMyForums = async (req, res) => {
   }
 };
 
+/**
+ * Gets a specified user's forums
+ * @param {Request} req
+ * @param {Response} res
+ */
 const getSomeoneForums = async (req, res) => {
   const query = req.query;
   query.toNumber("offset", 0);
@@ -95,6 +105,11 @@ const getSomeoneForums = async (req, res) => {
   }
 };
 
+/**
+ * Creates a forum from the currently logged in user
+ * @param {Request} req
+ * @param {Response} res
+ */
 const createForum = async (req, res) => {
   const profileId = req.user.profile.id;
   const body = req.body;
@@ -138,6 +153,11 @@ const createForum = async (req, res) => {
   }
 };
 
+/**
+ * Replaces the current forum information with new information
+ * @param {Request} req
+ * @param {Response} res
+ */
 const replaceForum = async (req, res) => {
   const body = req.body;
   body.setFields(FORUM_FIELDS);
@@ -163,6 +183,11 @@ const replaceForum = async (req, res) => {
   res.serverError();
 };
 
+/**
+ * updates specified information about the forum
+ * @param {Request} req
+ * @param {Response} res
+ */
 const updateForum = async (req, res) => {
   const body = req.body;
   body.setFields(FORUM_FIELDS);
@@ -185,6 +210,11 @@ const updateForum = async (req, res) => {
   res.serverError();
 };
 
+/**
+ * Deletes a specified forum
+ * @param {Request} req
+ * @param {Response} res
+ */
 const deleteForum = async (req, res) => {
   const forumId = req.forumId;
 
