@@ -18,7 +18,7 @@ const NEWS_FIELDS = [
  * @param {Response} res
  */
 const getNews = async (req, res) => {
-  const query = new ReqBody(req.query);
+  const query = req.query;
   if (query.isNull("offset")) query.set("offset", 0);
 
   try {
@@ -54,7 +54,8 @@ const getNews = async (req, res) => {
  * @param {Response} res
  */
 const createNews = async (req, res) => {
-  const body = new ReqBody(req.body, [...NEWS_FIELDS, "news"]);
+  const body = req.body;
+  body.setFields([...NEWS_FIELDS, "news"]);
 
   let news = [];
   if (!body.fieldNotArray("news")) {
@@ -116,7 +117,8 @@ const createNews = async (req, res) => {
  * @param {Response} res
  */
 const updateNews = async (req, res) => {
-  const body = new ReqBody(req.body, [...NEWS_FIELDS, "id"]);
+  const body = req.body;
+  body.setFields([...NEWS_FIELDS, "id"]);
 
   {
     // set to only image if an image is given
@@ -151,7 +153,7 @@ const updateNews = async (req, res) => {
  * @param {Response} res
  */
 const deleteNews = async (req, res) => {
-  const params = new ReqBody(req.params);
+  const params = req.params;
 
   if (params.isNull("handle")) return res.noParams();
 

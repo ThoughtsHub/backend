@@ -13,7 +13,7 @@ const FORUM_FIELDS = ["title", "description", "image", "images", "handle"];
  * @param {Response} res
  */
 const getForums = async (req, res) => {
-  const query = new ReqBody(req.query);
+  const query = req.query;
   query.toNumber("offset", 0);
 
   const offset = query.get("offset");
@@ -40,7 +40,7 @@ const getForums = async (req, res) => {
 const getMyForums = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const query = new ReqBody(req.query);
+  const query = req.query;
   query.toNumber("offset", 0);
 
   const offset = query.get("offset");
@@ -65,7 +65,7 @@ const getMyForums = async (req, res) => {
 };
 
 const getSomeoneForums = async (req, res) => {
-  const query = new ReqBody(req.query);
+  const query = req.query;
   query.toNumber("offset", 0);
 
   if (!query.isString("profileId")) return res.bad("Invalid profileId");
@@ -97,7 +97,8 @@ const getSomeoneForums = async (req, res) => {
 
 const createForum = async (req, res) => {
   const profileId = req.user.profile.id;
-  const body = new ReqBody(req.body, [...FORUM_FIELDS, "forums"]);
+  const body = req.body;
+  body.setFields([...FORUM_FIELDS, "forums"]);
 
   const forums = [];
 
@@ -138,7 +139,8 @@ const createForum = async (req, res) => {
 };
 
 const replaceForum = async (req, res) => {
-  const body = new ReqBody(req.body, FORUM_FIELDS);
+  const body = req.body;
+  body.setFields(FORUM_FIELDS);
   const forumId = req.forumId;
 
   if (body.anyFieldNull("title description")) return res.noParams();
@@ -162,7 +164,8 @@ const replaceForum = async (req, res) => {
 };
 
 const updateForum = async (req, res) => {
-  const body = new ReqBody(req.body, FORUM_FIELDS);
+  const body = req.body;
+  body.setFields(FORUM_FIELDS);
   const forumId = req.forumId;
 
   body.clearNulls();

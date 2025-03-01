@@ -20,7 +20,8 @@ const SCHOOL_FIELDS = [
 const createSchools = async (req, res) => {
   const profileId = req.user.profile.id;
 
-  const body = new ReqBody(req.body, [...SCHOOL_FIELDS, "schools"]);
+  const body = req.body;
+  body.setFields([...SCHOOL_FIELDS, "schools"]);
 
   const schools = [];
   if (body.fieldNotArray("schools")) return res.noParams();

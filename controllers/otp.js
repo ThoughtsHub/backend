@@ -1,7 +1,6 @@
 import otp from "../utils/otp.js";
 import { client } from "../db/clients.js";
 import { v4 } from "uuid";
-import ReqBody from "../utils/request.js";
 
 const OTP_FIELDS = ["mobile", "email", "isMobile", "otp", "confirmationId"];
 
@@ -13,7 +12,8 @@ const OTP_FIELDS = ["mobile", "email", "isMobile", "otp", "confirmationId"];
  * @returns {Response | null}
  */
 const getOtp = async (req, res) => {
-  const body = new ReqBody(req.body, OTP_FIELDS);
+  const body = req.body;
+  body.setFields(OTP_FIELDS);
 
   if (body.fieldsNull("email mobile")) return res.noParams();
 
@@ -54,7 +54,8 @@ const getOtp = async (req, res) => {
  * @returns {Response | null}
  */
 const verifyOtp = async (req, res) => {
-  const body = new ReqBody(req.body, OTP_FIELDS);
+  const body = req.body;
+  body.setFields(OTP_FIELDS);
 
   if (body.anyFieldNull("otp confirmationId")) return res.noParams();
 
