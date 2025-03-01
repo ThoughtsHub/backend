@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import News from "../models/News.js";
 import handle from "../utils/handle.js";
 import ReqBody from "../utils/request.js";
@@ -19,14 +20,14 @@ const NEWS_FIELDS = [
  */
 const getNews = async (req, res) => {
   const query = req.query;
-  if (query.isNull("offset")) query.set("offset", 0);
+  query.toNumber("timestamp", 0);
 
   try {
     let news = await News.findAll({
       attributes: { exclude: ["id"] },
-      offset: Number(query.get("offset")),
+      where: { createdAt: { [Op.gt]: query.get("timestamp") } },
       limit: 30,
-      order: [["createdAt", "desc"]],
+      order: [["createdAt", "asc"]],
     });
 
     // convert the news to readable format

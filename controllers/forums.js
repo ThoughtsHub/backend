@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import Comment from "../models/Comment.js";
 import Forum from "../models/Forum.js";
 import Profile from "../models/Profile.js";
@@ -14,14 +15,13 @@ const FORUM_FIELDS = ["title", "description", "image", "images", "handle"];
  */
 const getForums = async (req, res) => {
   const query = req.query;
-  query.toNumber("offset", 0);
+  query.toNumber("timestamp", 0);
 
-  const offset = query.get("offset");
   try {
     const forums = await Forum.findAll({
-      offset,
+      where: { createdAt: { [Op.gt]: query.get("timestamp") } },
       limit: 30,
-      order: [["createdAt", "desc"]],
+      order: [["createdAt", "asc"]],
       include: [
         { model: Profile, attributes: ["fullName", "about"] },
         { model: Comment, offset: 0, limit: 2, order: [["createdAt", "desc"]] },
