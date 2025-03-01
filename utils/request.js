@@ -21,6 +21,19 @@ class UpgradedBody {
   }
 
   /**
+   * Sets up the body with fields if previously not set up \
+   * removes the prev created body
+   * @param {string[]} fields
+   */
+  setFields = (fields = []) => {
+    const body = this.values;
+    this.values = {};
+    for (const field of fields) {
+      this.values[field] = body[field];
+    }
+  };
+
+  /**
    * Gets the value of a field in the body
    * @param {string} field
    * @returns {any}
