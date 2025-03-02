@@ -9,7 +9,7 @@ import ReqBody from "../utils/request.js";
  */
 const forumBelongsToUser = async (req, res, next) => {
   const profileId = req.user.profile.id;
-  const body = new ReqBody(req.body);
+  const body = req.body;
 
   if (body.isNull("forumId")) return res.noParams(["forumId"]);
   if (!body.isString("forumId")) return res.bad("Invalid forum Id");

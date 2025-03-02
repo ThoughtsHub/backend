@@ -13,7 +13,7 @@ const COOKIE_OPTIONS = {
   secure: true,
 };
 
-export const SID = "sessionId";
+export const SID = "userToken";
 export const HSID = "auth_token";
 
 /**
@@ -23,7 +23,7 @@ export const HSID = "auth_token";
  * @param {String} userId
  * @param {Response} res
  * @param {String} keyVal
- * @returns {Promise<String>} sessionId
+ * @returns {Promise<String>} userToken
  */
 const setupAuthentication = async (userId, res, keyVal) => {
   // generate tokens
@@ -34,13 +34,13 @@ const setupAuthentication = async (userId, res, keyVal) => {
 
   const tokensStringified = JSON.stringify(tokens);
 
-  const sessionId = `${keyVal ?? userId}-${uuidv4()}`; // create a random session Id
+  const userToken = `${keyVal ?? userId}-${uuidv4()}`; // create a random session Id
 
-  await client.setEx(sessionId, 7 * 24 * 60 * 60, tokensStringified); // set expiry
+  await client.setEx(userToken, 7 * 24 * 60 * 60, tokensStringified); // set expiry
 
-  res.cookie(SID, sessionId, COOKIE_OPTIONS);
+  res.cookie(SID, userToken, COOKIE_OPTIONS);
 
-  return sessionId;
+  return userToken;
 };
 
 /**
@@ -76,15 +76,14 @@ const verifyTokens = async ({ access, refresh }) => {
  * @param {Request} req
  * @param {Response} res
  * @param {Function} next
- * @returns
  */
 const verifyConnection = async (req, res, next) => {
   try {
-    const sessionId = req.headers[HSID] ?? req.cookies[SID] ?? null; // get session Id
+    const userToken = req.headers[HSID] ?? req.cookies[SID] ?? null; // get session Id
 
-    if (typeof sessionId !== "string") return next(); // verification failed
+    if (typeof userToken !== "string") return next(); // verification failed
 
-    const tokensStringified = await client.get(sessionId);
+    const tokensStringified = await client.get(userToken);
 
     if (tokensStringified === null) return next(); // verification failed
 
@@ -99,7 +98,7 @@ const verifyConnection = async (req, res, next) => {
           .json({ message: "User is blocked by admin" });
 
       req.user = userData; // set user data
-      req.sessionId = sessionId; // set session id for logout
+      req.userToken = userToken; // set session id for logout
     } catch (err) {
       console.log(err);
     }
@@ -116,7 +115,6 @@ const verifyConnection = async (req, res, next) => {
  * @param {Request} req
  * @param {Response} res
  * @param {Function} next
- * @returns
  */
 const admin = (req, res, next) => {
   const username = req.user.username;
@@ -131,7 +129,6 @@ const admin = (req, res, next) => {
  * @param {Request} req
  * @param {Response} res
  * @param {Function} next
- * @returns
  */
 const isLoggedIn = (req, res, next) => {
   if (req.user === undefined) return res.unauth("You are not logged in");
@@ -144,7 +141,6 @@ const isLoggedIn = (req, res, next) => {
  * @param {Request} req
  * @param {Response} res
  * @param {Function} next
- * @returns
  */
 const isProfile = async (req, res, next) => {
   const isProfile = req.user.isProfile;

@@ -50,10 +50,10 @@ const login = async (req, res) => {
   const { user, userId, profile, keyVal } = req.setParams;
 
   try {
-    const sessionId = await auth.setup(userId, res, keyVal);
+    const userToken = await auth.setup(userId, res, keyVal);
 
     res.ok("Login successfull", {
-      sessionId,
+      userToken,
       profileCreated: profile !== null,
       profile,
     });
@@ -71,7 +71,7 @@ const login = async (req, res) => {
  */
 const logout = async (req, res) => {
   try {
-    await client.del(req.sessionId); // remove from db
+    await client.del(req.userToken); // remove from db
     res.clearCookie(SID); // remove cookies
 
     res.deleted();
