@@ -32,9 +32,9 @@ const createPassword = async (req, res) => {
 
     const user = await User.create({ ...updateWith, password });
 
-    const sessionId = await auth.setup(user.id, res, key);
+    const userToken = await auth.setup(user.id, res, key);
 
-    res.ok("User created and logged In", { sessionId });
+    res.ok("User created and logged In", { userToken });
 
     client.del(confirmationId); // delete the used confirmationId
   } catch (err) {
