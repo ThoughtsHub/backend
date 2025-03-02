@@ -1,6 +1,6 @@
 # Process
 
-## Signup
+## Signup Process
 
 1. POST /otp/get with mobile or email
 2. You will get a response with a confirmationId
@@ -9,7 +9,7 @@
 5. POST /signup/create-password with password and above confirmationId
 6. You will get a userToken, you can discard the confirmationId now
 
-# Routes
+# Endpoints
 
 ## Important Information
 
@@ -105,5 +105,136 @@ inside the field 'auth_token'
     success: bool
     message: "User created"
     userToken: string
+}
+```
+
+## GET /profile
+
+**Query :**
+
+```sh
+{
+    id: string
+}
+```
+
+**Response :**
+
+```sh
+{
+    success: bool
+    message: "Requested Profile"
+    profile: ({
+        id: string
+        fullName: string
+        about: string
+        ...
+
+        School: [
+            ({
+            schoolName: string
+            studyCourse: string
+            ...
+        }),
+        ...
+        ]
+    })
+}
+```
+
+## GET /profile/me
+
+**Response :**
+
+```sh
+{
+    success: bool
+    message: "Your Profile"
+    profile: ({
+        id: string
+        fullName: string
+        about: string
+        ...
+
+        Schools: [
+            ({
+            schoolName: string
+            studyCourse: string
+            ...
+        }),
+        ...
+        ]
+    })
+}
+```
+
+## POST /profile
+
+Creation and updation, both can happen on the same endpoint
+
+```sh
+{
+    fullName: string
+    dob: date [yyyy-dd-mm]
+    about: string
+    gender: string [male | female | other]
+}
+```
+
+**Response :**
+
+If updating, only those values that are changed will be returned
+
+```sh
+{
+    success: bool
+    message: "User created"
+    profile: ({
+        id: string
+        fullName: string
+        about: string
+        dob: string
+        gender: string
+        ...
+    })
+}
+```
+
+# Endpoints (Development Purposes)
+
+## /delete-user
+
+if email/mobile exists, will destory the user associated with that email/mobile
+
+**Query :**
+
+```sh
+{
+    [email | mobile] : string
+}
+```
+
+**Response :**
+
+```sh
+{
+    success: bool
+    message: string
+}
+```
+
+## /test
+
+**Response :**
+
+```sh
+{
+    success: bool
+    message: string
+    user: ({
+        id: string
+        username: string
+        ...
+    })
 }
 ```
