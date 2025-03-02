@@ -143,7 +143,9 @@ const createProfile = async (req, res) => {
     else await Profile.create({ ...fields, userId }, { transaction: t });
 
     await t.commit();
-    res.ok(`Profile ${profile ? "upda" : "crea"}ted`, { profile: fields });
+    res.ok(`Profile ${profile ? "upda" : "crea"}ted`, {
+      profile: { ...fields, id: profileId },
+    });
   } catch (err) {
     await t.rollback();
     console.log(err);
