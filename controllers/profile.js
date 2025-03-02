@@ -28,8 +28,9 @@ const getProfile = async (req, res) => {
     // set profile readable
     profile = {
       ...profile.get({ plain: true }),
-      username: req.user.username,
-      isUsernameSet: req.user.usernameSet,
+      /// right now username is not required
+      //  username: req.user.username,
+      //  isUsernameSet: req.user.usernameSet,
     };
 
     res.ok("Requested Profile", { profile });
