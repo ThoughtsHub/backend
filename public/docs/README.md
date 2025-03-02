@@ -7,13 +7,14 @@
 3. POST /otp/verify with otp and the above confirmationId
 4. You will get a response with a new confirmationId
 5. POST /signup/create-password with password and above confirmationId
-6. You will get a sessionId, you can discard the confirmationId now
+6. You will get a userToken, you can discard the confirmationId now
 
 # Routes
 
 ## Important Information
 
-sessionId when found, Send it with each subsequent request
+userToken when found, Send it with each subsequent request in headers \
+inside the field 'auth_token'
 
 ## POST /login
 
@@ -32,7 +33,7 @@ sessionId when found, Send it with each subsequent request
 {
     success: bool
     message: "Logged in"
-    sessionId: string
+    userToken: string
     profileCreated: bool
     profile: null | ({
         id: string
@@ -103,6 +104,6 @@ sessionId when found, Send it with each subsequent request
 {
     success: bool
     message: "User created"
-    sessionId: string
+    userToken: string
 }
 ```
