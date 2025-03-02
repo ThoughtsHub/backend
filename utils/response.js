@@ -29,12 +29,17 @@ response.serverError = function (message = "Internal server error") {
 };
 
 response.noParams = function (attributes = []) {
+  attributes =
+    typeof attributes === "string" ? attributes.split(" ") : attributes;
   let message = "Required parameters not given : " + attributes.join("\n");
   return this.failure(c.BAD_REQUEST, message);
 };
 
-response.invalidParams = function () {
-  this.failure(c.clientError.UNPROCESSABLE_ENTITY, "Invalid parameters given");
+response.invalidParams = function (attributes = []) {
+  attributes =
+    typeof attributes === "string" ? attributes.split(" ") : attributes;
+  let message = "Invalid parameters given : " + attributes.join("\n");
+  this.failure(c.clientError.UNPROCESSABLE_ENTITY, message);
 };
 
 response.noMethod = function () {
