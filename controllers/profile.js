@@ -3,6 +3,7 @@ import Profile from "../models/Profile.js";
 import user from "../utils/user.js";
 import School from "../models/School.js";
 import User from "../models/user.js";
+import handle from "../utils/handle.js";
 
 const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
 
@@ -59,8 +60,8 @@ const getMyProfile = async (req, res) => {
 
     profile = {
       ...profile.get({ plain: true }),
-      username: req.user.username,
-      isUsernameSet: req.user.usernameSet,
+      //   username: req.user.username,
+      //   isUsernameSet: req.user.usernameSet,
     };
 
     res.ok("Your Profile", { profile });
@@ -91,8 +92,8 @@ const getProfileByHandle = async (req, res) => {
 
     profile = {
       ...profile.get({ plain: true }),
-      username: profile.User.username,
-      isUsernameSet: profile.User.username !== null,
+      //   username: profile.User.username,
+      //   isUsernameSet: profile.User.username !== null,
     };
 
     res.ok("Profile Found", { profile });
@@ -120,12 +121,14 @@ const createProfile = async (req, res) => {
   if (body.isNull("fullName"))
     return res.bad("Full Name is neccessary for creating profile");
 
+  if (!profile) body.set("handle", handle.create(body.get("fullName")));
+
   const t = await db.transaction();
   try {
     if (!body.isNull("dob")) body.set("dob", Date(body.get("dob")));
-    const fields = body.bulkGetMap("fullName gender about dob");
+    const fields = body.bulkGetMap("fullName gender about dob handle");
 
-    if (!checks.isNull(username)) {
+    if (!body.isNull(username)) {
       // TODO: check if username exists
 
       await user.updateUsername(userId, username, t);
