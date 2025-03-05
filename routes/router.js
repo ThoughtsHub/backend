@@ -10,6 +10,7 @@ import { SignupRouter } from "./signup.js";
 import { TestRouter } from "./extras_testing.js";
 import { ForumsRouter } from "./forums.js";
 import upgradeRequest from "../middlewares/body.js";
+import { RootRouter } from "./root.js";
 
 const app = Router();
 
@@ -18,6 +19,7 @@ app.use(auth.verify);
 // upgrade body/query of the request
 app.use(upgradeRequest);
 
+app.use("/", RootRouter);
 app.use("/signup", SignupRouter);
 app.use("/login", LoginRouter);
 app.use("/logout", auth.login, LogoutRouter);

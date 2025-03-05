@@ -5,6 +5,6 @@ const SignupController = controller.signup;
 
 const router = Router();
 
-router.post("/create-password", SignupController.createPassword);
+router.post("/create_password", SignupController.createPassword);
 
 export const SignupRouter = router;
