@@ -3,7 +3,7 @@ import auth from "../middlewares/auth.js";
 import User from "../models/user.js";
 
 const EMAIL_REGEXP = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const PASS_FIELDS = ["password", "confirmationId"];
+const PASS_FIELDS = ["password", "otpToken"];
 
 /**
  * creates a new user with the sent unique source and the desired password
@@ -14,14 +14,17 @@ const createPassword = async (req, res) => {
   const body = req.body;
   body.setFields(PASS_FIELDS);
 
-  if (body.anyFieldNull("password confirmationId")) return res.noParams();
+  const otpToken = req.headers['otpToken']
+  body.set("otpToken", otpToken);
 
-  const [password, confirmationId] = body.bulkGet("password confirmationId");
+  if (body.anyFieldNull("password otpToken")) return res.noParams("password otpToken");
+
+  const password = body.get("password");
   if (!body.isString("password")) return res.bad("Invalid type of password");
 
   try {
-    // check confirmationId for the creating password
-    const key = await client.get(confirmationId);
+    // check otpToken for the creating password
+    const key = await client.get(otpToken);
     if (key === null) return res.bad("Invalid confirmation Id");
 
     // check if email or mobile
@@ -36,7 +39,7 @@ const createPassword = async (req, res) => {
 
     res.ok("User created and logged In", { userToken });
 
-    client.del(confirmationId); // delete the used confirmationId
+    client.del(otpToken); // delete the used otpToken
   } catch (err) {
     console.log(err);
 

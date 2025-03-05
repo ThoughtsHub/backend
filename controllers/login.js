@@ -16,8 +16,9 @@ const getUser = async (req, res, next) => {
   const body = req.body;
   body.setFields(LOGIN_FIELDS);
 
-  if (body.fieldsNull("username mobile email")) return res.noParams();
-  if (body.isNull("password")) return res.noParams();
+  if (body.fieldsNull("username mobile email"))
+    return res.noParams(["username", "mobile", "email"]);
+  if (body.isNull("password")) return res.noParams(["password"]);
   if (!body.isString("password")) return res.bad("Invalid type of password");
 
   try {
@@ -54,8 +55,10 @@ const login = async (req, res) => {
 
     res.ok("Login successfull", {
       userToken,
-      profileCreated: profile !== null,
-      profile,
+      user: {
+        ...profile,
+        profileId: profile.id,
+      },
     });
   } catch (err) {
     console.log(err);

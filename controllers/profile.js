@@ -5,7 +5,13 @@ import School from "../models/School.js";
 import User from "../models/user.js";
 import handle from "../utils/handle.js";
 
-const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
+const PROFILE_FIELDS = [
+  "fullName",
+  "about",
+  "gender",
+  "dob",
+  "profileImageUrl",
+];
 
 /**
  * gets the profile with the requested profile Id
@@ -15,26 +21,29 @@ const PROFILE_FIELDS = ["fullName", "about", "gender", "dob"];
 const getProfile = async (req, res) => {
   const query = req.query;
 
-  if (query.isNull("id")) return res.noParams();
+  if (query.isNull("id")) query.set("id", req.user.profile.id);
 
   const id = query.get("id");
   try {
     let profile = await Profile.findByPk(id, {
-      attributes: { exclude: ["userId"] },
       include: [
         { model: School, attributes: { exclude: ["profileId", "id"] } },
       ],
     });
 
+    let user = await User.findByPk(profile.userId);
+
     // set profile readable
     profile = {
       ...profile.get({ plain: true }),
-      /// right now username is not required
-      //  username: req.user.username,
-      //  isUsernameSet: req.user.usernameSet,
+      userId: null,
+      username: user.username,
+      profileId: profile.id,
+      storyCount: profile.posts,
+      forumsCount: profile.forums,
     };
 
-    res.ok("Requested Profile", { profile });
+    res.ok("Profile", { ...profile });
   } catch (err) {
     console.log(err);
 
@@ -123,9 +132,10 @@ const createProfile = async (req, res) => {
 
   if (!profile) body.set("handle", handle.create(body.get("fullName")));
 
+  if (!body.isNull("dob")) body.toNumber("dob", null);
+
   const t = await db.transaction();
   try {
-    if (!body.isNull("dob")) body.set("dob", Date(body.get("dob")));
     const fields = body.bulkGetMap("fullName gender about dob handle");
 
     if (!body.isNull(username)) {
@@ -144,7 +154,7 @@ const createProfile = async (req, res) => {
 
     await t.commit();
     res.ok(`Profile ${profile ? "upda" : "crea"}ted`, {
-      profile: { ...fields, id: profileId },
+      profile: { ...fields, profileId },
     });
   } catch (err) {
     await t.rollback();

@@ -2,8 +2,9 @@ import School from "../models/School.js";
 import ReqBody from "../utils/request.js";
 
 const SCHOOL_FIELDS = [
-  "schoolName",
-  "studyCourse",
+  "collegeId",
+  "degreeId",
+  "fieldId",
   "description",
   "startDate",
   "startYear",

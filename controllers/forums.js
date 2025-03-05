@@ -120,7 +120,8 @@ const createForum = async (req, res) => {
   if (body.isArray("forums")) {
     for (const _ of body.get("forums")) {
       const forum = new ReqBody(_, FORUM_FIELDS);
-      if (forum.anyFieldNull("title description")) return res.noParams();
+      if (forum.anyFieldNull("title description"))
+        return res.noParams("title description");
 
       if (forum.isString("image")) forum.set("images", [forum.get("image")]);
 
@@ -132,7 +133,8 @@ const createForum = async (req, res) => {
       forums.push(forum.values);
     }
   } else {
-    if (body.anyFieldNull("title description")) return res.noParams();
+    if (body.anyFieldNull("title description"))
+      return res.noParams("title description");
 
     if (body.isString("image")) body.set("images", [body.get("image")]);
 
@@ -163,7 +165,8 @@ const replaceForum = async (req, res) => {
   body.setFields(FORUM_FIELDS);
   const forumId = req.forumId;
 
-  if (body.anyFieldNull("title description")) return res.noParams();
+  if (body.anyFieldNull("title description"))
+    return res.noParams("title description");
 
   if (body.isString("image")) body.set("images", [body.get("image")]);
 
