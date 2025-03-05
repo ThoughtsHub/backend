@@ -6,7 +6,7 @@ const ProfileController = controller.profile;
 
 const router = Router();
 
-router.get("/", ProfileController.getProfile.id);
+router.get("/", auth.login, auth.profile, ProfileController.getProfile.id);
 
 router.get("/me", auth.login, auth.profile, ProfileController.getProfile.mine);
 
