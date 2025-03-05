@@ -7,8 +7,9 @@ const School = db.define(
   "School",
   {
     id: { ...ATTR.ID },
-    schoolName: { ...ATTR.STR_REQ },
-    studyCourse: { ...ATTR.STR_REQ },
+    collegeId: { ...ATTR.STR_REQ },
+    degreeId: { ...ATTR.STR_REQ },
+    fieldId: { ...ATTR.STR_REQ },
     description: dt.TEXT,
     startDate: dt.DATEONLY,
     startYear: { ...ATTR.INTEGER },
