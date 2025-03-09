@@ -6,7 +6,7 @@ const DB = POSTGRESQL; // pgsql database
 const SqlDatabase = new Sequelize(DB.DB, DB.USER, DB.PASS, {
   host: DB.HOST,
   dialect: DB.DIALECT,
-  logging: NODE_ENV !== "prod",
+  logging: NODE_ENV !== "prod" ? console.log : false,
 });
 
 const redisClient = createClient({ url: REDIS.URI }); // redis client

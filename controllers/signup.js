@@ -14,7 +14,7 @@ const createPassword = async (req, res) => {
   const body = req.body;
   body.setFields(PASS_FIELDS);
 
-  const otpToken = req.headers['otpToken']
+  const otpToken = req.headers['otptoken']
   body.set("otpToken", otpToken);
 
   if (body.anyFieldNull("password otpToken")) return res.noParams("password otpToken");
