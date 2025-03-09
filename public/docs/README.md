@@ -200,6 +200,13 @@ If updating, only those values that are changed will be returned
 }
 ```
 
+
+## POST /school
+
+**
+
+## .
+
 # Endpoints (Development Purposes)
 
 ## /delete-user
