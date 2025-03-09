@@ -62,7 +62,7 @@ const verifyOtp = async (req, res) => {
   const [otp, otpToken] = body.bulkGet("otp otpToken");
   try {
     const key = await client.get(otpToken); // check the otpToken
-    if (key === null) return res.bad("Invalid confirmation Id");
+    if (key === null) return res.bad("Invalid otp token");
 
     // the otp that was set for that email/mobile
     const setOtp = await client.get(`otp:${key}`);

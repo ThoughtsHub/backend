@@ -25,7 +25,7 @@ const createPassword = async (req, res) => {
   try {
     // check otpToken for the creating password
     const key = await client.get(otpToken);
-    if (key === null) return res.bad("Invalid confirmation Id");
+    if (key === null) return res.bad("Invalid otp token");
 
     // check if email or mobile
     const isEmail = EMAIL_REGEXP.test(key);
