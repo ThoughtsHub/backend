@@ -55,6 +55,8 @@ const verifyOtp = async (req, res) => {
   const body = req.body;
   body.setFields(OTP_FIELDS);
 
+  body.set("otpToken", req.headers["otpToken"]);
+
   if (body.anyFieldNull("otp otpToken")) return res.noParams();
 
   const [otp, otpToken] = body.bulkGet("otp otpToken");
