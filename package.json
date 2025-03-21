@@ -26,7 +26,8 @@
         "pg": "^8.14.1",
         "redis": "^4.7.0",
         "sequelize": "^6.37.6",
-        "socket.io": "^4.8.1"
+        "socket.io": "^4.8.1",
+        "uuid": "^11.1.0"
     },
     "devDependencies": {
         "dotenv": "^16.4.7",
