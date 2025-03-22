@@ -1,6 +1,7 @@
 import { Router } from "express";
 import User from "../models/User.js";
-import { setupAuth } from "../middlewares/auth/auth.js";
+import { loggedIn, setupAuth } from "../middlewares/auth/auth.js";
+import client from "../db/redis.js";
 
 const router = Router();
 
@@ -28,6 +29,18 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/logout", async (req, res) => {});
+router.get("/logout", loggedIn, async (req, res) => {
+  const userToken = req.userToken;
+
+  try {
+    await client.del(userToken);
+
+    res.ok("Successfully logged out");
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+});
 
 export const LoginRouter = router;
