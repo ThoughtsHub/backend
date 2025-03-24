@@ -27,7 +27,7 @@ class ReqBody {
 
   bulkGetMap = (fields = [], def = null) => {
     fields = strToArray(fields);
-    data = {};
+    const data = {};
     fields.forEach((f) => (data[f] = this.get(f, def)));
     return data;
   };
@@ -38,11 +38,12 @@ class ReqBody {
 
   isNuldefined = (field) => this.isNull(field) || this.isUndefined(field);
 
-  anyNuldefined = (fields = []) => {
+  anyNuldefined = (fields = [], joinSeparator = null) => {
     fields = strToArray(fields);
     let nulFields = [];
     fields.forEach((f) => (this.isNuldefined(f) ? nulFields.push(f) : null));
-    return nulFields;
+    if (joinSeparator === null) return nulFields;
+    return nulFields.join(joinSeparator);
   };
 
   allNuldefined = (fields = []) => {
