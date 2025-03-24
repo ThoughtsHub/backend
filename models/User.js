@@ -6,7 +6,7 @@ const User = db.define(
   "User",
   {
     id: types.ID,
-    username: types.UNIQUE_STR_REQ,
+    username: types.STRING,
     password: types.STR_REQ,
     email: types.STRING,
     mobile: types.STRING,
