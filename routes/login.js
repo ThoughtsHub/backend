@@ -20,7 +20,7 @@ router.post("/login", async (req, res) => {
     if (user === null) return res.failure(`Bad ${givenField}`);
     if (user.password !== password) return res.unauth("Wrong password");
 
-    const userToken = await setupAuth(user.username);
+    const userToken = await setupAuth(user[givenField]);
     res.ok("Log in successful", { userToken });
   } catch (err) {
     console.log(err);
@@ -36,6 +36,33 @@ router.get("/logout", loggedIn, async (req, res) => {
     await client.del(userToken);
 
     res.ok("Successfully logged out");
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+});
+
+router.post("/signup/create-password", async (req, res) => {
+  const body = req.body;
+
+  const notGivenFields = body.anyNuldefined("password userToken", ",");
+  if (notGivenFields.length !== 0)
+    return res.failure(`Required: ${notGivenFields}`);
+
+  const { password, userToken: utoken } = body.bulkGetMap("password userToken");
+
+  try {
+    const userTokenValue = await client.get(utoken);
+    if (userTokenValue === null) return res.failure("Bad userToken");
+    const [givenField, contact] = userTokenValue.split(":");
+
+    // TODO: check password requirements
+
+    const user = await User.create({ [givenField]: contact, password });
+
+    const userToken = await setupAuth(contact);
+    res.created("Sign up successful", { userToken });
   } catch (err) {
     console.log(err);
 
