@@ -18,6 +18,11 @@ export const redis = {
   uri: process.env.redis_uri,
 };
 
-const env = { server, pg, redis };
+export const google = {
+  email: process.env.google_email,
+  password: process.env.google_password,
+};
+
+const env = { server, pg, redis, google };
 
 export default env;
