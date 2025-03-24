@@ -15,4 +15,10 @@ export const closeRedis = async () => {
   console.log("Closed Redis Connection");
 };
 
+export const flushCache = async () => {
+  await client.flushDb();
+
+  console.log("Redis flushed");
+};
+
 export default client;
