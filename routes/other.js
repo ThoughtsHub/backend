@@ -1,5 +1,5 @@
 import { Router } from "express";
-import User from "../models/User.js";
+import { usernameAvailable } from "../utils/username.js";
 
 const router = Router();
 
@@ -9,8 +9,8 @@ router.get("/check-username", async (req, res) => {
   const username = req.query.get("username");
 
   try {
-    const user = await User.findOne({ where: { username } });
-    if (user === null) res.ok("Username available", { isAvailable: true });
+    if (await usernameAvailable(username))
+      res.ok("Username available", { isAvailable: true });
     else res.failure("Username not available", 404, { isAvailable: false });
   } catch (err) {
     console.log(err);
