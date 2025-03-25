@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { spawn } from "child_process";
-import { loggedIn } from "../middlewares/auth/auth.js";
+import User from "../models/User.js";
+import { loggedAsAdmin, loggedIn } from "../middlewares/auth/auth.js";
 import env from "../env/env.config.js";
 
 const isWindows = process.platform === "win32";
@@ -37,6 +38,36 @@ router.get("/reload-website", async (_, res) => {
 
   res.send("Restarting....");
   process.exit(0);
+});
+
+/**
+ * ONLY FOR DEVELOPMENT PHASE
+ * deletes a user that has been created
+ * requires email or mobile in the query
+ * if both given, email will be given preference, then mobile
+ */
+router.get("/delete-user", async (req, res) => {
+  const body = req.query;
+
+  if (body.fieldsNull("email mobile")) return res.noParams();
+
+  const [email, mobile] = body.bulkGet("email mobile");
+  try {
+    let user = null;
+    if (user === null) user = await User.findOne({ where: { email } });
+    if (user === null) user = await User.findOne({ where: { mobile } });
+
+    if (user === null) return res.bad("No user like that to delete");
+
+    const destroyResult = await User.destroy({ where: { id: user.id } });
+    if (destroyResult === 1) return res.ok("Deletion Successfull");
+
+    res.serverError();
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
 });
 
 export const TestRouter = router;
