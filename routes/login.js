@@ -46,16 +46,16 @@ router.get("/logout", loggedIn, async (req, res) => {
 router.post("/signup/create-password", async (req, res) => {
   const body = req.body;
 
-  const notGivenFields = body.anyNuldefined("password userToken", ",");
+  const notGivenFields = body.anyNuldefined("password otpToken", ",");
   if (notGivenFields.length !== 0)
     return res.failure(`Required: ${notGivenFields}`);
 
-  const { password, userToken: utoken } = body.bulkGetMap("password userToken");
+  const { password, otpToken } = body.bulkGetMap("password otpToken");
 
   try {
-    const userTokenValue = await client.get(utoken);
-    if (userTokenValue === null) return res.failure("Bad userToken");
-    const [givenField, contact] = userTokenValue.split(":");
+    const otpTokenValue = await client.get(otpToken);
+    if (otpTokenValue === null) return res.failure("Bad otpToken");
+    const [givenField, contact] = otpTokenValue.split(":");
 
     // TODO: check password requirements
 

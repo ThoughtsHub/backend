@@ -45,10 +45,10 @@ router.post("/verify", async (req, res) => {
     if (otpValue === null) return res.unauth("Bad otp");
     await client.del(`otp:${req.ip}:${givenOtp}`);
 
-    const userToken = `password:${uuidv4()}-${Date.now()}`;
-    await client.setEx(userToken, 5 * 60, otpValue);
+    const otpToken = `password:${uuidv4()}-${Date.now()}`;
+    await client.setEx(otpToken, 5 * 60, otpValue);
 
-    res.ok("OTP verified", { userToken });
+    res.ok("OTP verified", { otpToken });
   } catch (err) {
     console.log(err);
 
