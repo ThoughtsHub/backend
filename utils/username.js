@@ -5,3 +5,7 @@ export const usernameAvailable = async (username = "admin") => {
   if (user === null) return true;
   return false;
 };
+
+export const usernameNotAvailable = async (username = "admin") => {
+  return !(await usernameAvailable(username));
+};
