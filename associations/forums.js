@@ -8,25 +8,13 @@ import { profileKey } from "./profile.js";
 export const forumKey = "forumId";
 
 const forumAssociations = () => {
-  Forum.hasMany(ForumVote, {
-    foreignKey: forumKey,
-    onDelete: onDelete.cascade,
-  });
-  Profile.hasMany(ForumVote, {
-    foreignKey: profileKey,
-    onDelete: onDelete.cascade,
-  });
+  Forum.hasMany(ForumVote, { foreignKey: forumKey });
+  Profile.hasMany(ForumVote, { foreignKey: profileKey });
   ForumVote.belongsTo(Forum, { foreignKey: forumKey });
   ForumVote.belongsTo(Profile, { foreignKey: profileKey });
 
-  Forum.hasMany(ForumComment, {
-    foreignKey: forumKey,
-    onDelete: onDelete.cascade,
-  });
-  Profile.hasMany(ForumComment, {
-    foreignKey: profileKey,
-    onDelete: onDelete.cascade,
-  });
+  Forum.hasMany(ForumComment, { foreignKey: forumKey });
+  Profile.hasMany(ForumComment, { foreignKey: profileKey });
   ForumComment.belongsTo(Forum, { foreignKey: forumKey });
   ForumComment.belongsTo(Profile, { foreignKey: profileKey });
 };

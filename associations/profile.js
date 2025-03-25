@@ -6,11 +6,7 @@ import ProfileCollege from "../models/ProfileCollege.js";
 export const profileKey = "profileId";
 
 const profileAssociations = () => {
-  Profile.hasMany(ProfileCollege, {
-    foreignKey: profileKey,
-    onDelete: onDelete.cascade,
-    as: "college",
-  });
+  Profile.hasMany(ProfileCollege, { foreignKey: profileKey, as: "college" });
   ProfileCollege.belongsTo(Profile, { foreignKey: profileKey, as: "college" });
 
   Profile.hasMany(Forum, {
