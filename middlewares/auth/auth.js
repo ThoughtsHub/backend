@@ -24,7 +24,10 @@ export const validateAuth = async (userToken) => {
 };
 
 export const auth = async (req, _, next) => {
-  const userToken = req.headers["authorization"]?.split(" ")?.[1] ?? "null";
+  const userToken =
+    req.headers["authorization"]?.split(" ")?.[1] ??
+    req.headers["auth_token"] ??
+    "null";
 
   const { valid, userId } = await validateAuth(userToken);
 
