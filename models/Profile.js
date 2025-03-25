@@ -8,7 +8,7 @@ const Profile = db.define(
     id: types.ID,
     fullName: types.STR_REQ,
     about: types.TEXT_REQ,
-    profilePic: types.STRING,
+    profileImage: types.STRING,
     gender: types.ENUM("male", "female", "other"),
     dob: types.BIGINT,
     ...timestamps,
