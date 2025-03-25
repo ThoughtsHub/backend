@@ -46,7 +46,7 @@ router.get("/logout", loggedIn, async (req, res) => {
 router.post("/signup/create-password", async (req, res) => {
   const body = req.body;
 
-  const otpTokenFromHeaders = req.header["otpToken"] ?? null;
+  const otpTokenFromHeaders = req.headers["otpToken"] ?? null;
   body.set("otpToken", otpTokenFromHeaders);
 
   const notGivenFields = body.anyNuldefined("password otpToken", ",");
