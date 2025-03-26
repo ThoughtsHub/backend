@@ -43,5 +43,19 @@ router.post("/", loggedIn, async (req, res) => {
   }
 });
 
+router.get("/profile", loggedIn, async (req, res) => {
+  if (req.query.isNuldefined("profileId"))
+    return res.failure("Profile Id is required");
+  const profileId = req.query.get("profileId");
+
+  try {
+    const profile = await Profile.findByPk(profileId);
+    res.ok("Profile found", profile);
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+});
 
 export const ProfileRouter = router;
