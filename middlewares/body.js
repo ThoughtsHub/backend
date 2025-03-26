@@ -3,6 +3,7 @@ import { strToArray } from "../utils/arrays.js";
 class ReqBody {
   constructor(body = {}, fields = []) {
     this.data = {};
+    fields = strToArray(fields);
     if (!Array.isArray(fields) || fields.length === 0) this.data = body;
     else fields.forEach((f) => (this.data[f] = body[f] ?? null));
   }
@@ -66,3 +67,4 @@ const handleBody = (req, _, next) => {
 };
 
 export default handleBody;
+export const UpgradedBody = ReqBody;
