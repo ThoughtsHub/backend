@@ -4,6 +4,8 @@ import { Op } from "sequelize";
 import Forum from "../models/Forums.js";
 import { loggedIn } from "../middlewares/auth/auth.js";
 import db from "../db/pg.js";
+import ForumVote from "../models/ForumVote.js";
+import { ForumCommentRouter } from "./forums_comments.js";
 
 const router = Router();
 
@@ -52,5 +54,31 @@ router.get("/", async (req, res) => {
     res.serverError();
   }
 });
+
+router.post("/upvote", loggedIn, async (req, res) => {
+  const profileId = req.user.Profile.id;
+  const body = req.body;
+  body.setFields("forumId value");
+
+  if (body.isNuldefined("forumId")) return res.failure("Forum Id is required");
+  body.set("value", body.isTrue("value") ? 1 : 0);
+
+  const t = await db.transaction();
+  try {
+    const vote = await ForumVote.create(
+      { ...body.data, profileId },
+      { transaction: t }
+    );
+
+    res.ok("Voted");
+    await t.commit();
+  } catch (err) {
+    await t.rollback();
+    console.log(err);
+    res.serverError();
+  }
+});
+
+router.use("/comments", ForumCommentRouter);
 
 export const ForumsRouter = router;
