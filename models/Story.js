@@ -11,7 +11,7 @@ const Story = db.define(
     body: types.TEXT_REQ,
     caption: types.STRING,
     category: types.STR_REQ,
-    genre: types.ARRAY(types.STRING),
+    genre: types.STRING,
     color: types.STRING,
     backgroundColor: types.STRING,
     backgroundImageId: types.STRING,
