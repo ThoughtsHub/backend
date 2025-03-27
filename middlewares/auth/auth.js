@@ -32,9 +32,11 @@ export const auth = async (req, _, next) => {
     "null";
 
   const { valid, userId } = await validateAuth(userToken);
+  const user = valid
+    ? await User.findByPk(userId, { include: { model: Profile } })
+    : null;
 
-  if (valid) {
-    const user = await User.findByPk(userId, { include: { model: Profile } });
+  if (user !== null) {
     req.user = user;
     req.loggedIn = true;
     req.userId = userId;
