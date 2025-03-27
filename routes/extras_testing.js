@@ -49,7 +49,7 @@ router.get("/reload-website", async (_, res) => {
 router.get("/delete-user", async (req, res) => {
   const body = req.query;
 
-  if (body.fieldsNull("email mobile")) return res.noParams();
+  if (body.allNuldefined("email mobile")) return res.failure("Email or mobile required");
 
   const [email, mobile] = body.bulkGet("email mobile");
   try {
