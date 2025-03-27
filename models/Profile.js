@@ -6,6 +6,7 @@ const Profile = db.define(
   "Profile",
   {
     id: types.ID,
+    username: types.STRING,
     fullName: types.STR_REQ,
     about: types.TEXT_REQ,
     profileImageUrl: types.STRING,

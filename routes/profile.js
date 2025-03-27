@@ -26,7 +26,6 @@ router.post("/", loggedIn, async (req, res) => {
       { username },
       { where: { id: req.userId }, transaction }
     );
-    body.del("username");
 
     if (userUpdate !== 1) {
       await transaction.rollback();
