@@ -12,3 +12,6 @@ public/uploads/*
 
 # python output files
 *.pyout
+
+# docx output files
+*.doc*
