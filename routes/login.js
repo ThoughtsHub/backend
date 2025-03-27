@@ -58,6 +58,7 @@ router.post("/signup/create-password", async (req, res) => {
 
   try {
     const otpTokenValue = await client.get(otpToken);
+    await client.del(otpToken);
     if (otpTokenValue === null) return res.failure("Bad otpToken");
     const [givenField, contact] = otpTokenValue.split(":");
 
