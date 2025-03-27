@@ -16,6 +16,8 @@ const TEXT_REQ = { type: dt.TEXT, allowNull: false };
 
 const INTEGER_REQ = { type: dt.INTEGER, allowNull: false };
 
+const INT_REQ_0 = { type: dt.INTEGER, allowNull: false, default: 0 };
+
 const BOOL_FALSE = { type: dt.BOOLEAN, allowNull: false, default: false };
 
 const BOOL_TRUE = { type: dt.BOOLEAN, allowNull: false, default: true };
@@ -26,6 +28,7 @@ export const types = {
   UNIQUE_STR_REQ,
   TEXT_REQ,
   INTEGER_REQ,
+  INT_REQ_0,
   BOOL_TRUE,
   BOOL_FALSE,
   ...dt,

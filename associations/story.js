@@ -17,6 +17,21 @@ const storyAssociations = () => {
   Profile.hasMany(StoryComment, { foreignKey: profileKey });
   StoryComment.belongsTo(Story, { foreignKey: storyKey });
   StoryComment.belongsTo(Profile, { foreignKey: profileKey });
+
+  Story.afterCreate(async (payload, options) => {
+    Profile.increment("storyCount", {
+      by: 1,
+      where: { id: payload.profileId },
+      transaction: options.transaction,
+    });
+  });
+  Story.afterDestroy(async (payload, options) => {
+    Profile.decrement("storyCount", {
+      by: 1,
+      where: { id: payload.profileId },
+      transaction: options.transaction,
+    });
+  });
 };
 
 export default storyAssociations;

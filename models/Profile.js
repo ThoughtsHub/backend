@@ -11,6 +11,10 @@ const Profile = db.define(
     profileImageUrl: types.STRING,
     gender: types.ENUM("male", "female", "other"),
     dob: types.BIGINT,
+    followers: types.INT_REQ_0,
+    following: types.INT_REQ_0,
+    storyCount: types.INT_REQ_0,
+    forumsCount: types.INT_REQ_0,
     ...timestamps,
   },
   { hooks }

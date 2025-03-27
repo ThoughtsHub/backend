@@ -17,6 +17,21 @@ const forumAssociations = () => {
   Profile.hasMany(ForumComment, { foreignKey: profileKey });
   ForumComment.belongsTo(Forum, { foreignKey: forumKey });
   ForumComment.belongsTo(Profile, { foreignKey: profileKey });
+
+  Forum.afterCreate(async (payload, options) => {
+    Profile.increment("forumsCount", {
+      by: 1,
+      where: { id: payload.profileId },
+      transaction: options.transaction,
+    });
+  });
+  Forum.afterDestroy(async (payload, options) => {
+    Profile.decrement("forumsCount", {
+      by: 1,
+      where: { id: payload.profileId },
+      transaction: options.transaction,
+    });
+  });
 };
 
 export default forumAssociations;
