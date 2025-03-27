@@ -57,6 +57,11 @@ class ReqBody {
     for (const f of fields) if (!this.isNuldefined(f)) return f;
     return null;
   };
+
+  isNumber = (field) => {
+    const value = this.get(field);
+    return typeof value === "number" && !isNaN(value);
+  };
 }
 
 const handleBody = (req, _, next) => {
