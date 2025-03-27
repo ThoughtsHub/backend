@@ -2,6 +2,7 @@ import { Router } from "express";
 import otp from "../utils/otp.js";
 import client from "../db/redis.js";
 import { v4 as uuidv4 } from "uuid";
+import User from "../models/User.js";
 
 const router = Router();
 
@@ -14,6 +15,9 @@ router.post("/get", async (req, res) => {
 
   const givenField = body.getNotNuldefined("email mobile");
   const [contact, isMobile] = body.bulkGet(`${givenField} isMobile`);
+
+  const user = await User.findOne({ where: { [givenField]: contact } });
+  if (user !== null) return res.conflict("Email already used by another user.");
 
   const generatedOtp = otp.generate();
   const send = isMobile ? otp.sendMobile : otp.sendEmail;
