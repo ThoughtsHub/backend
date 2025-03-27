@@ -1,10 +1,11 @@
 import { Sequelize } from "sequelize";
-import { pg } from "../env/env.config.js";
+import { nodeEnv, pg } from "../env/env.config.js";
 
 const db = new Sequelize(pg.database, pg.username, pg.password, {
   host: pg.server,
   dialect: "postgres",
   define: { timestamps: false },
+  logging: nodeEnv.production === true ? false : console.log,
 });
 
 export const connectToPg = async () => {

@@ -23,6 +23,10 @@ export const google = {
   password: process.env.google_password,
 };
 
-const env = { server, pg, redis, google };
+export const nodeEnv = {
+  production: process.env.node_env_production ?? true,
+};
+
+const env = { server, pg, redis, google, nodeEnv };
 
 export default env;
