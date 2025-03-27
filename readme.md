@@ -47,13 +47,7 @@ OR
 {
   "message": "Log in successful",
   "success": true,
-  "userToken": "abc123",
-  "user": {
-    "profileId": "12345",
-    "fullname": "John Doe",
-    "about": "A short bio",
-    "profileImageUrl": "https://example.com/image.jpg"
-  }
+  "userToken": "abc123"
 }
 ```
 
@@ -143,29 +137,6 @@ OR
 
 ---
 
-## **POST /school**
-
-**Body Parameters**:
-
-- A list of college objects with fields:
-  - `collegeId` (String): ID of the college.
-  - `degreeId` (String): ID of the degree.
-  - `fieldId` (String): ID of the field.
-  - `description` (String): Description of the college.
-  - `startYear` (Number): Start year.
-  - `endYear` (Number): End year.
-
-**Response**:
-
-```json
-{
-  "message": "College added",
-  "success": true
-}
-```
-
----
-
 ## **GET /profile**
 
 **Query Parameters**:
@@ -213,6 +184,29 @@ OR
     "storyCount": 10,
     "forumsCount": 20
   }
+}
+```
+
+---
+
+## **POST /school**
+
+**Body Parameters**:
+
+- A list of college objects with fields:
+  - `collegeId` (String): ID of the college.
+  - `degreeId` (String): ID of the degree.
+  - `fieldId` (String): ID of the field.
+  - `description` (String): Description of the college.
+  - `startYear` (Number): Start year.
+  - `endYear` (Number): End year.
+
+**Response**:
+
+```json
+{
+  "message": "College added",
+  "success": true
 }
 ```
 
@@ -424,6 +418,185 @@ OR
   "message": "File Uploaded",
   "success": true,
   "fileUrl": "/uploads/filename.jpg"
+}
+```
+
+---
+
+## **POST /story**
+
+**Body Parameters**:
+
+- `content` (Object, required):
+  - `title` (String, required): Title of the story.
+  - `body` (String, required): Body of the story.
+  - `caption` (String, optional): Caption for the story.
+- `categorization` (Object, required):
+  - `category` (String, required): Category of the story.
+  - `genre` (String, optional): Genre of the story.
+- `decoration` (Object, required):
+  - `color` (String, optional): Text color.
+  - `backgroundColor` (String, optional): Background color.
+  - `backgroundImageId` (String, optional): ID of the background image.
+  - `alignment` (Number, optional): Alignment (0 for left, 1 for center).
+
+**Response**:
+
+```json
+{
+  "message": "Story Created",
+  "success": true,
+  "story": {
+    "id": "1",
+    "localId": "local123",
+    "title": "Story Title",
+    "body": "This is the body of the story.",
+    "caption": "A caption",
+    "category": "Fiction",
+    "genre": ["Drama"],
+    "color": "#FFFFFF",
+    "backgroundImageId": "image123",
+    "alignment": 0,
+    "writer": {
+      "profileId": "12345",
+      "fullname": "John Doe",
+      "about": "A short bio",
+      "profileImageUrl": "https://example.com/image.jpg",
+      "User": {
+        "username": "johndoe"
+      }
+    }
+  }
+}
+```
+
+---
+
+## **GET /story**
+
+**Query Parameters**:
+
+- `timestamp` (Number, optional): Fetch stories newer than this timestamp.
+
+**Response**:
+
+```json
+{
+  "message": "Stories",
+  "success": true,
+  "stories": [
+    {
+      "id": "1",
+      "title": "Story Title",
+      "body": "This is the body of the story.",
+      "caption": "A caption",
+      "category": "Fiction",
+      "genre": ["Drama"],
+      "color": "#FFFFFF",
+      "backgroundImageIndex": 0,
+      "alignment": 0,
+      "createDate": 1609459200,
+      "updateDate": 1609459200,
+      "writer": {
+        "profileId": "12345",
+        "fullname": "John Doe",
+        "about": "A short bio",
+        "profileImageUrl": "https://example.com/image.jpg",
+        "User": {
+          "username": "johndoe"
+        }
+      },
+      "likedByUser": true
+    }
+  ]
+}
+```
+
+---
+
+## **POST /story/like**
+
+**Body Parameters**:
+
+- `storyId` (String, required): ID of the story.
+
+**Response**:
+
+```json
+{
+  "message": "Liked",
+  "success": true
+}
+```
+
+---
+
+## **GET /story/comments**
+
+**Query Parameters**:
+
+- `storyId` (String, required): ID of the story.
+- `timestamp` (Number, optional): Fetch comments newer than this timestamp.
+
+**Response**:
+
+```json
+{
+  "message": "Comments",
+  "success": true,
+  "comments": [
+    {
+      "id": "1",
+      "postId": "2",
+      "localId": "local123",
+      "body": "This is a comment.",
+      "createDate": 1609459200,
+      "writer": {
+        "profileId": "12345",
+        "fullname": "John Doe",
+        "about": "A short bio",
+        "profileImageUrl": "https://example.com/image.jpg",
+        "User": {
+          "username": "johndoe"
+        }
+      }
+    }
+  ]
+}
+```
+
+---
+
+## **POST /story/comments**
+
+**Body Parameters**:
+
+- `body` (String, required): Body of the comment.
+- `storyId` (String, required): ID of the story.
+- `localId` (String, optional): Local ID of the comment.
+
+**Response**:
+
+```json
+{
+  "message": "Commented",
+  "success": true,
+  "comment": {
+    "id": "1",
+    "postId": "2",
+    "localId": "local123",
+    "body": "This is a comment.",
+    "createDate": 1609459200,
+    "writer": {
+      "profileId": "12345",
+      "fullname": "John Doe",
+      "about": "A short bio",
+      "profileImageUrl": "https://example.com/image.jpg",
+      "User": {
+        "username": "johndoe"
+      }
+    }
+  }
 }
 ```
 
