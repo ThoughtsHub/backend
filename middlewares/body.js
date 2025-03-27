@@ -67,6 +67,10 @@ class ReqBody {
     const value = this.get(field);
     return typeof value === "number" && !isNaN(value);
   };
+
+  isTrue = (field) => {
+    return this.get(field) === true;
+  };
 }
 
 const handleBody = (req, _, next) => {
