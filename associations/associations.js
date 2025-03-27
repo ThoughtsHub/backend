@@ -8,7 +8,7 @@ const initAssociations = async () => {
   profileAssociations();
   forumAssociations();
 
-  db.sync({ force: true });
+  db.sync({ alter: true });
 };
 
 export default initAssociations;
