@@ -1,4 +1,5 @@
 import { onDelete } from "../constants/hooks.js";
+import writer from "../constants/writer.js";
 import ForumComment from "../models/ForumComment.js";
 import Forum from "../models/Forums.js";
 import ForumVote from "../models/ForumVote.js";
@@ -11,12 +12,12 @@ const forumAssociations = () => {
   Forum.hasMany(ForumVote, { foreignKey: forumKey });
   Profile.hasMany(ForumVote, { foreignKey: profileKey });
   ForumVote.belongsTo(Forum, { foreignKey: forumKey });
-  ForumVote.belongsTo(Profile, { foreignKey: profileKey });
+  ForumVote.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Forum.hasMany(ForumComment, { foreignKey: forumKey });
   Profile.hasMany(ForumComment, { foreignKey: profileKey });
   ForumComment.belongsTo(Forum, { foreignKey: forumKey });
-  ForumComment.belongsTo(Profile, { foreignKey: profileKey });
+  ForumComment.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Forum.afterCreate(async (payload, options) => {
     Profile.increment("forumsCount", {

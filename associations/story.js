@@ -1,4 +1,5 @@
 import { onDelete } from "../constants/hooks.js";
+import writer from "../constants/writer.js";
 import Profile from "../models/Profile.js";
 import Story from "../models/Story.js";
 import StoryComment from "../models/StoryComment.js";
@@ -11,12 +12,12 @@ const storyAssociations = () => {
   Story.hasMany(StoryLike, { foreignKey: storyKey });
   Profile.hasMany(StoryLike, { foreignKey: profileKey });
   StoryLike.belongsTo(Story, { foreignKey: storyKey });
-  StoryLike.belongsTo(Profile, { foreignKey: profileKey });
+  StoryLike.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Story.hasMany(StoryComment, { foreignKey: storyKey });
   Profile.hasMany(StoryComment, { foreignKey: profileKey });
   StoryComment.belongsTo(Story, { foreignKey: storyKey });
-  StoryComment.belongsTo(Profile, { foreignKey: profileKey });
+  StoryComment.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Story.afterCreate(async (payload, options) => {
     Profile.increment("storyCount", {

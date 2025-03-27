@@ -1,4 +1,5 @@
 import { onDelete } from "../constants/hooks.js";
+import writer from "../constants/writer.js";
 import Forum from "../models/Forums.js";
 import Profile from "../models/Profile.js";
 import ProfileCollege from "../models/ProfileCollege.js";
@@ -15,14 +16,14 @@ const profileAssociations = () => {
     onDelete: onDelete.setNull,
     as: "forum",
   });
-  Forum.belongsTo(Profile, { foreignKey: profileKey, as: "forum" });
+  Forum.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Profile.hasMany(Story, {
     foreignKey: profileKey,
     onDelete: onDelete.setNull,
     as: "story",
   });
-  Story.belongsTo(Profile, { foreignKey: profileKey, as: "story" });
+  Story.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 };
 
 export default profileAssociations;
