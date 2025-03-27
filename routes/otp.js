@@ -20,7 +20,7 @@ router.post("/get", async (req, res) => {
   try {
     const sentSuccess = await send(contact, generatedOtp);
     await client.setEx(
-      `otp:${req.ip}:${generatedOtp}`,
+      `otp:${contact}:${generatedOtp}`,
       5 * 60,
       `${givenField}:${contact}`
     );
@@ -37,13 +37,14 @@ router.post("/get", async (req, res) => {
 router.post("/verify", async (req, res) => {
   const body = req.body;
 
-  if (body.isNuldefined("otp")) return res.failure("Otp is required");
-  const givenOtp = body.get("otp");
+  const reqFields = body.anyNuldefined("otp contact", ",");
+  if (body.isNuldefined("otp")) return res.failure(`Required: ${reqFields}`);
+  const [givenOtp, contact] = body.bulkGet("otp contact");
 
   try {
-    const otpValue = await client.get(`otp:${req.ip}:${givenOtp}`);
+    const otpValue = await client.get(`otp:${contact}:${givenOtp}`);
     if (otpValue === null) return res.unauth("Bad otp");
-    await client.del(`otp:${req.ip}:${givenOtp}`);
+    await client.del(`otp:${contact}:${givenOtp}`);
 
     const otpToken = `password:${uuidv4()}-${Date.now()}`;
     await client.setEx(otpToken, 5 * 60, otpValue);
