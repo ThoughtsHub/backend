@@ -586,3 +586,107 @@ OR
 ```
 
 ---
+
+Based on the provided content, here are the endpoints that were missing from the previous API documentation:
+
+---
+
+## **POST /admin/news**
+
+**Description**:It requires you to be **admin** to post news
+
+```
+ADMIN USERNAME: admin
+ADMIN PASSWORD: admin
+```
+
+**Body Parameters**:
+
+- `title` (String, required): Title of the news.
+- `body` (String, required): Body of the news.
+- `imageUrl` (String, optional): URL of the image.
+- `category` (String, required): Category of the news.
+- `genre` (String, optional): Genre of the news.
+- `newsUrl` (String, optional): URL of the full news article.
+
+**Response**:
+
+```json
+{
+  "message": "News created",
+  "success": true,
+  "news": {
+    "id": "1",
+    "title": "Breaking News",
+    "body": "This is the body of the news.",
+    "imageUrl": "https://example.com/image.jpg",
+    "category": "Politics",
+    "newsUrl": "https://example.com/news",
+    "timeStamp": 1609459200
+  }
+}
+```
+
+---
+
+## **GET /test**
+
+**Description**: Returns the user object referenced to the session ID.  
+**Requires**: User must be logged in (`loggedIn` middleware).
+
+**Response**:
+
+```json
+{
+  "user": {
+    "profileId": "12345",
+    "fullname": "John Doe",
+    "about": "A short bio",
+    "profileImageUrl": "https://example.com/image.jpg"
+  }
+}
+```
+
+---
+
+## **GET /reload-website**
+
+**Description**: Reloads the website by pulling the latest commit.  
+**Note**: Only for development purposes.
+
+**Response**:
+
+```text
+Restarting....
+```
+
+---
+
+## **GET /delete-user**
+
+**Query Parameters**:
+
+- `email` (String, optional): Email of the user to delete.
+- `mobile` (String, optional): Mobile number of the user to delete.
+
+**Description**: Deletes a user account. If both `email` and `mobile` are provided, `email` takes precedence.
+
+**Response**:
+
+```json
+{
+  "message": "Deletion Successful",
+  "success": true
+}
+```
+
+OR
+
+```json
+{
+  "message": "No user like that to delete",
+  "success": false
+}
+```
+
+---
