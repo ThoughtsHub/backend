@@ -33,6 +33,8 @@ router.post("/", loggedIn, async (req, res) => {
       return res.failure("username could not be set, contact admin");
     }
 
+    body.bulkSet("followers following storyCount forumsCount", 0);
+
     body.set("userId", req.userId);
     const profile = await Profile.create(body.data, { transaction });
     res.ok("Profile created", { user: profile });
@@ -40,17 +42,18 @@ router.post("/", loggedIn, async (req, res) => {
   } catch (err) {
     await transaction.rollback();
     console.log(err);
+    res.serverError();
   }
 });
 
-router.get("/profile", loggedIn, async (req, res) => {
+router.get("/", loggedIn, async (req, res) => {
   if (req.query.isNuldefined("profileId"))
     return res.failure("Profile Id is required");
   const profileId = req.query.get("profileId");
 
   try {
     const profile = await Profile.findByPk(profileId);
-    res.ok("Profile found", profile);
+    res.ok("Profile found", { ...profile.get({ plain: true }) });
   } catch (err) {
     console.log(err);
 
