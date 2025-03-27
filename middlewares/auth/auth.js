@@ -1,4 +1,5 @@
 import client from "../../db/redis.js";
+import Profile from "../../models/Profile.js";
 import User from "../../models/User.js";
 import { hashSHA256 } from "../../utils/hash.js";
 import { v4 as uuidv4 } from "uuid";
@@ -33,7 +34,7 @@ export const auth = async (req, _, next) => {
   const { valid, userId } = await validateAuth(userToken);
 
   if (valid) {
-    const user = await User.findByPk(userId);
+    const user = await User.findByPk(userId, { include: { model: Profile } });
     req.user = user;
     req.loggedIn = true;
     req.userId = userId;
