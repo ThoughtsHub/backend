@@ -9,7 +9,7 @@ const Forum = db.define(
     localID: types.STRING,
     title: types.STR_REQ,
     body: types.TEXT_REQ,
-    image: types.STRING,
+    imageUrl: types.STRING,
     ...timestamps,
   },
   { hooks }
