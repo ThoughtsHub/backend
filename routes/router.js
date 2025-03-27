@@ -8,6 +8,8 @@ import { ProfileCollegeRouter } from "./school.js";
 import { ForumsRouter } from "./forums.js";
 import { StoryRouter } from "./story.js";
 import { NewsRouter } from "./news.js";
+import { AdminRouter } from "./admin.js";
+import { loggedAsAdmin } from "../middlewares/auth/auth.js";
 
 const router = Router();
 
@@ -20,5 +22,7 @@ router.use("/school", ProfileCollegeRouter);
 router.use("/forums", ForumsRouter);
 router.use("/story", StoryRouter);
 router.use("/news", NewsRouter);
+
+router.use("/admin", loggedAsAdmin, AdminRouter);
 
 export const AppRouter = router;
