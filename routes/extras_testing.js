@@ -57,7 +57,7 @@ router.get("/delete-user", async (req, res) => {
     if (user === null) user = await User.findOne({ where: { email } });
     if (user === null) user = await User.findOne({ where: { mobile } });
 
-    if (user === null) return res.bad("No user like that to delete");
+    if (user === null) return res.failure("No user like that to delete");
 
     const destroyResult = await User.destroy({ where: { id: user.id } });
     if (destroyResult === 1) return res.ok("Deletion Successfull");
