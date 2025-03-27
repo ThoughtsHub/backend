@@ -1,6 +1,6 @@
 import { types } from "./db.js";
 
-const timestampsKeys = {
+export const timestampsKeys = {
   createdAt: "createDate",
   updatedAt: "updateDate",
 };
