@@ -266,9 +266,7 @@ OR
         "fullname": "John Doe",
         "about": "A short bio",
         "profileImageUrl": "https://example.com/image.jpg",
-        "User": {
-          "username": "johndoe"
-        }
+        "username": "johndoe"
       },
       "isVoted": true
     }
@@ -306,9 +304,7 @@ OR
       "fullname": "John Doe",
       "about": "A short bio",
       "profileImageUrl": "https://example.com/image.jpg",
-      "User": {
-        "username": "johndoe"
-      }
+      "username": "johndoe"
     }
   }
 }
@@ -359,9 +355,7 @@ OR
         "fullname": "John Doe",
         "about": "A short bio",
         "profileImageUrl": "https://example.com/image.jpg",
-        "User": {
-          "username": "johndoe"
-        }
+        "username": "johndoe"
       }
     }
   ]
@@ -395,9 +389,7 @@ OR
       "fullname": "John Doe",
       "about": "A short bio",
       "profileImageUrl": "https://example.com/image.jpg",
-      "User": {
-        "username": "johndoe"
-      }
+      "username": "johndoe"
     }
   }
 }
@@ -462,9 +454,7 @@ OR
       "fullname": "John Doe",
       "about": "A short bio",
       "profileImageUrl": "https://example.com/image.jpg",
-      "User": {
-        "username": "johndoe"
-      }
+      "username": "johndoe"
     }
   }
 }
@@ -502,9 +492,7 @@ OR
         "fullname": "John Doe",
         "about": "A short bio",
         "profileImageUrl": "https://example.com/image.jpg",
-        "User": {
-          "username": "johndoe"
-        }
+        "username": "johndoe"
       },
       "likedByUser": true
     }
@@ -556,9 +544,7 @@ OR
         "fullname": "John Doe",
         "about": "A short bio",
         "profileImageUrl": "https://example.com/image.jpg",
-        "User": {
-          "username": "johndoe"
-        }
+        "username": "johndoe"
       }
     }
   ]
@@ -592,9 +578,7 @@ OR
       "fullname": "John Doe",
       "about": "A short bio",
       "profileImageUrl": "https://example.com/image.jpg",
-      "User": {
-        "username": "johndoe"
-      }
+      "username": "johndoe"
     }
   }
 }
