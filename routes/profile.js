@@ -37,7 +37,7 @@ router.post("/", loggedIn, async (req, res) => {
 
     body.set("userId", req.userId);
     const profile = await Profile.create(body.data, { transaction });
-    res.ok("Profile created", { user: profile });
+    res.ok("Profile created", { profile });
     await transaction.commit();
   } catch (err) {
     await transaction.rollback();
@@ -53,7 +53,24 @@ router.get("/", loggedIn, async (req, res) => {
 
   try {
     const profile = await Profile.findByPk(profileId);
-    res.ok("Profile found", { ...profile.get({ plain: true }) });
+    const user = await User.findByPk(profile.userId);
+    res.ok("Profile found", {
+      profile: { ...profile.get({ plain: true }), username: user.username },
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.serverError();
+  }
+});
+
+router.get("/me", loggedIn, async (req, res) => {
+  try {
+    const profile = await Profile.findByPk(req.user.Profile.id);
+    const user = await User.findByPk(profile.userId);
+    res.ok("Your Profile", {
+      profile: { ...profile.get({ plain: true }), username: user.username },
+    });
   } catch (err) {
     console.log(err);
 
