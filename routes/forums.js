@@ -6,6 +6,7 @@ import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import db from "../db/pg.js";
 import ForumVote from "../models/ForumVote.js";
 import { ForumCommentRouter } from "./forums_comments.js";
+import { includeWriter } from "../constants/writer.js";
 
 const router = Router();
 
@@ -46,6 +47,7 @@ router.get("/", async (req, res) => {
       where: { ...whereObj },
       limit: 50,
       order: [[timestampsKeys.createdAt, "DESC"]],
+      include: [includeWriter],
     });
 
     res.ok("Forums", { forums });

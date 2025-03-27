@@ -3,6 +3,7 @@ import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import db from "../db/pg.js";
 import StoryComment from "../models/StoryComment.js";
 import { timestampsKeys } from "../constants/timestamps.js";
+import { includeWriter } from "../constants/writer.js";
 
 const router = Router();
 
@@ -46,6 +47,7 @@ router.get("/", async (req, res) => {
       where: { storyId, ...whereObj },
       order: [[timestampsKeys.createdAt, "DESC"]],
       limit: 30,
+      include: [includeWriter],
     });
 
     res.ok("Comments", { comments });

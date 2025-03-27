@@ -3,6 +3,7 @@ import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import ForumComment from "../models/ForumComment.js";
 import db from "../db/pg.js";
 import { timestampsKeys } from "../constants/timestamps.js";
+import { includeWriter } from "../constants/writer.js";
 
 const router = Router();
 
@@ -45,6 +46,7 @@ router.get("/", async (req, res) => {
     const comments = await ForumComment.findAll({
       where: { forumId, ...whereObj },
       order: [[timestampsKeys.createdAt, "DESC"]],
+      include: [includeWriter],
       limit: 30,
     });
 

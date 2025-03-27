@@ -5,6 +5,7 @@ import { StoryCommentRouter } from "./story_comments.js";
 import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
+import { includeWriter } from "../constants/writer.js";
 
 const router = Router();
 
@@ -60,6 +61,7 @@ router.get("/", async (req, res) => {
       where: { ...whereObj },
       limit: 50,
       order: [[timestampsKeys.createdAt, "DESC"]],
+      include: [includeWriter],
     });
 
     res.ok("Stories", { stories });
