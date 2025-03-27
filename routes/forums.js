@@ -2,14 +2,14 @@ import { Router } from "express";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { Op } from "sequelize";
 import Forum from "../models/Forums.js";
-import { loggedIn } from "../middlewares/auth/auth.js";
+import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import db from "../db/pg.js";
 import ForumVote from "../models/ForumVote.js";
 import { ForumCommentRouter } from "./forums_comments.js";
 
 const router = Router();
 
-router.post("/", loggedIn, async (req, res) => {
+router.post("/", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;
 
@@ -55,7 +55,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/upvote", loggedIn, async (req, res) => {
+router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;
   body.setFields("forumId value");

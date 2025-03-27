@@ -56,4 +56,9 @@ export const loggedAsAdmin = (req, res, next) => {
   else res.forbidden("Only admins are allowed");
 };
 
+export const haveProfile = (req, res, next) => {
+  if (req.loggedIn && req.user.Profile !== null) next();
+  else res.forbidden("Only users with profile created can access");
+};
+
 export default auth;

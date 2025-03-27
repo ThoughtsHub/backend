@@ -2,13 +2,13 @@ import { Router } from "express";
 import Story from "../models/Story.js";
 import StoryLike from "../models/StoryLike.js";
 import { StoryCommentRouter } from "./story_comments.js";
-import { loggedIn } from "../middlewares/auth/auth.js";
+import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
 
 const router = Router();
 
-router.post("/", loggedIn, async (req, res) => {
+router.post("/", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;
 
@@ -69,7 +69,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/like", loggedIn, async (req, res) => {
+router.post("/like", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;
 

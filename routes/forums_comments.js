@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { loggedIn } from "../middlewares/auth/auth.js";
+import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import ForumComment from "../models/ForumComment.js";
 import db from "../db/pg.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 
 const router = Router();
 
-router.post("/", loggedIn, async (req, res) => {
+router.post("/", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;
   body.setFields("forumId body localId");
