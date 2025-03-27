@@ -77,6 +77,7 @@ OR
 **Body Parameters**:
 
 - `otp` (String, required): OTP to verify.
+- `contact` (String, required): Contact with which to verify.
 
 **Response**:
 
