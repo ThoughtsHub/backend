@@ -606,7 +606,6 @@ ADMIN PASSWORD: admin
 - `body` (String, required): Body of the news.
 - `imageUrl` (String, optional): URL of the image.
 - `category` (String, required): Category of the news.
-- `genre` (String, optional): Genre of the news.
 - `newsUrl` (String, optional): URL of the full news article.
 
 **Response**:
