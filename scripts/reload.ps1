@@ -7,4 +7,5 @@ npx kill-port $env:PORT
 Write-Output "Kill complete"
 
 Write-Output "Restarting application"
+npm i
 npm run start
