@@ -26,7 +26,7 @@ router.post("/", loggedIn, async (req, res) => {
   }
 
   body.setFields(
-    "localId title body caption category genre color backgroundImageIndex alignment"
+    "localId title body caption category genre color backgroundColor backgroundImageId alignment"
   );
 
   const reqFields = body.anyNuldefined("title body category", ",");
