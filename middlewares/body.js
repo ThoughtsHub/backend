@@ -33,6 +33,11 @@ class ReqBody {
     return data;
   };
 
+  bulkSet = (fields = [], def = null) => {
+    fields = strToArray(fields);
+    fields.forEach((f) => this.set(f, def));
+  };
+
   isNull = (field) => this.get(field) === null;
 
   isUndefined = (field) => this.get(field) === undefined;
