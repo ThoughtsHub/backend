@@ -1,4 +1,5 @@
 import client from "../../db/redis.js";
+import User from "../../models/User.js";
 import { hashSHA256 } from "../../utils/hash.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -32,6 +33,8 @@ export const auth = async (req, _, next) => {
   const { valid, userId } = await validateAuth(userToken);
 
   if (valid) {
+    const user = await User.findByPk(userId);
+    req.user = user;
     req.loggedIn = true;
     req.userId = userId;
     req.userToken = userToken;
@@ -46,7 +49,7 @@ export const loggedIn = (req, res, next) => {
 };
 
 export const loggedAsAdmin = (req, res, next) => {
-  if (req.loggedIn && req.userId === "admin") next();
+  if (req.loggedIn && req.user.username === "admin") next();
   else res.forbidden("Only admins are allowed");
 };
 
