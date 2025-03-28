@@ -21,7 +21,7 @@ router.post("/", loggedIn, async (req, res) => {
   try {
     const username = body.get("username");
     if (await usernameNotAvailable(username))
-      return failure("Username not avalilable");
+      return res.failure("Username not avalilable");
     const [userUpdate] = await User.update(
       { username },
       { where: { id: req.userId }, transaction }
