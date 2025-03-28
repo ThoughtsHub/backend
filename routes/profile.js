@@ -10,7 +10,7 @@ const router = Router();
 router.post("/", loggedIn, async (req, res) => {
   const body = req.body;
 
-  body.setFields("fullName username profileImageUrl dob about");
+  body.setFields("fullName username profileImageUrl gender dob about");
 
   const requiredFields = body.anyNuldefined("fullName username about", ",");
   if (requiredFields.length !== 0)
