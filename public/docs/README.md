@@ -1,6 +1,7 @@
 # **API Documentation**
 
-**Success Status Code**: `200`
+**Success Status Code**: `200` \
+**Headers Token for Authorization (Login)**: `auth_token`
 
 ---
 
@@ -47,7 +48,8 @@ OR
 {
   "message": "Log in successful",
   "success": true,
-  "userToken": "abc123"
+  "userToken": "abc123",
+  "user": {}
 }
 ```
 
@@ -104,7 +106,8 @@ OR
 {
   "message": "Sign up successful",
   "success": true,
-  "userToken": "abc123"
+  "userToken": "abc123",
+  "user": {}
 }
 ```
 
@@ -126,7 +129,7 @@ OR
 {
   "message": "Profile created",
   "success": true,
-  "profile": {
+  "user": {
     "id": "12345",
     "fullname": "John Doe",
     "profileImageUrl": "https://example.com/image.jpg",
