@@ -10,7 +10,7 @@ const Profile = db.define(
     fullName: types.STR_REQ,
     about: types.TEXT_REQ,
     profileImageUrl: types.STRING,
-    gender: types.ENUM("male", "female", "other"),
+    gender: types.STRING,
     dob: types.BIGINT,
     followers: types.INT_REQ_0,
     following: types.INT_REQ_0,
