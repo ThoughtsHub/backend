@@ -38,12 +38,7 @@ router.post("/", loggedIn, async (req, res) => {
     body.set("userId", req.userId);
     const profile = await Profile.create(body.data, { transaction });
 
-    const user = await User.findByPk(req.userId);
-
-    res.ok("Profile created", {
-      profile,
-      user: user.username === null ? null : user,
-    });
+    res.ok("Profile created", { user: profile });
     await transaction.commit();
   } catch (err) {
     await transaction.rollback();
