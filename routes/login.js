@@ -21,7 +21,7 @@ router.post("/login", async (req, res) => {
     if (user.password !== password) return res.unauth("Wrong password");
 
     const userToken = await setupAuth(user.id);
-    res.ok("Log in successful", { userToken });
+    res.ok("Log in successful", { auth_token: userToken, user });
   } catch (err) {
     console.log(err);
 
@@ -67,7 +67,7 @@ router.post("/signup/create-password", async (req, res) => {
     const user = await User.create({ [givenField]: contact, password });
 
     const userToken = await setupAuth(user.id);
-    res.ok("Sign up successful", { userToken });
+    res.ok("Sign up successful", { auth_token: userToken, user });
   } catch (err) {
     console.log(err);
 
