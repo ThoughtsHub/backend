@@ -4,6 +4,7 @@ import db from "../db/pg.js";
 import StoryComment from "../models/StoryComment.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { includeWriter } from "../constants/writer.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -26,7 +27,8 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
     await t.commit();
   } catch (err) {
     await t.rollback();
-    console.log(err);
+    logger.error(err);
+    
     res.serverErro();
   }
 });
@@ -52,7 +54,8 @@ router.get("/", async (req, res) => {
 
     res.ok("Comments", { comments });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
+    
     res.serverError();
   }
 });

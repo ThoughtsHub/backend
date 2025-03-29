@@ -1,5 +1,6 @@
 import { Router } from "express";
 import News from "../models/News.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -12,7 +13,8 @@ router.post("/news", async (req, res) => {
     const news = await News.create(body.data);
     res.ok("News created", { news });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
+
     res.serverError();
   }
 });

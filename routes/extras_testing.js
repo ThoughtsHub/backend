@@ -3,6 +3,7 @@ import { spawn } from "child_process";
 import User from "../models/User.js";
 import { loggedAsAdmin, loggedIn } from "../middlewares/auth/auth.js";
 import env from "../env/env.config.js";
+import logger from "../constants/logger.js";
 
 const isWindows = process.platform === "win32";
 
@@ -49,7 +50,8 @@ router.get("/reload-website", async (_, res) => {
 router.get("/delete-user", async (req, res) => {
   const body = req.query;
 
-  if (body.allNuldefined("email mobile")) return res.failure("Email or mobile required");
+  if (body.allNuldefined("email mobile"))
+    return res.failure("Email or mobile required");
 
   const [email, mobile] = body.bulkGet("email mobile");
   try {
@@ -64,7 +66,7 @@ router.get("/delete-user", async (req, res) => {
 
     res.serverError();
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }

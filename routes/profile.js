@@ -4,6 +4,7 @@ import db from "../db/pg.js";
 import User from "../models/User.js";
 import { usernameNotAvailable } from "../utils/username.js";
 import Profile from "../models/Profile.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -46,7 +47,9 @@ router.post("/", loggedIn, async (req, res) => {
     await transaction.commit();
   } catch (err) {
     await transaction.rollback();
-    console.log(err);
+
+    logger.error(err);
+
     res.serverError();
   }
 });
@@ -63,7 +66,7 @@ router.get("/", loggedIn, async (req, res) => {
       profile: { ...profile.get({ plain: true }), username: user.username },
     });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }
@@ -77,7 +80,7 @@ router.get("/me", loggedIn, async (req, res) => {
       profile: { ...profile.get({ plain: true }), username: user.username },
     });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }

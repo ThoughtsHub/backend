@@ -32,7 +32,8 @@ router.get("/", async (req, res) => {
 
     res.ok("News", { news });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
+
     res.serverError();
   }
 });

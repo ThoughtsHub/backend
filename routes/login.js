@@ -2,6 +2,7 @@ import { Router } from "express";
 import User from "../models/User.js";
 import { loggedIn, setupAuth } from "../middlewares/auth/auth.js";
 import client from "../db/redis.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -26,7 +27,7 @@ router.post("/login", async (req, res) => {
       user: user.username === null ? null : user,
     });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }
@@ -40,7 +41,7 @@ router.get("/logout", loggedIn, async (req, res) => {
 
     res.ok("Successfully logged out");
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }
@@ -75,7 +76,7 @@ router.post("/signup/create-password", async (req, res) => {
       user: user.username === null ? null : user,
     });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }

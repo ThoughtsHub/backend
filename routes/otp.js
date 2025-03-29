@@ -3,6 +3,7 @@ import otp from "../utils/otp.js";
 import client from "../db/redis.js";
 import { v4 as uuidv4 } from "uuid";
 import User from "../models/User.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -32,7 +33,7 @@ router.post("/get", async (req, res) => {
     if (sentSuccess) return res.ok("Otp sent");
     res.failure("Otp could not be sent due to server failure", 500);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }
@@ -55,7 +56,7 @@ router.post("/verify", async (req, res) => {
 
     res.ok("OTP verified", { otpToken });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
 
     res.serverError();
   }

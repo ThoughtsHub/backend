@@ -6,6 +6,7 @@ import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
 import { includeWriter } from "../constants/writer.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -22,7 +23,8 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
       ...body.get("decoration"),
     };
   } catch (err) {
-    console.log(err);
+    logger.error(err);
+
     return res.failure("bad format");
   }
 
@@ -44,7 +46,8 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
     await t.commit();
   } catch (err) {
     await t.rollback();
-    console.log(err);
+    logger.error(err);
+
     res.serverError();
   }
 });
@@ -66,7 +69,8 @@ router.get("/", async (req, res) => {
 
     res.ok("Stories", { stories });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
+
     res.serverError();
   }
 });
@@ -89,7 +93,8 @@ router.post("/like", loggedIn, haveProfile, async (req, res) => {
     await t.commit();
   } catch (err) {
     await t.rollback();
-    console.log(err);
+    logger.error(err);
+
     res.serverError();
   }
 });

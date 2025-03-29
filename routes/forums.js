@@ -7,6 +7,7 @@ import db from "../db/pg.js";
 import ForumVote from "../models/ForumVote.js";
 import { ForumCommentRouter } from "./forums_comments.js";
 import { includeWriter } from "../constants/writer.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -30,7 +31,8 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
     await t.commit();
   } catch (err) {
     await t.rollback();
-    console.log(err);
+    logger.error();
+
     res.serverError();
   }
 });
@@ -52,7 +54,8 @@ router.get("/", async (req, res) => {
 
     res.ok("Forums", { forums });
   } catch (err) {
-    console.log(err);
+    logger.error();
+
     res.serverError();
   }
 });
@@ -76,7 +79,8 @@ router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
     await t.commit();
   } catch (err) {
     await t.rollback();
-    console.log(err);
+    logger.error();
+
     res.serverError();
   }
 });
