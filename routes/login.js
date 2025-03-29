@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import { loggedIn, setupAuth } from "../middlewares/auth/auth.js";
 import client from "../db/redis.js";
 import logger from "../constants/logger.js";
+import Profile from "../models/Profile.js";
 
 const router = Router();
 
@@ -21,10 +22,12 @@ router.post("/login", async (req, res) => {
     if (user === null) return res.failure(`Bad ${givenField}`);
     if (user.password !== password) return res.unauth("Wrong password");
 
+    const profile = await Profile.findOne({where: {userId: user.id}})
+
     const userToken = await setupAuth(user.id);
     res.ok("Log in successful", {
       auth_token: userToken,
-      user: user.username === null ? null : user,
+      user: profile,
     });
   } catch (err) {
     logger.error(err);
