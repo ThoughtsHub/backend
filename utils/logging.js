@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, { write } from "fs";
 import path from "path";
 
 const file = (writeDir, filename) => {
@@ -30,13 +30,19 @@ class Logger {
     this.writeLog(writeMessage);
   }
 
-  error(message = "Error", err, user = null) {
-    const writeMessage = `${this.title(user)} : ${message}\n${err}\n----\n`;
+  error(message = "Error", err, user = null, variables = {}) {
+    let writeMessage = `${this.title(user)} : ${message}\n--\n`;
+    writeMessage += `Error : ${err}\n--\n`;
+    for (const vars in variables) {
+      writeMessage += `${vars} : \n`;
+      writeMessage += `${variables[vars]}\n--\n`;
+    }
+    writeMessage += "----\n";
     this.writeError(writeMessage);
   }
 
   info(message = "", user = null, variables = {}) {
-    let writeMessage = `${this.title(user)} : ${message}\n`;
+    let writeMessage = `${this.title(user)} : ${message}\n--\n`;
     for (const vars in variables) {
       writeMessage += `${vars} : \n`;
       writeMessage += `${variables[vars]}\n--\n`;
@@ -47,7 +53,7 @@ class Logger {
   }
 
   warning(message = "", user = null, variables = {}) {
-    let writeMessage = `${this.title(user)} : ${message}\n`;
+    let writeMessage = `${this.title(user)} : ${message}\n--\n`;
     for (const vars in variables) {
       writeMessage += `${vars} : \n`;
       writeMessage += `${variables[vars]}\n--\n`;
@@ -57,9 +63,9 @@ class Logger {
     this.log(message, writeMessage);
   }
 
-  title(user = "random") {
+  title(user = { id: null, username: null }) {
     return `[${new Date(Date.now()).toLocaleString()}] (${
-      user === null ? "random" : user
+      user?.id === null ? "random" : `${username} [${user.id}]`
     })`;
   }
 
