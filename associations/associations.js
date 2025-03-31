@@ -10,7 +10,7 @@ const initAssociations = async () => {
   forumAssociations();
   storyAssociations();
 
-  db.sync({ alter: true });
+  db.sync({ force: true });
 };
 
 export default initAssociations;

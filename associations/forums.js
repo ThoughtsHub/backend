@@ -20,14 +20,14 @@ const forumAssociations = () => {
   ForumComment.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Forum.afterCreate(async (payload, options) => {
-    Profile.increment("forumsCount", {
+    await Profile.increment("forumsCount", {
       by: 1,
       where: { id: payload.profileId },
       transaction: options.transaction,
     });
   });
   Forum.afterDestroy(async (payload, options) => {
-    Profile.decrement("forumsCount", {
+    await Profile.decrement("forumsCount", {
       by: 1,
       where: { id: payload.profileId },
       transaction: options.transaction,

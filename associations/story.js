@@ -20,14 +20,14 @@ const storyAssociations = () => {
   StoryComment.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Story.afterCreate(async (payload, options) => {
-    Profile.increment("storyCount", {
+    await Profile.increment("storyCount", {
       by: 1,
       where: { id: payload.profileId },
       transaction: options.transaction,
     });
   });
   Story.afterDestroy(async (payload, options) => {
-    Profile.decrement("storyCount", {
+    await Profile.decrement("storyCount", {
       by: 1,
       where: { id: payload.profileId },
       transaction: options.transaction,
