@@ -5,6 +5,18 @@ const file = (writeDir, filename) => {
   return writeDir === null ? filename : path.join(writeDir, filename);
 };
 
+const objToString = (obj) => {
+  if (typeof obj === "object") return JSON.stringify(obj, null, 2);
+  else return obj;
+};
+
+const errorToString = (error) => {
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}\nStack Trace:\n${error.stack}`;
+  }
+  return String(error);
+};
+
 class Logger {
   constructor({
     writeDir = null,
@@ -32,21 +44,17 @@ class Logger {
 
   error(message = "Error", err, user = null, variables = {}) {
     let writeMessage = `${this.title(user)} : ${message}\n--\n`;
-    writeMessage += `Error : ${err}\n--\n`;
-    for (const vars in variables) {
-      writeMessage += `${vars} : \n`;
-      writeMessage += `${variables[vars]}\n--\n`;
-    }
+    writeMessage += `Error : ${errorToString(err)}\n--\n`;
+    for (const vars in variables)
+      writeMessage += `${vars} : ${objToString(variables[vars])}\n--\n`;
     writeMessage += "----\n";
     this.writeError(writeMessage);
   }
 
   info(message = "", user = null, variables = {}) {
     let writeMessage = `${this.title(user)} : ${message}\n--\n`;
-    for (const vars in variables) {
-      writeMessage += `${vars} : \n`;
-      writeMessage += `${variables[vars]}\n--\n`;
-    }
+    for (const vars in variables)
+      writeMessage += `${vars} : ${objToString(variables[vars])}\n--\n`;
     writeMessage += "----\n";
     this.writeInfo(writeMessage);
     this.log(message, writeMessage);
@@ -54,10 +62,8 @@ class Logger {
 
   warning(message = "", user = null, variables = {}) {
     let writeMessage = `${this.title(user)} : ${message}\n--\n`;
-    for (const vars in variables) {
-      writeMessage += `${vars} : \n`;
-      writeMessage += `${variables[vars]}\n--\n`;
-    }
+    for (const vars in variables)
+      writeMessage += `${vars} : ${objToString(variables[vars])}\n--\n`;
     writeMessage += "----\n";
     this.writeWarning(writeMessage);
     this.log(message, writeMessage);
@@ -65,7 +71,7 @@ class Logger {
 
   title(user = { id: null, username: null }) {
     return `[${new Date(Date.now()).toLocaleString()}] (${
-      (user?.id ?? null) === null ? "random" : `${username} [${user.id}]`
+      (user?.id ?? null) === null ? "random" : `${user.username} [${user?.id}]`
     })`;
   }
 
