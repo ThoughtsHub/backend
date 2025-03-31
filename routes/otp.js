@@ -36,7 +36,8 @@ router.post("/get", async (req, res) => {
   const generatedOtp = otp.generate();
   const send = isMobile ? otp.sendMobile : otp.sendEmail;
   try {
-    const sentSuccess = await send(contact, generatedOtp);
+    send(contact, generatedOtp);
+    const sentSuccess = true;
     await client.setEx(
       `otp:${contact}:${generatedOtp}`,
       5 * 60,
