@@ -51,8 +51,6 @@ router.post("/", loggedIn, async (req, res) => {
       return res.failure("username could not be set, contact admin");
     }
 
-    body.bulkSet("followers following storyCount forumsCount", 0);
-
     body.set("userId", req.userId);
     const profile = await Profile.create(body.data, { transaction });
 

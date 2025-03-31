@@ -18,9 +18,9 @@ const INTEGER_REQ = { type: dt.INTEGER, allowNull: false };
 
 const INT_REQ_0 = { type: dt.INTEGER, default: 0 };
 
-const BOOL_FALSE = { type: dt.BOOLEAN, allowNull: false, default: false };
+const BOOL_FALSE = { type: dt.BOOLEAN, allowNull: false, defaultValue: false };
 
-const BOOL_TRUE = { type: dt.BOOLEAN, allowNull: false, default: true };
+const BOOL_TRUE = { type: dt.BOOLEAN, allowNull: false, defaultValue: true };
 
 const dataTypesFromSequelize = () => {
   const types = {};
