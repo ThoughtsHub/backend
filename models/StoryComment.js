@@ -5,9 +5,9 @@ import db from "../db/pg.js";
 const StoryComment = db.define(
   "StoryComment",
   {
-    id: types.ID,
-    localID: types.STRING,
-    body: types.TEXT_REQ,
+    id: { ...types.ID },
+    localId: { ...types.STRING },
+    body: { ...types.TEXT_REQ },
     ...timestamps,
   },
   { hooks }

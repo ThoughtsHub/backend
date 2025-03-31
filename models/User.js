@@ -5,11 +5,11 @@ import db from "../db/pg.js";
 const User = db.define(
   "User",
   {
-    id: types.ID,
-    username: types.STRING,
-    password: types.STR_REQ,
-    email: types.STRING,
-    mobile: types.STRING,
+    id: { ...types.ID },
+    username: { ...types.STRING },
+    password: { ...types.STR_REQ },
+    email: { ...types.STRING },
+    mobile: { ...types.STRING },
     ...timestamps,
   },
   { hooks }

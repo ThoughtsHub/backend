@@ -5,7 +5,7 @@ import db from "../db/pg.js";
 const StoryLike = db.define(
   "StoryLike",
   {
-    id: types.ID,
+    id: { ...types.ID },
     ...timestamps,
   },
   { hooks }

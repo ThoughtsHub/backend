@@ -5,14 +5,14 @@ import db from "../db/pg.js";
 const ProfileCollege = db.define(
   "ProfileCollege",
   {
-    id: types.ID,
-    name: types.STR_REQ,
-    collegeId: types.STRING,
-    course: types.STR_REQ,
-    courseId: types.STRING,
-    description: types.TEXT,
-    startYear: types.INTEGER_REQ,
-    endYear: types.INTEGER_REQ,
+    id: { ...types.ID },
+    name: { ...types.STR_REQ },
+    collegeId: { ...types.STRING },
+    course: { ...types.STR_REQ },
+    courseId: { ...types.STRING },
+    description: { ...types.TEXT },
+    startYear: { ...types.INTEGER_REQ },
+    endYear: { ...types.INTEGER_REQ },
     ...timestamps,
   },
   { hooks }

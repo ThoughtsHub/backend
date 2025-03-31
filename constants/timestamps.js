@@ -5,13 +5,9 @@ export const timestampsKeys = {
   updatedAt: "updateDate",
 };
 
-const createdAt = {
-  type: types.BIGINT,
-};
+const createdAt = { ...types.BIGINT };
 
-const updatedAt = {
-  type: types.BIGINT,
-};
+const updatedAt = { ...types.BIGINT };
 
 const beforeCreate = (model, _) => {
   const timeNow = Date.now();

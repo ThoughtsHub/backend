@@ -16,11 +16,19 @@ const TEXT_REQ = { type: dt.TEXT, allowNull: false };
 
 const INTEGER_REQ = { type: dt.INTEGER, allowNull: false };
 
-const INT_REQ_0 = { type: dt.INTEGER, allowNull: false, default: 0 };
+const INT_REQ_0 = { type: dt.INTEGER, default: 0 };
 
 const BOOL_FALSE = { type: dt.BOOLEAN, allowNull: false, default: false };
 
 const BOOL_TRUE = { type: dt.BOOLEAN, allowNull: false, default: true };
+
+const dataTypesFromSequelize = () => {
+  const types = {};
+  for (const type in dt) {
+    types[type] = { type: dt[type] };
+  }
+  return types;
+};
 
 export const types = {
   ID,
@@ -31,5 +39,5 @@ export const types = {
   INT_REQ_0,
   BOOL_TRUE,
   BOOL_FALSE,
-  ...dt,
+  ...dataTypesFromSequelize(),
 };

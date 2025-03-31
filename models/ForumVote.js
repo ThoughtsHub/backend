@@ -5,7 +5,7 @@ import db from "../db/pg.js";
 const ForumVote = db.define(
   "ForumVote",
   {
-    id: types.ID,
+    id: { ...types.ID },
     value: { ...types.INTEGER_REQ, defaultValue: 1 },
     ...timestamps,
   },

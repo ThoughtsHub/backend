@@ -5,12 +5,12 @@ import db from "../db/pg.js";
 const News = db.define(
   "News",
   {
-    id: types.ID,
-    title: types.STR_REQ,
-    body: types.TEXT_REQ,
-    image: types.STRING,
-    newsUrl: types.STRING,
-    category: types.STR_REQ,
+    id: { ...types.ID },
+    title: { ...types.STR_REQ },
+    body: { ...types.TEXT_REQ },
+    image: { ...types.STRING },
+    newsUrl: { ...types.STRING },
+    category: { ...types.STR_REQ },
     ...timestamps,
   },
   { hooks, tableName: "News" }
