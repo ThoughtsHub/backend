@@ -25,9 +25,12 @@ class Logger {
 
   allowedToWrite = () => this.writeAllowed === true;
 
-  log() {}
+  log(title = "Log", message) {
+    const writeMessage = `****\n\n${title}\n\n${message}\n\n****\n\n`;
+    this.writeLog(writeMessage);
+  }
 
-  error(err, message = "Error", user = null) {
+  error(message = "Error", err, user = null) {
     const writeMessage = `${this.title(user)} : ${message}\n${err}\n----\n`;
     this.writeError(writeMessage);
   }
@@ -40,6 +43,7 @@ class Logger {
     }
     writeMessage += "----\n";
     this.writeInfo(writeMessage);
+    this.log(message, writeMessage);
   }
 
   warning(message = "", user = null, variables = {}) {
@@ -50,12 +54,17 @@ class Logger {
     }
     writeMessage += "----\n";
     this.writeWarning(writeMessage);
+    this.log(message, writeMessage);
   }
 
   title(user = "random") {
     return `[${new Date(Date.now()).toLocaleString()}] (${
       user === null ? "random" : user
     })`;
+  }
+
+  writeLog(message) {
+    this.write(this.logFilename, message);
   }
 
   writeError(message) {
