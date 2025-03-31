@@ -18,7 +18,14 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
   body.setFields("title body localId imageUrl");
 
   const reqFields = body.anyNuldefined("title body", ",");
-  if (reqFields.length !== 0) return res.failure(`Required: ${reqFields}`);
+  if (reqFields.length !== 0) {
+    logger.warning("forum creation failed", req.user, {
+      reason: "required fields missing",
+      requires: reqFields,
+      body: body.data,
+    });
+    return res.failure(`Required: ${reqFields}`);
+  }
 
   const t = await db.transaction();
   try {
@@ -29,9 +36,16 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
 
     res.ok("Forum Created", { forum: newForum });
     await t.commit();
+    logger.info("forum created", req.user, {
+      body: body.data,
+      createdForum: newForum,
+    });
   } catch (err) {
     await t.rollback();
-    logger.error();
+    logger.error("Internal server error", req.user, {
+      event: "forum creation failed",
+      body: body.data,
+    });
 
     res.serverError();
   }
@@ -53,8 +67,18 @@ router.get("/", async (req, res) => {
     });
 
     res.ok("Forums", { forums });
+    logger.info("forums delivered", req.user, {
+      forums,
+      timestamp,
+      body: req.query.data,
+      whereObj,
+    });
   } catch (err) {
-    logger.error();
+    logger.error("Internal server error", err, req.user, {
+      event: "forum creation failed",
+      body: body.data,
+      whereObj,
+    });
 
     res.serverError();
   }
@@ -65,7 +89,13 @@ router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
   const body = req.body;
   body.setFields("forumId value");
 
-  if (body.isNuldefined("forumId")) return res.failure("Forum Id is required");
+  if (body.isNuldefined("forumId")) {
+    logger.warning("upvoting for forum failed", req.user, {
+      reason: "forum Id not given",
+      body: body.data,
+    });
+    return res.failure("Forum Id is required");
+  }
   body.set("value", body.isTrue("value") ? 1 : 0);
 
   const t = await db.transaction();
@@ -77,9 +107,16 @@ router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
 
     res.ok("Voted");
     await t.commit();
+    logger.info("voted on forum", req.user, {
+      body: body.data,
+      createdVote: vote,
+    });
   } catch (err) {
     await t.rollback();
-    logger.error();
+    logger.error("Internal server error", err, req.user, {
+      event: "voting on forum failed",
+      body: body.data,
+    });
 
     res.serverError();
   }

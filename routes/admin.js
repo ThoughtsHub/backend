@@ -12,8 +12,9 @@ router.post("/news", async (req, res) => {
   try {
     const news = await News.create(body.data);
     res.ok("News created", { news });
+    logger.info("news created", req.user, { body: body.data, news });
   } catch (err) {
-    logger.error(err);
+    logger.error("news creation failed", err, req.user, { body: body.data });
 
     res.serverError();
   }

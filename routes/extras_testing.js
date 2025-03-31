@@ -20,6 +20,7 @@ const router = Router();
  */
 router.get("/test", loggedIn, (req, res) => {
   res.json({ user: req.user });
+  logger.info("test success", req.user, { user: req.user });
 });
 
 /**
@@ -38,6 +39,17 @@ router.get("/reload-website", async (_, res) => {
   child.unref();
 
   res.send("Restarting....");
+  logger.info("Website restarting", req.user, {
+    envServer: env.server,
+    options: {
+      env: { ...env.server },
+      detached: true,
+      stdio: "ignore",
+      shell: isWindows,
+    },
+    reloadOptions,
+    reloadProgram,
+  });
   process.exit(0);
 });
 
@@ -50,8 +62,14 @@ router.get("/reload-website", async (_, res) => {
 router.get("/delete-user", async (req, res) => {
   const body = req.query;
 
-  if (body.allNuldefined("email mobile"))
+  if (body.allNuldefined("email mobile")) {
+    logger.warning("delete user failed", req.user, {
+      reason: "required fields not given",
+      requires: "email, mobile",
+      body: body.data,
+    });
     return res.failure("Email or mobile required");
+  }
 
   const [email, mobile] = body.bulkGet("email mobile");
   try {
@@ -59,14 +77,34 @@ router.get("/delete-user", async (req, res) => {
     if (user === null) user = await User.findOne({ where: { email } });
     if (user === null) user = await User.findOne({ where: { mobile } });
 
-    if (user === null) return res.failure("No user like that to delete");
+    if (user === null) {
+      logger.warning("delete user failed", req.user, {
+        reason: "user not found with given credentials",
+        body: body.data,
+        userFound: user,
+      });
+      return res.failure("No user like that to delete");
+    }
 
     const destroyResult = await User.destroy({ where: { id: user.id } });
-    if (destroyResult === 1) return res.ok("Deletion Successfull");
+    if (destroyResult === 1) {
+      logger.info("user deleted", req.user, {
+        userFound: user,
+        destroyResult,
+        body: body.data,
+      });
+      return res.ok("Deletion Successfull");
+    }
 
     res.serverError();
+    logger.warning("delete user failed", req.user, {
+      reason: "destroy Result was not 1",
+      body: body.data,
+      userFound: user,
+      destroyResult,
+    });
   } catch (err) {
-    logger.error(err);
+    logger.error("Internal server error", err, req.user, { body: body.data });
 
     res.serverError();
   }

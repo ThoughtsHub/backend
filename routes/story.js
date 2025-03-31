@@ -23,7 +23,9 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
       ...body.get("decoration"),
     };
   } catch (err) {
-    logger.error(err);
+    logger.error("Error due to bad formatting of ", err, req.user, {
+      body: body.data,
+    });
 
     return res.failure("bad format");
   }
@@ -33,7 +35,13 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
   );
 
   const reqFields = body.anyNuldefined("title body category", ",");
-  if (reqFields.length !== 0) return res.failure(`Required: ${reqFields}`);
+  if (reqFields.length !== 0) {
+    logger.warning("Required variables were not given", req.user, {
+      requires: reqFields,
+      body: body.data,
+    });
+    return res.failure(`Required: ${reqFields}`);
+  }
 
   const t = await db.transaction();
   try {
@@ -44,9 +52,14 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
 
     res.ok("Story Created", { story: newStory });
     await t.commit();
+    logger.info("Story created", req.user, {
+      story: newStory,
+      body: body.data,
+      user: req.user,
+    });
   } catch (err) {
     await t.rollback();
-    logger.error(err);
+    logger.error("Internal server error", err, req.user, { body: body.data });
 
     res.serverError();
   }
@@ -68,8 +81,15 @@ router.get("/", async (req, res) => {
     });
 
     res.ok("Stories", { stories });
+    logger.info("Stories delivered", req.user, {
+      stories,
+      timestamp,
+      whereObj,
+    });
   } catch (err) {
-    logger.error(err);
+    logger.error("Internal server error", err, req.user, {
+      body: req.query.data,
+    });
 
     res.serverError();
   }
@@ -79,7 +99,13 @@ router.post("/like", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;
 
-  if (body.isNuldefined("storyId")) return res.failure("Story Id is required");
+  if (body.isNuldefined("storyId")) {
+    logger.warning("Story couldn't be liked", req.user, {
+      reason: "No Story Id given",
+      body: body.data,
+    });
+    return res.failure("Story Id is required");
+  }
   const storyId = body.get("storyId");
 
   const t = await db.transaction();
@@ -91,9 +117,10 @@ router.post("/like", loggedIn, haveProfile, async (req, res) => {
 
     res.ok("Liked");
     await t.commit();
+    logger.info("Story was liked", req.user, { like, body: body.data });
   } catch (err) {
     await t.rollback();
-    logger.error(err);
+    logger.error("Internal server error", err, req.user, { body: body.data });
 
     res.serverError();
   }

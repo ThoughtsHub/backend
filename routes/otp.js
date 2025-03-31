@@ -10,15 +10,28 @@ const router = Router();
 router.post("/get", async (req, res) => {
   const body = req.body;
 
-  if (body.allNuldefined("email mobile"))
+  if (body.allNuldefined("email mobile")) {
+    logger.warning("otp generation failed", req.user, {
+      reason: "required fields not given",
+      required: "email, mobile",
+      body: body.data,
+    });
     return res.failure("required mobile or email");
+  }
   if (body.isNuldefined("isMobile")) body.set("isMobile", false);
 
   const givenField = body.getNotNuldefined("email mobile");
   const [contact, isMobile] = body.bulkGet(`${givenField} isMobile`);
 
   const user = await User.findOne({ where: { [givenField]: contact } });
-  if (user !== null) return res.conflict("Email already used by another user.");
+  if (user !== null) {
+    logger.warning("otp generation failed", req.user, {
+      reason: "contact given is already in use",
+      body: body.data,
+      userWithAssociatedContact: user,
+    });
+    return res.conflict("Email already used by another user.");
+  }
 
   const generatedOtp = otp.generate();
   const send = isMobile ? otp.sendMobile : otp.sendEmail;
@@ -30,10 +43,26 @@ router.post("/get", async (req, res) => {
       `${givenField}:${contact}`
     );
 
-    if (sentSuccess) return res.ok("Otp sent");
+    if (sentSuccess) {
+      logger.info("Otp generated", null, {
+        body: body.data,
+        generatedOtp,
+        sentSuccess,
+      });
+      return res.ok("Otp sent");
+    }
     res.failure("Otp could not be sent due to server failure", 500);
+    logger.warning("otp generation failed", req.user, {
+      reason:
+        "Internal server failure or due to error in redis or nodemailer not responding",
+      body: body.data,
+      generatedOtp,
+    });
   } catch (err) {
-    logger.error(err);
+    logger.error("Internal server error", err, req.user, {
+      event: "otp generation failed",
+      body: body.data,
+    });
 
     res.serverError();
   }
@@ -43,7 +72,14 @@ router.post("/verify", async (req, res) => {
   const body = req.body;
 
   const reqFields = body.anyNuldefined("otp contact", ",");
-  if (body.isNuldefined("otp")) return res.failure(`Required: ${reqFields}`);
+  if (reqFields.length !== 0) {
+    logger.warning("otp verification failed", req.user, {
+      reason: "required fields were not given",
+      requires: reqFields,
+      body: body.data,
+    });
+    return res.failure(`Required: ${reqFields}`);
+  }
   const [givenOtp, contact] = body.bulkGet("otp contact");
 
   try {
@@ -55,8 +91,16 @@ router.post("/verify", async (req, res) => {
     await client.setEx(otpToken, 5 * 60, otpValue);
 
     res.ok("OTP verified", { otpToken });
+    logger.info("otp verification successfull", null, {
+      body: body.data,
+      otpValue,
+      otpToken,
+    });
   } catch (err) {
-    logger.error(err);
+    logger.error("Internal server error", err, req.user, {
+      event: "otp verification failed",
+      body: body.data,
+    });
 
     res.serverError();
   }

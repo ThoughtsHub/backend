@@ -14,7 +14,14 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
   body.setFields("storyId body localId");
 
   const reqFields = body.anyNuldefined("storyId body", ",");
-  if (reqFields.length !== 0) return res.failure(`Required: ${reqFields}`);
+  if (reqFields.length !== 0) {
+    logger.warning("Comment for story could not be created", req.user, {
+      reason: "Required fields were missind",
+      requires: reqFields,
+      body: body.data,
+    });
+    return res.failure(`Required: ${reqFields}`);
+  }
 
   const t = await db.transaction();
   try {
@@ -25,10 +32,14 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
 
     res.ok("Commented", { comment });
     await t.commit();
+    logger.info("Commented on story", req.user, { body: body.data, comment });
   } catch (err) {
     await t.rollback();
-    logger.error(err);
-    
+    logger.error("Internal server error", err, req.user, {
+      event: "comment on story failed",
+      body: body.data,
+    });
+
     res.serverErro();
   }
 });
@@ -37,7 +48,13 @@ router.get("/", async (req, res) => {
   const body = req.query;
   body.setFields("timestamp storyId");
 
-  if (body.isNuldefined("storyId")) return res.failure("Story Id is required");
+  if (body.isNuldefined("storyId")) {
+    logger.warning("Delivering story's comments failed", req.user, {
+      reason: "No story Id given",
+      body: body.data,
+    });
+    return res.failure("Story Id is required");
+  }
   const [timestamp, storyId] = body.bulkGet("timestamp storyId");
 
   const whereObj = req.query.isNumber(timestamp)
@@ -53,9 +70,18 @@ router.get("/", async (req, res) => {
     });
 
     res.ok("Comments", { comments });
+    logger.info("Story's comments delivered", req.user, {
+      comments,
+      body: body.data,
+      whereObj,
+    });
   } catch (err) {
-    logger.error(err);
-    
+    logger.error("Internal server error", err, req.user, {
+      event: "story's comment delivery failed",
+      body: body.data,
+      whereObj,
+    });
+
     res.serverError();
   }
 });

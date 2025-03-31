@@ -2,6 +2,7 @@ import { Router } from "express";
 import News from "../models/News.js";
 import { Op } from "sequelize";
 import { timestampsKeys } from "../constants/timestamps.js";
+import logger from "../constants/logger.js";
 
 const router = Router();
 
@@ -31,8 +32,19 @@ router.get("/", async (req, res) => {
       });
 
     res.ok("News", { news });
+    logger.info("news delivered", req.user, {
+      body: body.data,
+      timestamp,
+      whereObj,
+      news,
+    });
   } catch (err) {
-    logger.error(err);
+    logger.error("Internal server error", err, req.user, {
+      event: "news deliver failed",
+      body: body.data,
+      whereObj,
+      timestamp,
+    });
 
     res.serverError();
   }
