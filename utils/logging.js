@@ -1,18 +1,24 @@
 import fs from "fs";
+import path from "path";
+
+const file = (writeDir, filename) => {
+  return writeDir === null ? filename : path.join(writeDir, filename);
+};
 
 class Logger {
-  constructor(
+  constructor({
+    writeDir = null,
     logFilename,
     errorFilename,
     infoFilename,
     warnFilename,
     writeAllowed = true,
-    alternateFunction = console.log
-  ) {
-    this.logFilename = logFilename;
-    this.errorFilename = errorFilename;
-    this.infoFilename = infoFilename;
-    this.warnFilename = warnFilename;
+    alternateFunction = console.log,
+  }) {
+    this.logFilename = file(writeDir, logFilename);
+    this.errorFilename = file(writeDir, errorFilename);
+    this.infoFilename = file(writeDir, infoFilename);
+    this.warnFilename = file(writeDir, warnFilename);
     this.writeAllowed = writeAllowed;
     this.alternateFunction = alternateFunction;
   }
