@@ -65,7 +65,7 @@ class Logger {
 
   title(user = { id: null, username: null }) {
     return `[${new Date(Date.now()).toLocaleString()}] (${
-      user?.id === null ? "random" : `${username} [${user.id}]`
+      (user?.id ?? null) === null ? "random" : `${username} [${user.id}]`
     })`;
   }
 
