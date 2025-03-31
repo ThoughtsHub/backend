@@ -27,7 +27,7 @@ router.get("/test", loggedIn, (req, res) => {
  * ONLY FOR DEVELOPING PHASE
  * Reloads the website by pulling the latest commit
  */
-router.get("/reload-website", async (_, res) => {
+router.get("/reload-website", async (req, res) => {
   const child = spawn(reloadProgram, reloadOptions, {
     env: { ...env.server },
     detached: true,
