@@ -1,10 +1,10 @@
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
-import { usernameAvailable } from "../utils/username.js";
+import { usernameNotAvailable } from "../utils/username.js";
 
 const createAdmin = () => {
   setTimeout(async () => {
-    if (usernameAvailable("admin")) {
+    if (usernameNotAvailable("admin")) {
       const user = await User.create({
         username: "admin",
         password: "admin",
