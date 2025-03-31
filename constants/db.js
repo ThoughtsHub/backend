@@ -16,7 +16,7 @@ const TEXT_REQ = { type: dt.TEXT, allowNull: false };
 
 const INTEGER_REQ = { type: dt.INTEGER, allowNull: false };
 
-const INT_REQ_0 = { type: dt.INTEGER, default: 0 };
+const INT_REQ_0 = { type: dt.INTEGER, allowNull: false, defaultValue: 0 };
 
 const BOOL_FALSE = { type: dt.BOOLEAN, allowNull: false, defaultValue: false };
 
