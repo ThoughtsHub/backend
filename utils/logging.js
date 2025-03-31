@@ -87,7 +87,10 @@ class Logger {
 
   write(filename, message) {
     if (this.allowedToWrite()) fs.appendFileSync(filename, message);
-    else this.alternateFunction(message);
+    else
+      typeof this.alternateFunction === "function"
+        ? this.alternateFunction(message)
+        : null;
   }
 }
 
