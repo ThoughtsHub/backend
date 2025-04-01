@@ -11,6 +11,4 @@ const StoryLike = db.define(
   { hooks }
 );
 
-StoryLike.sync({ force: true });
-
 export default StoryLike;

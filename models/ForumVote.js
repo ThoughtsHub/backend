@@ -12,6 +12,4 @@ const ForumVote = db.define(
   { hooks }
 );
 
-ForumVote.sync({ force: true });
-
 export default ForumVote;
