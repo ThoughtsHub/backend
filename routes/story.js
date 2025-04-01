@@ -95,7 +95,7 @@ router.get("/", async (req, res) => {
       f = f.get({ plain: true });
       if (Array.isArray(f.StoryLikes) && f.StoryLikes.length === 1)
         f.likedByUser = true;
-      f.likedByUser = true;
+      else f.likedByUser = false;
       delete f.StoryLikes;
       return f;
     });

@@ -139,7 +139,7 @@ router.get("/story", loggedIn, async (req, res) => {
       f = f.get({ plain: true });
       if (Array.isArray(f.StoryLikes) && f.StoryLikes.length === 1)
         f.likedByUser = true;
-      f.likedByUser = true;
+      else f.likedByUser = false;
       delete f.StoryLikes;
       return f;
     });
@@ -186,7 +186,7 @@ router.get("/forums", loggedIn, async (req, res) => {
       f = f.get({ plain: true });
       if (Array.isArray(f.ForumVotes) && f.ForumVotes.length === 1)
         f.isVoted = true;
-      f.isVoted = true;
+      else f.isVoted = false;
       delete f.ForumVotes;
       return f;
     });

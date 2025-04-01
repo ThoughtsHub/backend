@@ -81,7 +81,7 @@ router.get("/", async (req, res) => {
       f = f.get({ plain: true });
       if (Array.isArray(f.ForumVotes) && f.ForumVotes.length === 1)
         f.isVoted = true;
-      f.isVoted = true;
+      else f.isVoted = false;
       delete f.ForumVotes;
       return f;
     });
