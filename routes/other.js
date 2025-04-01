@@ -76,6 +76,9 @@ router.post("/admin-login", async (req, res) => {
     }
 
     const userToken = await setupAuth(user.id);
+
+    res.cookie("auth_token", userToken); // setting cookie to user
+
     res.ok("Admin Log in successful", { auth_token: userToken });
     logger.info("login successfull", req.user, {
       userToken,
