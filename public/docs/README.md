@@ -169,6 +169,71 @@ OR
 
 ---
 
+## **GET /profile/story**
+
+**Query Parameters**:
+
+- `profileId` (String, optional): ID of the profile to fetch.
+- `offset` (Number, optional): How many you have got from server
+
+**Response**:
+
+```json
+{
+  "message": "Stories of the user",
+  "success": true,
+  "nextOffset": 10,
+  "endOfUserStories": true,
+  "stories": [
+    {
+      "id": "1",
+      "localId": "local123",
+      "title": "Story Title",
+      "body": "This is the body of the story.",
+      "caption": "A caption",
+      "category": "Fiction",
+      "genre": "Drama",
+      "color": "#FFFFFF",
+      "backgroundImageId": "image123",
+      "alignment": 0
+    }
+  ]
+}
+```
+
+---
+
+## **GET /profile/forums**
+
+**Query Parameters**:
+
+- `profileId` (String, optional): ID of the profile to fetch.
+- `offset` (Number, optional): How many you have got from server
+
+**Response**:
+
+```json
+{
+  "message": "Forums of the user",
+  "success": true,
+  "nextOffset": 10,
+  "endOfUserStories": true,
+  "forums": [
+    {
+      "id": "1",
+      "title": "Forum Title",
+      "body": "This is the body of the forum.",
+      "imageUrl": "https://example.com/image.jpg",
+      "createDate": 1609459200,
+      "updateDate": 1609459200,
+      "isVoted": true
+    }
+  ]
+}
+```
+
+---
+
 ## **GET /profile/me**
 
 **Response**:
