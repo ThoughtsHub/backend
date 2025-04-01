@@ -9,6 +9,8 @@ import Story from "../models/Story.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { validate as isUUID } from "uuid";
 import Forum from "../models/Forums.js";
+import ForumVote from "../models/ForumVote.js";
+import StoryLike from "../models/StoryLike.js";
 
 const router = Router();
 
@@ -125,14 +127,24 @@ router.get("/story", loggedIn, async (req, res) => {
     : userProfileId;
 
   try {
-    const stories = await Story.findAll({
+    let stories = await Story.findAll({
       where: { profileId },
       offset,
       limit: 40,
       order: [[timestampsKeys.createdAt, "desc"]],
+      include: [{ model: StoryLike, required: false, where: { profileId } }],
     });
 
-    res.ok("Stories by you", {
+    stories = stories.map((f) => {
+      f = f.get({ plain: true });
+      if (Array.isArray(f.StoryLikes) && f.StoryLikes.length === 1)
+        f.likedByUser = true;
+      f.likedByUser = true;
+      delete f.StoryLikes;
+      return f;
+    });
+
+    res.ok("Stories", {
       stories,
       nextOffset: stories.length + offset,
       endOfUserStories: stories.length < 40,
@@ -162,14 +174,24 @@ router.get("/forums", loggedIn, async (req, res) => {
     : userProfileId;
 
   try {
-    const forums = await Forum.findAll({
+    let forums = await Forum.findAll({
       where: { profileId },
       offset,
       limit: 40,
       order: [[timestampsKeys.createdAt, "desc"]],
+      include: [{ model: ForumVote, required: false, where: { profileId } }],
     });
 
-    res.ok("Stories by you", {
+    forums = forums.map((f) => {
+      f = f.get({ plain: true });
+      if (Array.isArray(f.ForumVotes) && f.ForumVotes.length === 1)
+        f.isVoted = true;
+      f.isVoted = true;
+      delete f.ForumVotes;
+      return f;
+    });
+
+    res.ok("Forums", {
       forums,
       nextOffset: forums.length + offset,
       endOfUserForums: forums.length < 40,

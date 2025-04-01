@@ -59,11 +59,31 @@ router.get("/", async (req, res) => {
     : {};
 
   try {
-    const forums = await Forum.findAll({
+    const includeObj =
+      req.loggedIn === true
+        ? [
+            {
+              model: ForumVote,
+              required: false,
+              where: { profileId: req.user.Profile.id },
+            },
+          ]
+        : [];
+
+    let forums = await Forum.findAll({
       where: { ...whereObj },
       limit: 50,
       order: [[timestampsKeys.createdAt, "DESC"]],
-      include: [includeWriter],
+      include: [includeWriter, ...includeObj],
+    });
+
+    forums = forums.map((f) => {
+      f = f.get({ plain: true });
+      if (Array.isArray(f.ForumVotes) && f.ForumVotes.length === 1)
+        f.isVoted = true;
+      f.isVoted = true;
+      delete f.ForumVotes;
+      return f;
     });
 
     res.ok("Forums", { forums });
@@ -72,6 +92,7 @@ router.get("/", async (req, res) => {
       timestamp,
       body: req.query.data,
       whereObj,
+      includeObj,
     });
   } catch (err) {
     logger.error("Internal server error", err, req.user, {

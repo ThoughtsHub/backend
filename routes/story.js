@@ -73,11 +73,31 @@ router.get("/", async (req, res) => {
     : {};
 
   try {
-    const stories = await Story.findAll({
+    const includeObj =
+      req.loggedIn === true
+        ? [
+            {
+              model: StoryLike,
+              required: false,
+              where: { profileId: req.user.Profile.id },
+            },
+          ]
+        : [];
+
+    let stories = await Story.findAll({
       where: { ...whereObj },
       limit: 50,
       order: [[timestampsKeys.createdAt, "DESC"]],
-      include: [includeWriter],
+      include: [includeWriter, ...includeObj],
+    });
+
+    stories = stories.map((f) => {
+      f = f.get({ plain: true });
+      if (Array.isArray(f.StoryLikes) && f.StoryLikes.length === 1)
+        f.likedByUser = true;
+      f.likedByUser = true;
+      delete f.StoryLikes;
+      return f;
     });
 
     res.ok("Stories", { stories });
@@ -85,6 +105,7 @@ router.get("/", async (req, res) => {
       stories,
       timestamp,
       whereObj,
+      includeObj,
     });
   } catch (err) {
     logger.error("Internal server error", err, req.user, {
