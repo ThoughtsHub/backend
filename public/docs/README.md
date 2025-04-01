@@ -173,7 +173,7 @@ OR
 
 **Query Parameters**:
 
-- `profileId` (String, optional): ID of the profile to fetch.
+- `profileId` (String, optional): ID of the profile to fetch. if not given, takes the currently logged in user profile id
 - `offset` (Number, optional): How many you have got from server
 
 **Response**:
@@ -207,7 +207,7 @@ OR
 
 **Query Parameters**:
 
-- `profileId` (String, optional): ID of the profile to fetch.
+- `profileId` (String, optional): ID of the profile to fetch. if not given, takes the currently logged in user profile id
 - `offset` (Number, optional): How many you have got from server
 
 **Response**:
