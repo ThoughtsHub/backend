@@ -5,8 +5,11 @@ import { AppRouter } from "../routes/router.js";
 import "../utils/response.js";
 import auth from "../middlewares/auth/auth.js";
 import handleBody from "../middlewares/body.js";
+import cors from "cors";
 
 const app = express();
+
+app.use(cors()); // development purposes
 
 app.use(express.json());
 app.use(cookieParser());
