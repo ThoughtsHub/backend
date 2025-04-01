@@ -1,3 +1,4 @@
+import logger from "../../constants/logger.js";
 import client from "../../db/redis.js";
 import Profile from "../../models/Profile.js";
 import User from "../../models/User.js";
@@ -48,17 +49,26 @@ export const auth = async (req, _, next) => {
 
 export const loggedIn = (req, res, next) => {
   if (req.loggedIn === true) next();
-  else res.unauth("Not logged In");
+  else {
+    logger.warning("Accessing information without logging in", null, { req });
+    res.unauth("Not logged In");
+  }
 };
 
 export const loggedAsAdmin = (req, res, next) => {
   if (req.loggedIn && req.user.username === "admin") next();
-  else res.forbidden("Only admins are allowed");
+  else {
+    logger.warning("Admin restricted", null, { req });
+    res.forbidden("Only admins are allowed");
+  }
 };
 
 export const haveProfile = (req, res, next) => {
   if (req.loggedIn && req.user.Profile !== null) next();
-  else res.forbidden("Only users with profile created can access");
+  else {
+    logger.warning("Profiled entry", null, { req });
+    res.forbidden("Only users with profile created can access");
+  }
 };
 
 export default auth;
