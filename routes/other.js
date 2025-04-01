@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { usernameAvailable } from "../utils/username.js";
 import logger from "../constants/logger.js";
-import { loggedAsAdmin } from "../middlewares/auth/auth.js";
+import { setupAuth, loggedAsAdmin } from "../middlewares/auth/auth.js";
 import User from "../models/User.js";
 
 const router = Router();
