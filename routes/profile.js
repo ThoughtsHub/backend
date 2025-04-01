@@ -5,6 +5,10 @@ import User from "../models/User.js";
 import { usernameNotAvailable } from "../utils/username.js";
 import Profile from "../models/Profile.js";
 import logger from "../constants/logger.js";
+import Story from "../models/Story.js";
+import { timestampsKeys } from "../constants/timestamps.js";
+import { validate as isUUID } from "uuid";
+import Forum from "../models/Forums.js";
 
 const router = Router();
 
@@ -100,13 +104,87 @@ router.get("/me", loggedIn, async (req, res) => {
     res.ok("Your Profile", {
       profile: { ...profile.get({ plain: true }), username: user.username },
     });
-    logger.info("User's Profile was delivered", req.user, {profile});
+    logger.info("User's Profile was delivered", req.user, { profile });
   } catch (err) {
     logger.error("Internal server error", err, req.user, {
       happened: "user's own profile couldn't be delivered",
     });
 
     res.serverError();
+  }
+});
+
+router.get("/story", loggedIn, async (req, res) => {
+  const userProfileId = req.user.Profile.id;
+  const offset = req.query.isNumber(req.query.get("offset"))
+    ? req.query.get("offset")
+    : 0;
+
+  const profileId = isUUID(req.query.get("profileId"))
+    ? req.query.get("profileId")
+    : userProfileId;
+
+  try {
+    const stories = await Story.findAll({
+      where: { profileId },
+      offset,
+      limit: 40,
+      order: [[timestampsKeys.createdAt, "desc"]],
+    });
+
+    res.ok("Stories by you", {
+      stories,
+      nextOffset: stories.length + offset,
+      endOfUserStories: stories.length < 40,
+    });
+    logger.info("Stories delivered", req.user, {
+      query: req.query.data,
+      stories,
+    });
+  } catch (err) {
+    console.log(err);
+    res.serverError();
+    logger.error("Internal server error", err, req.user, {
+      event: "stories requested by user could not be delivered /profile/story",
+      query: req.query.data,
+    });
+  }
+});
+
+router.get("/forums", loggedIn, async (req, res) => {
+  const userProfileId = req.user.Profile.id;
+  const offset = req.query.isNumber(req.query.get("offset"))
+    ? req.query.get("offset")
+    : 0;
+
+  const profileId = isUUID(req.query.get("profileId"))
+    ? req.query.get("profileId")
+    : userProfileId;
+
+  try {
+    const forums = await Forum.findAll({
+      where: { profileId },
+      offset,
+      limit: 40,
+      order: [[timestampsKeys.createdAt, "desc"]],
+    });
+
+    res.ok("Stories by you", {
+      forums,
+      nextOffset: forums.length + offset,
+      endOfUserForums: forums.length < 40,
+    });
+    logger.info("Forums delivered", req.user, {
+      query: req.query.data,
+      forums,
+    });
+  } catch (err) {
+    console.log(err);
+    res.serverError();
+    logger.error("Internal server error", err, req.user, {
+      event: "forums requested by user could not be delivered /profile/forums",
+      query: req.query.data,
+    });
   }
 });
 
