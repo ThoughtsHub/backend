@@ -65,7 +65,7 @@ router.get("/", async (req, res) => {
             {
               model: ForumVote,
               required: false,
-              where: { profileId: req.user.Profile.id },
+              where: { profileId: req.user.Profile.id, value: 1 },
             },
           ]
         : [];

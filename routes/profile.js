@@ -179,7 +179,9 @@ router.get("/forums", loggedIn, async (req, res) => {
       offset,
       limit: 40,
       order: [[timestampsKeys.createdAt, "desc"]],
-      include: [{ model: ForumVote, required: false, where: { profileId } }],
+      include: [
+        { model: ForumVote, required: false, where: { profileId, value: 1 } },
+      ],
     });
 
     forums = forums.map((f) => {
