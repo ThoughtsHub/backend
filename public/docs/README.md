@@ -576,6 +576,7 @@ OR
 **Body Parameters**:
 
 - `storyId` (String, required): ID of the story.
+- `value` (Boolean, required): Tells whether you are liking or unliking the story (true to like, false to not like)
 
 **Response**:
 
