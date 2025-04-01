@@ -127,14 +127,22 @@ router.post("/like", loggedIn, haveProfile, async (req, res) => {
     });
     return res.failure("Story Id is required");
   }
+  const value = body.isTrue("value") ? 1 : 0;
   const storyId = body.get("storyId");
 
   const t = await db.transaction();
   try {
-    const like = await StoryLike.create(
-      { storyId, profileId },
-      { transaction: t }
-    );
+    const storylike = await StoryLike.findOne({
+      where: { storyId, profileId },
+    });
+
+    let like;
+    if (storylike !== null) {
+      if (value === 0)
+        await StoryLike.destroy({ where: { storyId, profileId } });
+    } else {
+      if (value === 1) like = await StoryLike.create({ storyId, profileId });
+    }
 
     res.ok("Liked");
     await t.commit();

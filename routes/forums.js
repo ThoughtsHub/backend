@@ -119,18 +119,32 @@ router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
   }
   body.set("value", body.isTrue("value") ? 1 : 0);
 
+  const [forumId, value] = body.bulkGet("forumId value");
+
   const t = await db.transaction();
   try {
-    const vote = await ForumVote.create(
-      { ...body.data, profileId },
-      { transaction: t }
-    );
+    const forumVote = await ForumVote.findOne({
+      where: { forumId, profileId },
+    });
+
+    let vote;
+    if (forumVote !== null)
+      vote = await ForumVote.update(
+        { value: body.get("value") },
+        { where: { forumId, profileId } }
+      );
+    else
+      vote = await ForumVote.create(
+        { ...body.data, profileId },
+        { transaction: t }
+      );
 
     res.ok("Voted");
     await t.commit();
     logger.info("voted on forum", req.user, {
       body: body.data,
       createdVote: vote,
+      forumVote,
     });
   } catch (err) {
     await t.rollback();
