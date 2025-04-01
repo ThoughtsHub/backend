@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { usernameAvailable } from "../utils/username.js";
 import logger from "../constants/logger.js";
-import { setupAuth, loggedAsAdmin } from "../middlewares/auth/auth.js";
+import { setupAuth } from "../middlewares/auth/auth.js";
 import User from "../models/User.js";
 
 const router = Router();
@@ -38,7 +38,7 @@ router.get("/check-username", async (req, res) => {
   }
 });
 
-router.post("/check-admin", loggedAsAdmin, async (req, res) => {
+router.post("/check-admin", async (req, res) => {
   const body = req.body;
 
   if (body.allNuldefined("username password")) {
