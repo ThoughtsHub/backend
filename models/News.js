@@ -8,7 +8,7 @@ const News = db.define(
     id: { ...types.ID },
     title: { ...types.STR_REQ },
     body: { ...types.TEXT_REQ },
-    image: { ...types.STRING },
+    imageUrl: { ...types.STRING },
     newsUrl: { ...types.STRING },
     category: { ...types.STR_REQ },
     ...timestamps,
