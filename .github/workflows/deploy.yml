@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /path/to/yourrepo
+            cd /home/ec2-user/backend
             git pull origin main
             npm install
             pm2 restart myapp
