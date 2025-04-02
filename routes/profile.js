@@ -59,7 +59,11 @@ router.post("/", loggedIn, async (req, res) => {
     }
 
     body.set("userId", req.userId);
-    const profile = await Profile.create(body.data, { transaction });
+    let profile = await Profile.create(body.data, { transaction });
+
+    profile = profile.get({ plain: true });
+    profile.profileId = profile.id;
+    delete profile.id;
 
     res.ok("Profile created", { user: profile });
     await transaction.commit();
@@ -84,8 +88,11 @@ router.get("/", loggedIn, async (req, res) => {
   const profileId = req.query.get("profileId");
 
   try {
-    const profile = await Profile.findByPk(profileId);
+    const profile = await Profile.findByPk(profileId, {
+      attributes: { include: [["id", "profileId"]], exclude: ["id"] },
+    });
     const user = await User.findByPk(profile.userId);
+
     res.ok("Profile found", {
       profile: { ...profile.get({ plain: true }), username: user.username },
     });
@@ -102,8 +109,11 @@ router.get("/", loggedIn, async (req, res) => {
 
 router.get("/me", loggedIn, async (req, res) => {
   try {
-    const profile = await Profile.findByPk(req.user.Profile.id);
+    const profile = await Profile.findByPk(req.user.Profile.id, {
+      attributes: { include: [["id", "profileId"]], exclude: ["id"] },
+    });
     const user = await User.findByPk(profile.userId);
+
     res.ok("Your Profile", {
       profile: { ...profile.get({ plain: true }), username: user.username },
     });

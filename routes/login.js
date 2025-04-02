@@ -134,7 +134,7 @@ router.post("/signup/create-password", async (req, res) => {
     const userToken = await setupAuth(user.id);
     res.ok("Sign up successful", {
       auth_token: userToken,
-      user: user.username === null ? null : user,
+      user: null,
     });
     logger.info("Signup successful", req.user, {
       event: "password created",
