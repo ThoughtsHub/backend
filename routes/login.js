@@ -50,9 +50,11 @@ router.post("/login", async (req, res) => {
 
     let profile = await Profile.findOne({ where: { userId: user.id } });
 
-    profile = profile.get({ plain: true });
-    profile.profileId = profile.id;
-    delete profile.id;
+    if (profile !== null) {
+      profile = profile.get({ plain: true });
+      profile.profileId = profile.id;
+      delete profile.id;
+    }
 
     const userToken = await setupAuth(user.id);
     res.ok("Log in successful", {
