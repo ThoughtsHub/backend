@@ -11,6 +11,7 @@ import { validate as isUUID } from "uuid";
 import Forum from "../models/Forums.js";
 import ForumVote from "../models/ForumVote.js";
 import StoryLike from "../models/StoryLike.js";
+import { includeWriter } from "../constants/writer.js";
 
 const router = Router();
 
@@ -132,7 +133,10 @@ router.get("/story", loggedIn, async (req, res) => {
       offset,
       limit: 40,
       order: [[timestampsKeys.createdAt, "desc"]],
-      include: [{ model: StoryLike, required: false, where: { profileId } }],
+      include: [
+        includeWriter,
+        { model: StoryLike, required: false, where: { profileId } },
+      ],
     });
 
     stories = stories.map((f) => {
@@ -180,7 +184,12 @@ router.get("/forums", loggedIn, async (req, res) => {
       limit: 40,
       order: [[timestampsKeys.createdAt, "desc"]],
       include: [
-        { model: ForumVote, required: false, where: { profileId, value: 1 } },
+        includeWriter,
+        {
+          model: ForumVote,
+          required: false,
+          where: { profileId, value: 1 },
+        },
       ],
     });
 
