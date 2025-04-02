@@ -130,7 +130,7 @@ OR
   "message": "Profile created",
   "success": true,
   "user": {
-    "id": "12345",
+    "profileId": "12345",
     "fullname": "John Doe",
     "profileImageUrl": "https://example.com/image.jpg",
     "about": "A short bio",
@@ -154,7 +154,7 @@ OR
   "message": "Profile found",
   "success": true,
   "profile": {
-    "id": "12345",
+    "profileId": "12345",
     "fullname": "John Doe",
     "username": "johndoe",
     "profileImageUrl": "https://example.com/image.jpg",
@@ -243,7 +243,7 @@ OR
   "message": "Your Profile",
   "success": true,
   "profile": {
-    "id": "12345",
+    "profileId": "12345",
     "fullname": "John Doe",
     "username": "johndoe",
     "profileImageUrl": "https://example.com/image.jpg",
