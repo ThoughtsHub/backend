@@ -15,20 +15,20 @@ app.use(cookieParser());
 app.use(
   helmet({
     contentSecurityPolicy: false,
-    // crossOriginOpenerPolicy: { policy: "same-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin" },
   })
 );
 
 app.use(express.static("./public"));
+
+app.use(auth);
+app.use(handleBody);
 
 // Ensure consistent headers
 app.use((req, res, next) => {
   res.setHeader("Origin-Agent-Cluster", "?1");
   next();
 });
-
-app.use(auth);
-app.use(handleBody);
 
 app.use("/", AppRouter);
 
