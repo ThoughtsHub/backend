@@ -5,17 +5,27 @@ import { AppRouter } from "../routes/router.js";
 import "../utils/response.js";
 import auth from "../middlewares/auth/auth.js";
 import handleBody from "../middlewares/body.js";
-import cors from "cors";
 
 const app = express();
 
-app.use(cors()); // development purposes
+// app.use(cors()); // development purposes
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    // crossOriginOpenerPolicy: { policy: "same-origin" },
+  })
+);
 
 app.use(express.static("./public"));
+
+// Ensure consistent headers
+app.use((req, res, next) => {
+  res.setHeader("Origin-Agent-Cluster", "?1");
+  next();
+});
 
 app.use(auth);
 app.use(handleBody);
