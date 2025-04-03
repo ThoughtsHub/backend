@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(
   helmet({
     contentSecurityPolicy: false,
-    crossOriginOpenerPolicy: { policy: "same-origin" },
+    crossOriginOpenerPolicy: false, // for development
   })
 );
 
