@@ -56,9 +56,12 @@ export const loggedIn = (req, res, next) => {
 };
 
 export const loggedAsAdmin = (req, res, next) => {
-  if (req.loggedIn && req.user.username === "admin") next();
+  if (req.loggedIn === true && req?.user?.username === "admin") next();
   else {
-    logger.warning("Admin restricted", null, { req });
+    logger.warning("Admin restricted", null, {
+      user: req.user,
+      headers: req.headers,
+    });
     res.forbidden("Only admins are allowed");
   }
 };
