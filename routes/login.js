@@ -4,6 +4,7 @@ import { loggedIn, setupAuth } from "../middlewares/auth/auth.js";
 import client from "../db/redis.js";
 import logger from "../constants/logger.js";
 import Profile from "../models/Profile.js";
+import db from "../db/pg.js";
 
 const router = Router();
 
@@ -153,6 +154,37 @@ router.post("/signup/create-password", async (req, res) => {
     });
 
     res.serverError();
+  }
+});
+
+router.get("/delete-user", loggedIn, async (req, res) => {
+  const userId = req.userId;
+  const userToken = req.userToken;
+
+  const t = await db.transaction();
+  try {
+    const destroyResult = await User.destroy({
+      where: { id: userId },
+      transaction: t,
+    });
+
+    if (destroyResult !== 1) {
+      await t.rollback();
+      logger.warning("user deletion failed", req.user, {
+        reason: "bad user Id",
+        userId,
+      });
+      return res.failure("bad user Id");
+    }
+
+    await client.del(userToken);
+    res.ok("user deletion successfull");
+    logger.info("user deleted", req.user, { user: req.user, userId });
+    await t.commit();
+  } catch (err) {
+    console.log(err);
+    res.serverError();
+    logger.error("user deletion failed", err, req.user, { userId });
   }
 });
 

@@ -103,7 +103,7 @@ router.post("/admin-login", async (req, res) => {
   }
 });
 
-router.get("update-admin-panel", async (req, res) => {
+router.get("/update-admin-panel", async (req, res) => {
   const child = spawn(reloadProgram, reloadOptions, {
     detached: true,
     stdio: "ignore",
