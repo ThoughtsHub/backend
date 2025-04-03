@@ -5,6 +5,8 @@ import { loggedAsAdmin, setupAuth } from "../middlewares/auth/auth.js";
 import User from "../models/User.js";
 import { spawn } from "child_process";
 
+const isWindows = process.platform === "win32";
+
 // Path to reload shell script
 const scriptPath = `./scripts/admin_panel.${isWindows ? "ps1" : "sh"}`;
 const reloadProgram = isWindows ? "powershell.exe" : "bash";
