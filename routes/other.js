@@ -3,6 +3,12 @@ import { usernameAvailable } from "../utils/username.js";
 import logger from "../constants/logger.js";
 import { loggedAsAdmin, setupAuth } from "../middlewares/auth/auth.js";
 import User from "../models/User.js";
+import { spawn } from "child_process";
+
+// Path to reload shell script
+const scriptPath = `./scripts/admin_panel.${isWindows ? "ps1" : "sh"}`;
+const reloadProgram = isWindows ? "powershell.exe" : "bash";
+const reloadOptions = isWindows ? ["-File", scriptPath] : [scriptPath];
 
 const router = Router();
 
@@ -93,6 +99,23 @@ router.post("/admin-login", async (req, res) => {
 
     res.serverError();
   }
+});
+
+router.get("update-admin-panel", async (req, res) => {
+  const child = spawn(reloadProgram, reloadOptions, {
+    detached: true,
+    stdio: "ignore",
+    shell: isWindows, // necessary in windows to run a detached process
+  });
+
+  // detach process
+  child.unref();
+
+  res.send("Updating....");
+  logger.info("updating the admin panel", req.user, {
+    reloadProgram,
+    reloadOptions,
+  });
 });
 
 export const OtherRouter = router;
