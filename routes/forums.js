@@ -51,6 +51,61 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
   }
 });
 
+router.put("/", loggedIn, haveProfile, async (req, res) => {
+  const profileId = req.user.Profile.id;
+  const body = req.body;
+
+  body.setFields("title body localId imageUrl forumId");
+
+  const reqFields = body.anyNuldefined("title body forumId", ",");
+  if (reqFields.length !== 0) {
+    logger.warning("forum update failed", req.user, {
+      reason: "required fields missing",
+      requires: reqFields,
+      body: body.data,
+    });
+    return res.failure(`Required: ${reqFields}`);
+  }
+
+  const forumId = body.get("forumId");
+  body.del("forumId");
+
+  const t = await db.transaction();
+  try {
+    const [updateResult] = await Forum.update(
+      { ...body.data },
+      { where: { id: forumId, profileId }, transaction: t }
+    );
+
+    if (updateResult !== 1) {
+      await t.rollback();
+      logger.warning("Forum update failed", req.user, {
+        body: body.data,
+        forumId,
+        profileId,
+      });
+      return res.failure("Forum does not belong to you.");
+    }
+
+    const newForum = await Forum.findByPk(forumId);
+
+    res.ok("Forum Updated", { forum: newForum.get({ plain: true }) });
+    await t.commit();
+    logger.info("forum updated", req.user, {
+      body: body.data,
+      createdForum: newForum,
+    });
+  } catch (err) {
+    await t.rollback();
+    logger.error("Internal server error", req.user, {
+      event: "forum update failed",
+      body: body.data,
+    });
+
+    res.serverError();
+  }
+});
+
 router.get("/", async (req, res) => {
   const timestamp = req.query.get("timestamp");
 

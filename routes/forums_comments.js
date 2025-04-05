@@ -16,7 +16,7 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
   const reqFields = body.anyNuldefined("forumId body", ",");
   if (reqFields.length !== 0) {
     logger.warning("Comment for forum could not be created", req.user, {
-      reason: "Required fields were missind",
+      reason: "Required fields were missing",
       requires: reqFields,
       body: body.data,
     });
@@ -37,6 +37,57 @@ router.post("/", loggedIn, haveProfile, async (req, res) => {
     await t.rollback();
     logger.error("Internal server error", err, req.user, {
       event: "comment on forum failed",
+      body: body.data,
+    });
+
+    res.serverErro();
+  }
+});
+
+router.put("/", loggedIn, haveProfile, async (req, res) => {
+  const profileId = req.user.Profile.id;
+  const body = req.body;
+  body.setFields("forumId body localId commentId");
+
+  const reqFields = body.anyNuldefined("forumId body commentId", ",");
+  if (reqFields.length !== 0) {
+    logger.warning("Comment for forum could not be updated", req.user, {
+      reason: "Required fields were missing",
+      requires: reqFields,
+      body: body.data,
+    });
+    return res.failure(`Required: ${reqFields}`);
+  }
+
+  const commentId = body.get("commentId");
+  body.del("commentId");
+
+  const t = await db.transaction();
+  try {
+    const [updateResult] = await ForumComment.update(
+      { ...body.data },
+      { where: { id: commentId, profileId }, transaction: t }
+    );
+
+    if (updateResult !== 1) {
+      await t.rollback();
+      logger.warning("Comment update failed", req.user, {
+        body: body.data,
+        commentId,
+        profileId,
+      });
+      return res.failure("Comment does not belong to you.");
+    }
+
+    const comment = await ForumComment.findByPk(commentId);
+
+    res.ok("Comment updated", { comment: comment.get({ plain: true }) });
+    await t.commit();
+    logger.info("Comment updated", req.user, { body: body.data, comment });
+  } catch (err) {
+    await t.rollback();
+    logger.error("Internal server error", err, req.user, {
+      event: "comment update failed",
       body: body.data,
     });
 
