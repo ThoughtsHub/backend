@@ -105,6 +105,49 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.delete("/", async (req, res) => {
+  if (req.query.isNuldefined("forumId")) {
+    logger.warning("Forum deletion failed", req.user, { query: req.query });
+    return res.failure("ForumId is required");
+  }
+
+  const forumId = req.query.get("forumId");
+  const profileId = req.user.Profile.id;
+
+  const t = await db.transaction();
+  try {
+    const destroyResult = await Forum.destroy({
+      where: { id: forumId, profileId },
+    });
+
+    if (destroyResult !== 1) {
+      await t.rollback();
+      logger.warning("Forum deletion failed", req.user, {
+        query: req.query,
+        destroyResult,
+      });
+      return res.failure(
+        "No forum found that belongs to you with that forum Id"
+      );
+    }
+
+    res.ok("Forum deleted");
+    await t.commit();
+    logger.info("Forum deleted", req.user, {
+      query: req.query,
+      destroyResult,
+    });
+  } catch (err) {
+    await t.rollback();
+    console.log(err);
+
+    logger.error("Internal server error", err, req.user, {
+      query: req.query,
+      event: "Forum deletion failed",
+    });
+  }
+});
+
 router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;

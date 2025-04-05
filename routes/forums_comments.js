@@ -86,4 +86,47 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.delete("/", async (req, res) => {
+  if (req.query.isNuldefined("commentId")) {
+    logger.warning("Comment deletion failed", req.user, { query: req.query });
+    return res.failure("CommentId is required");
+  }
+
+  const commentId = req.query.get("commentId");
+  const profileId = req.user.Profile.id;
+
+  const t = await db.transaction();
+  try {
+    const destroyResult = await ForumComment.destroy({
+      where: { id: commentId, profileId },
+    });
+
+    if (destroyResult !== 1) {
+      await t.rollback();
+      logger.warning("Comment deletion failed", req.user, {
+        query: req.query,
+        destroyResult,
+      });
+      return res.failure(
+        "No comment found that belongs to you with that commentId"
+      );
+    }
+
+    res.ok("Comment deleted");
+    await t.commit();
+    logger.info("Comment deleted", req.user, {
+      query: req.query,
+      destroyResult,
+    });
+  } catch (err) {
+    await t.rollback();
+    console.log(err);
+
+    logger.error("Internal server error", err, req.user, {
+      query: req.query,
+      event: "comment deletion failed",
+    });
+  }
+});
+
 export const ForumCommentRouter = router;
