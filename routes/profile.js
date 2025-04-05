@@ -82,6 +82,47 @@ router.post("/", loggedIn, async (req, res) => {
   }
 });
 
+router.put("/", async (req, res) => {
+  const body = req.body;
+
+  body.setFields("fullName profileImageUrl gender dob about");
+
+  const requiredFields = body.anyNuldefined("fullName about", ",");
+  if (requiredFields.length !== 0) {
+    logger.warning("Profile update failed", req.user, {
+      reason: "required fields not given",
+      requires: requiredFields,
+      body: body.data,
+    });
+    return res.failure(`Required : ${requiredFields}`);
+  }
+
+  const transaction = await db.transaction();
+  try {
+    body.set("userId", req.userId);
+    let profile = await Profile.update(body.data, { transaction });
+
+    profile = profile.get({ plain: true });
+    profile.profileId = profile.id;
+    delete profile.id;
+
+    res.ok("Profile updated", { user: profile });
+    await transaction.commit();
+    logger.info("Profile updated", req.user, {
+      body: body.data,
+      profile,
+      username,
+      userUpdate,
+    });
+  } catch (err) {
+    await transaction.rollback();
+
+    logger.error("Internal server error", err, req.user, { body: body.data });
+
+    res.serverError();
+  }
+});
+
 router.get("/", loggedIn, async (req, res) => {
   if (req.query.isNuldefined("profileId"))
     return res.failure("Profile Id is required");
