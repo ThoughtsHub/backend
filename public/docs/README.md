@@ -381,6 +381,53 @@ OR
 
 ---
 
+## **PUT /forums**
+
+**Body Parameters**:
+
+- `forumId` (String, required): Forum ID of the forum.
+- `localId` (String, optional): Local ID of the forum.
+- `title` (String, required): Title of the forum.
+- `body` (String, required): Body of the forum.
+- `imageUrl` (String, optional): URL of the image.
+
+**Response**:
+
+```json
+{
+  "message": "Forum Updated",
+  "success": true,
+  "forum": {
+    "id": "#####",
+    "localId": "local123",
+    "title": "Forum Title",
+    "body": "This is the body of the forum.",
+    "imageUrl": "https://example.com/image.jpg",
+    "createDate": 1609459200,
+    "updateDate": 1609459200
+  }
+}
+```
+
+---
+
+## **DELETE /forums**
+
+**Body Parameters**:
+
+- `forumId` (String, required): Forum ID of the forum.
+
+**Response**:
+
+```json
+{
+  "message": "Forum deleted",
+  "success": true
+}
+```
+
+---
+
 ## **POST /forums/upvote**
 
 **Body Parameters**:
@@ -461,6 +508,51 @@ OR
       "username": "johndoe"
     }
   }
+}
+```
+
+---
+
+## **PUT /forums/comments**
+
+**Body Parameters**:
+
+- `commentId` (String, required): Comment Id of the comment.
+- `body` (String, required): Body of the comment.
+- `forumId` (String, required): ID of the forum.
+- `localId` (String, optional): Local ID of the comment.
+
+**Response**:
+
+```json
+{
+  "message": "Comment Updated",
+  "success": true,
+  "comment": {
+    "id": "####",
+    "postId": "2",
+    "localId": "local123",
+    "body": "This is a comment.",
+    "createDate": 1609459200,
+    "updateDate": 241234124
+  }
+}
+```
+
+---
+
+## **DELETE /forums/comments**
+
+**Query Parameters**:
+
+- `commentId` (String, required): Comment Id of the comment.
+
+**Response**:
+
+```json
+{
+  "message": "Comment deleted",
+  "success": true
 }
 ```
 
