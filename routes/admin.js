@@ -20,4 +20,17 @@ router.post("/news", async (req, res) => {
   }
 });
 
+router.delete("/all/news", async (req, res) => {
+  try {
+    const destroyResults = await News.destroy({ where: {} });
+
+    res.ok("Deleted All News", { numbers: destroyResults });
+    logger.info("Deleted all news", req.user, { destroyResults });
+  } catch (err) {
+    console.log(err);
+    res.serverError();
+    logger.error("Deletion of all news failed", err, req.user);
+  }
+});
+
 export const AdminRouter = router;
