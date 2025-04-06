@@ -4,7 +4,7 @@ import logger from "../constants/logger.js";
 import { loggedAsAdmin, setupAuth } from "../middlewares/auth/auth.js";
 import User from "../models/User.js";
 import { spawn } from "child_process";
-import { categoriesList } from "../constants/categories.js";
+import Category from "../models/Category.js";
 
 const isWindows = process.platform === "win32";
 
@@ -16,7 +16,9 @@ const reloadOptions = isWindows ? ["-File", scriptPath] : [scriptPath];
 const router = Router();
 
 router.get("/categories", async (req, res) => {
-  return res.ok("Categories", { categories: categoriesList });
+  const categories = await Category.findAll();
+
+  return res.ok("Categories", { categories });
 });
 
 router.get("/check-username", async (req, res) => {
