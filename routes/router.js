@@ -28,7 +28,7 @@ router.use("/upload", UploadRouter);
 router.use("/admin", loggedAsAdmin, AdminRouter);
 
 router.get("/admin-panel", async (req, res) => {
-  res.redirect("/dist/index.html");
+  res.redirect("/dist");
 });
 
 export const AppRouter = router;
