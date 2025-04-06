@@ -4,6 +4,7 @@ import logger from "../constants/logger.js";
 import { loggedAsAdmin, setupAuth } from "../middlewares/auth/auth.js";
 import User from "../models/User.js";
 import { spawn } from "child_process";
+import { categoriesList } from "../constants/categories.js";
 
 const isWindows = process.platform === "win32";
 
@@ -13,6 +14,10 @@ const reloadProgram = isWindows ? "powershell.exe" : "bash";
 const reloadOptions = isWindows ? ["-File", scriptPath] : [scriptPath];
 
 const router = Router();
+
+router.get("/categories", async (req, res) => {
+  return res.ok("Categories", { categories: categoriesList });
+});
 
 router.get("/check-username", async (req, res) => {
   if (req.query.isNuldefined("username")) {

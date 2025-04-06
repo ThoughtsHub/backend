@@ -33,6 +33,20 @@ OR
 
 ---
 
+## **GET /categories**
+
+**Response**:
+
+```json
+{
+  "message": "Username available",
+  "success": true,
+  "categories": ["Crime", "Economy"]
+}
+```
+
+---
+
 ## **POST /login**
 
 **Body Parameters**:
