@@ -3,4 +3,4 @@ export const categories = {
   ECONOMY: "Economy",
 };
 
-export const categoriesList = Object.keys(categories);
+export const categoriesList = Object.values(categories);
