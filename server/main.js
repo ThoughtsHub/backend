@@ -11,7 +11,7 @@ const app = express();
 
 // Ensure consistent headers
 app.use((req, res, next) => {
-  res.setHeader("Origin-Agent-Cluster", "?1");
+  res.setHeader("Origin-Agent-Cluster", "?0");
   next();
 });
 
