@@ -71,6 +71,15 @@ class ReqBody {
   isTrue = (field) => {
     return this.get(field) === true;
   };
+
+  toNumber = (field, def = 0) => {
+    const value = this.get(field);
+    try {
+      return this.isNumber(field) ? value : Number(value);
+    } catch {
+      return def ?? 0;
+    }
+  };
 }
 
 const handleBody = (req, _, next) => {
