@@ -2,6 +2,7 @@ import { Router } from "express";
 import News from "../models/News.js";
 import logger from "../constants/logger.js";
 import Category from "../models/Category.js";
+import Forum from "../models/Forums.js";
 
 const router = Router();
 
@@ -67,6 +68,19 @@ router.delete("/all/news", async (req, res) => {
     console.log(err);
     res.serverError();
     logger.error("Deletion of all news failed", err, req.user);
+  }
+});
+
+router.delete("/all/forums", async (req, res) => {
+  try {
+    const destroyResults = await Forum.destroy({ where: {} });
+
+    res.ok("Deleted All Forums", { numbers: destroyResults });
+    logger.info("Deleted all forums", req.user, { destroyResults });
+  } catch (err) {
+    console.log(err);
+    res.serverError();
+    logger.error("Deletion of all forums failed", err, req.user);
   }
 });
 
