@@ -9,6 +9,12 @@ import cors from "cors";
 
 const app = express();
 
+// Ensure consistent headers
+app.use((req, res, next) => {
+  res.setHeader("Origin-Agent-Cluster", "?1");
+  next();
+});
+
 app.use(cors()); // development purposes
 
 app.use(express.json());
@@ -24,12 +30,6 @@ app.use(express.static("./public"));
 
 app.use(auth);
 app.use(handleBody);
-
-// Ensure consistent headers
-app.use((req, res, next) => {
-  res.setHeader("Origin-Agent-Cluster", "?1");
-  next();
-});
 
 app.use("/", AppRouter);
 
