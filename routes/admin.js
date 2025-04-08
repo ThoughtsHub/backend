@@ -164,7 +164,7 @@ router.delete("/users", async (req, res) => {
 router.post("/users", async (req, res) => {
   const body = req.body;
 
-  body.setFields("username password fullName about gender");
+  body.setFields("username password fullName about gender profileImageUrl");
 
   const reqFields = body.anyNuldefined("username password fullName about", ",");
   if (reqFields.length !== 0) return res.failure(`Required : ${reqFields}`);
