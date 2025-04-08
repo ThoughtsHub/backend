@@ -6,10 +6,10 @@ const User = db.define(
   "User",
   {
     id: { ...types.ID },
-    username: { ...types.STRING },
+    username: { ...types.STRING, unique: true },
     password: { ...types.STR_REQ },
-    email: { ...types.STRING },
-    mobile: { ...types.STRING },
+    email: { ...types.STRING, unique: true },
+    mobile: { ...types.STRING, unique: true },
     ...timestamps,
   },
   { hooks }

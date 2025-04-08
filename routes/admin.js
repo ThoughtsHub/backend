@@ -3,6 +3,11 @@ import News from "../models/News.js";
 import logger from "../constants/logger.js";
 import Category from "../models/Category.js";
 import Forum from "../models/Forums.js";
+import User from "../models/User.js";
+import { timestampsKeys } from "../constants/timestamps.js";
+import Profile from "../models/Profile.js";
+
+const usersLimitPerPage = 30;
 
 const router = Router();
 
@@ -109,6 +114,39 @@ router.delete("/forums", async (req, res) => {
     console.log(err);
     res.serverError();
     logger.error("Deletion of forums failed", err, req.user, { forumId });
+  }
+});
+
+router.get("/users", async (req, res) => {
+  const offset = req.query.toNumber("offset");
+
+  try {
+    const users = await User.findAll({
+      offset: offset * usersLimitPerPage,
+      limit: usersLimitPerPage,
+      order: [[timestampsKeys.updatedAt, "DESC"]],
+      include: [{ model: Profile }],
+    });
+
+    res.ok("Users", { users });
+    logger.info("User delivered", req.user, { offset, users });
+  } catch (err) {
+    logger.error("User delivery failed", err, req.user, { offset });
+    res.serverError();
+  }
+});
+
+router.get("/users/pages", async (req, res) => {
+  try {
+    const pages = await User.count({ where: {} });
+
+    const total = Math.ceil(pages / usersLimitPerPage);
+
+    res.ok("Users", { total });
+    logger.info("User delivered", req.user, { total });
+  } catch (err) {
+    logger.error("User delivery failed", err, req.user);
+    res.serverError();
   }
 });
 
