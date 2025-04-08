@@ -6,6 +6,7 @@ import Forum from "../models/Forums.js";
 import User from "../models/User.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import Profile from "../models/Profile.js";
+import db from "../db/pg.js";
 
 const usersLimitPerPage = 30;
 
@@ -157,6 +158,35 @@ router.delete("/users", async (req, res) => {
   } catch (err) {
     res.serverError();
     logger.error("Deletion of user failed", err, req.user, { userId });
+  }
+});
+
+router.post("/users", async (req, res) => {
+  const body = req.body;
+
+  body.setFields("username password fullName about gender");
+
+  const reqFields = body.anyNuldefined("username password fullName about", ",");
+  if (reqFields.length !== 0) return res.failure(`Required : ${reqFields}`);
+
+  const [username, password, fullName, about, gender, profileImageUrl] =
+    body.bulkGet("username password fullName about gender profileImageUrl");
+
+  const t = await db.transaction();
+  try {
+    const user = await User.create({ username, password }, { transaction: t });
+    const profile = await Profile.create(
+      { fullName, about, gender, username, profileImageUrl, userId: user.id },
+      { transaction: t }
+    );
+
+    res.ok("User created");
+    await t.commit();
+    logger.info("User created", req.user, { body: body.data, user, profile });
+  } catch (err) {
+    await t.rollback();
+    res.serverError();
+    logger.error("User creation failed", err, req.user, { body: body.data });
   }
 });
 
