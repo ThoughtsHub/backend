@@ -84,6 +84,20 @@ router.delete("/all/forums", async (req, res) => {
   }
 });
 
+router.delete("/news", async (req, res) => {
+  const newsId = req.query.get("newsId");
+  try {
+    const destroyResults = await News.destroy({ where: { id: newsId } });
+
+    res.ok("Deleted News", { numbers: destroyResults, newsId });
+    logger.info("Deleted News", req.user, { destroyResults, newsId });
+  } catch (err) {
+    console.log(err);
+    res.serverError();
+    logger.error("Deletion of News failed", err, req.user, { newsId });
+  }
+});
+
 router.delete("/forums", async (req, res) => {
   const forumId = req.query.get("forumId");
   try {
