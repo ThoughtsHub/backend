@@ -50,7 +50,10 @@ export const auth = async (req, _, next) => {
 export const loggedIn = (req, res, next) => {
   if (req.loggedIn === true) next();
   else {
-    logger.warning("Accessing information without logging in", null, { req });
+    logger.warning("Accessing information without logging in", null, {
+      user: req.user,
+      headers: req.headers,
+    });
     res.unauth("Not logged In");
   }
 };
@@ -69,7 +72,10 @@ export const loggedAsAdmin = (req, res, next) => {
 export const haveProfile = (req, res, next) => {
   if (req.loggedIn && req.user.Profile !== null) next();
   else {
-    logger.warning("Profiled entry", null, { req });
+    logger.warning("Profiled entry", null, {
+      user: req.user,
+      headers: req.headers,
+    });
     res.forbidden("Only users with profile created can access");
   }
 };
