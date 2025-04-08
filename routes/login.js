@@ -28,10 +28,14 @@ router.post("/login", async (req, res) => {
   }
 
   const givenField = body.getNotNuldefined("username email mobile");
-  const [identifier, password] = body.bulkGet(`${givenField} password`);
+  const [identifier, password] = body.bulkGet(`email password`);
 
   try {
-    const user = await User.findOne({ where: { [givenField]: identifier } });
+    let user = await User.findOne({ where: { username: identifier } });
+    if (user === null)
+      user = await User.findOne({ where: { email: identifier } });
+    if (user === null)
+      user = await User.findOne({ where: { mobile: identifier } });
     if (user === null) {
       logger.warning("login attempt failed", null, {
         reason: "credentials invalid: username/email/mobile",
