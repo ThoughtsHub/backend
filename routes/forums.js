@@ -8,6 +8,7 @@ import ForumVote from "../models/ForumVote.js";
 import { ForumCommentRouter } from "./forums_comments.js";
 import { includeWriter } from "../constants/writer.js";
 import logger from "../constants/logger.js";
+import { ForumsExtra } from "./forums_extra.js";
 
 const router = Router();
 
@@ -256,5 +257,7 @@ router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
 });
 
 router.use("/comments", ForumCommentRouter);
+
+router.use("/", ForumsExtra);
 
 export const ForumsRouter = router;
