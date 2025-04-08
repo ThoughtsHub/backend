@@ -13,14 +13,14 @@ const profileAssociations = () => {
 
   Profile.hasMany(Forum, {
     foreignKey: profileKey,
-    onDelete: onDelete.setNull,
+    onDelete: onDelete.cascade,
     as: "forum",
   });
   Forum.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 
   Profile.hasMany(Story, {
     foreignKey: profileKey,
-    onDelete: onDelete.setNull,
+    onDelete: onDelete.cascade,
     as: "story",
   });
   Story.belongsTo(Profile, { foreignKey: profileKey, as: writer });

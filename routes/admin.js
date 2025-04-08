@@ -70,7 +70,6 @@ router.delete("/all/news", async (req, res) => {
     res.ok("Deleted All News", { numbers: destroyResults });
     logger.info("Deleted all news", req.user, { destroyResults });
   } catch (err) {
-    console.log(err);
     res.serverError();
     logger.error("Deletion of all news failed", err, req.user);
   }
@@ -83,7 +82,6 @@ router.delete("/all/forums", async (req, res) => {
     res.ok("Deleted All Forums", { numbers: destroyResults });
     logger.info("Deleted all forums", req.user, { destroyResults });
   } catch (err) {
-    console.log(err);
     res.serverError();
     logger.error("Deletion of all forums failed", err, req.user);
   }
@@ -97,7 +95,6 @@ router.delete("/news", async (req, res) => {
     res.ok("Deleted News", { numbers: destroyResults, newsId });
     logger.info("Deleted News", req.user, { destroyResults, newsId });
   } catch (err) {
-    console.log(err);
     res.serverError();
     logger.error("Deletion of News failed", err, req.user, { newsId });
   }
@@ -111,7 +108,6 @@ router.delete("/forums", async (req, res) => {
     res.ok("Deleted Forums", { numbers: destroyResults, forumId });
     logger.info("Deleted forums", req.user, { destroyResults, forumId });
   } catch (err) {
-    console.log(err);
     res.serverError();
     logger.error("Deletion of forums failed", err, req.user, { forumId });
   }
@@ -147,6 +143,20 @@ router.get("/users/pages", async (req, res) => {
   } catch (err) {
     logger.error("User delivery failed", err, req.user);
     res.serverError();
+  }
+});
+
+router.delete("/users", async (req, res) => {
+  const userId = req.query.get("userId");
+
+  try {
+    const destroyResults = await User.destroy({ where: { id: userId } });
+
+    res.ok("Deleted User", { numbers: destroyResults, userId });
+    logger.info("Deleted user", req.user, { destroyResults, userId });
+  } catch (err) {
+    res.serverError();
+    logger.error("Deletion of user failed", err, req.user, { userId });
   }
 });
 
