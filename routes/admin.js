@@ -190,4 +190,56 @@ router.post("/users", async (req, res) => {
   }
 });
 
+router.get("/user", async (req, res) => {
+  const userId = req.query.get("userId");
+
+  try {
+    const profile = await Profile.findOne({ where: { userId } });
+    if (profile !== null) {
+      logger.info("Profile delivered", req.user, { userId, profile });
+      return res.ok("Profile found", { user: profile });
+    }
+
+    res.failure("No profile found with the given userId");
+    logger.warning("Profile get failure", req.user, { userId });
+  } catch (err) {
+    res.serverError();
+    logger.error("Profile delivery failed", err, req.user, { userId });
+  }
+});
+
+router.put("/user", async (req, res) => {
+  const body = req.body;
+
+  body.setFields("fullName about gender profileImageUrl userId");
+  const [userId, fullName, about, gender, profileImageUrl] = body.bulkGet(
+    "userId fullName about gender profileImageUrl"
+  );
+
+  try {
+    const profile = await Profile.findOne({ where: { userId } });
+
+    if (profile === null) {
+      const user = await User.findByPk(userId);
+      await Profile.create({
+        fullName,
+        username: user.username,
+        about,
+        gender,
+        profileImageUrl,
+        userId,
+      });
+    } else {
+      await Profile.update(
+        { fullName, about, gender, profileImageUrl },
+        { where: { id: profile.id, userId } }
+      );
+    }
+
+    res.ok("Profile Updated");
+  } catch (err) {
+    res.serverError();
+  }
+});
+
 export const AdminRouter = router;
