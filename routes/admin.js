@@ -84,4 +84,18 @@ router.delete("/all/forums", async (req, res) => {
   }
 });
 
+router.delete("/forums", async (req, res) => {
+  const forumId = req.query.get("forumId");
+  try {
+    const destroyResults = await Forum.destroy({ where: { id: forumId } });
+
+    res.ok("Deleted Forums", { numbers: destroyResults, forumId });
+    logger.info("Deleted forums", req.user, { destroyResults, forumId });
+  } catch (err) {
+    console.log(err);
+    res.serverError();
+    logger.error("Deletion of forums failed", err, req.user, { forumId });
+  }
+});
+
 export const AdminRouter = router;
