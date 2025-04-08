@@ -80,6 +80,15 @@ class ReqBody {
       return def ?? 0;
     }
   };
+
+  removeNulDefined = () => {
+    const removeFields = [];
+    for (const key in this.data)
+      if (Object.prototype.hasOwnProperty.call(this.data, key))
+        if (this.isNuldefined(key)) removeFields.push(key);
+
+    for (const field of removeFields) this.del(field);
+  };
 }
 
 const handleBody = (req, _, next) => {

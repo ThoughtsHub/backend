@@ -99,8 +99,44 @@ router.put("/", async (req, res) => {
 
   const transaction = await db.transaction();
   try {
-    body.set("userId", req.userId);
-    let profile = await Profile.update(body.data, { transaction });
+    let profile = await Profile.update(body.data, {
+      where: { userId: req.userId },
+      transaction,
+    });
+
+    profile = profile.get({ plain: true });
+    profile.profileId = profile.id;
+    delete profile.id;
+
+    res.ok("Profile updated", { user: profile });
+    await transaction.commit();
+    logger.info("Profile updated", req.user, {
+      body: body.data,
+      profile,
+      username,
+      userUpdate,
+    });
+  } catch (err) {
+    await transaction.rollback();
+
+    logger.error("Internal server error", err, req.user, { body: body.data });
+
+    res.serverError();
+  }
+});
+
+router.patch("/", async (req, res) => {
+  const body = req.body;
+
+  body.setFields("fullName profileImageUrl gender dob about");
+  body.removeNulDefined();
+
+  const transaction = await db.transaction();
+  try {
+    let profile = await Profile.update(body.data, {
+      where: { userId: req.userId },
+      transaction,
+    });
 
     profile = profile.get({ plain: true });
     profile.profileId = profile.id;
