@@ -128,12 +128,23 @@ router.put("/", async (req, res) => {
 router.patch("/", async (req, res) => {
   const body = req.body;
 
-  body.setFields("fullName profileImageUrl gender dob about");
+  body.setFields("fullName profileImageUrl gender dob about username");
   body.removeNulDefined();
 
   const transaction = await db.transaction();
   try {
+    if (!body.isNuldefined("username"))
+      await User.update(
+        { username: body.get("username") },
+        { where: { id: req.userId }, transaction }
+      );
+
     let profile = await Profile.update(body.data, {
+      where: { userId: req.userId },
+      transaction,
+    });
+
+    profile = await Profile.findOne({
       where: { userId: req.userId },
       transaction,
     });
@@ -147,15 +158,12 @@ router.patch("/", async (req, res) => {
     logger.info("Profile updated", req.user, {
       body: body.data,
       profile,
-      username,
-      userUpdate,
+      username: body.get("username"),
     });
   } catch (err) {
     await transaction.rollback();
-
-    logger.error("Internal server error", err, req.user, { body: body.data });
-
     res.serverError();
+    logger.error("Internal server error", err, req.user, { body: body.data });
   }
 });
 

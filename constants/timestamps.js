@@ -16,7 +16,7 @@ const beforeCreate = (model, _) => {
 };
 
 const beforeUpdate = (model, _) => {
-  model[timestampsKeys.createdAt] = Date.now();
+  model[timestampsKeys.updatedAt] = Date.now();
 };
 
 export const timestamps = {

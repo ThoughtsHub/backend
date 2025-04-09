@@ -155,6 +155,36 @@ OR
 
 ---
 
+## **PATCH /profile**
+
+Only the fields given will be updated
+
+**Body Parameters**:
+
+- `fullName` (String, optional): Full name of the user.
+- `username` (String, optional): Desired username.
+- `profileImageUrl` (String, optional): URL of the profile image.
+- `dob` (Number, optional): Date of birth as a timestamp.
+- `about` (String, optional): Short description about the user.
+
+**Response**:
+
+```json
+{
+  "message": "Profile created",
+  "success": true,
+  "user": {
+    "profileId": "12345",
+    "fullname": "John Doe",
+    "profileImageUrl": "https://example.com/image.jpg",
+    "about": "A short bio",
+    "dob": 1609459200
+  }
+}
+```
+
+---
+
 ## **GET /profile**
 
 **Query Parameters**:
