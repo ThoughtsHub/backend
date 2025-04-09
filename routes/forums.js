@@ -75,7 +75,11 @@ router.put("/", loggedIn, haveProfile, async (req, res) => {
   try {
     const [updateResult] = await Forum.update(
       { ...body.data },
-      { where: { id: forumId, profileId }, transaction: t }
+      {
+        where: { id: forumId, profileId },
+        transaction: t,
+        individualHooks: true,
+      }
     );
 
     if (updateResult !== 1) {

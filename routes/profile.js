@@ -142,6 +142,7 @@ router.patch("/", async (req, res) => {
     let profile = await Profile.update(body.data, {
       where: { userId: req.userId },
       transaction,
+      individualHooks: true,
     });
 
     profile = await Profile.findOne({

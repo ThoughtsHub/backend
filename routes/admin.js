@@ -232,7 +232,7 @@ router.put("/user", async (req, res) => {
     } else {
       await Profile.update(
         { fullName, about, gender, profileImageUrl },
-        { where: { id: profile.id, userId } }
+        { where: { id: profile.id, userId }, individualHooks: true }
       );
     }
 
