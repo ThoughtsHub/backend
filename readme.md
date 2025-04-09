@@ -457,7 +457,7 @@ Only the fields given will be updated
 
 ## **DELETE /forums**
 
-**Body Parameters**:
+**Query Parameters**:
 
 - `forumId` (String, required): Forum ID of the forum.
 
