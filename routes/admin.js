@@ -237,7 +237,29 @@ router.put("/user", async (req, res) => {
     }
 
     res.ok("Profile Updated");
+    logger.info("Profile Updated", req.user, { body: body.data, profile });
   } catch (err) {
+    res.serverError();
+    logger.error("Profile update failed", err, req.user, { body: body.data });
+  }
+});
+
+router.put("/forums", async (req, res) => {
+  const body = req.body;
+
+  body.setFields("title body forumId");
+  const { title, body: body_, forumId } = body.bulkGetMap("title body forumId");
+
+  try {
+    const forumUpdate = await Forum.update(
+      { title, body: body_ },
+      { where: { id: forumId }, individualHooks: true }
+    );
+
+    res.ok("Forum Updated");
+    logger.info("Forum Updated", req.user, { body: body.data, forumUpdate });
+  } catch (err) {
+    logger.error("Forum update failed", err, req.user, { body: body.data });
     res.serverError();
   }
 });

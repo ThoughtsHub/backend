@@ -82,4 +82,17 @@ router.get("/pages", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const forum = await Forum.findByPk(id);
+
+    res.ok("Forum", { forum });
+    logger.info("Forum delivered", req.user, { forum, id });
+  } catch (err) {
+    logger.error("Forum couldn't be delivered", err, req.user, { id });
+  }
+});
+
 export const ForumsExtra = router;
