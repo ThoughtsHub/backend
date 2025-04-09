@@ -264,4 +264,29 @@ router.put("/forums", async (req, res) => {
   }
 });
 
+router.put("/news", async (req, res) => {
+  const body = req.body;
+
+  body.setFields("title body imageUrl category genre newsUrl newsId");
+  const newsId = body.get("newsId");
+  body.del("newsId");
+
+  try {
+    const newsUpdate = await News.update(body.data, {
+      where: { id: newsId },
+      individualHooks: true,
+    });
+
+    res.ok("News Updated");
+    logger.info("News updated", req.user, {
+      body: body.data,
+      newsId,
+      newsUpdate,
+    });
+  } catch (err) {
+    logger.error("News update failed", err, req.user, { body: body.data });
+    res.serverError();
+  }
+});
+
 export const AdminRouter = router;

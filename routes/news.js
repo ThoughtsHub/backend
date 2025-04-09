@@ -106,4 +106,18 @@ router.get("/pages", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const news = await News.findByPk(id);
+
+    res.ok("News", { news });
+    logger.info("News delivered", req.user, { news, id });
+  } catch (err) {
+    logger.error("News delivery failed", err, req.user, { id });
+    res.serverError();
+  }
+});
+
 export const NewsRouter = router;
