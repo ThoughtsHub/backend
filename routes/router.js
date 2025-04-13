@@ -11,6 +11,7 @@ import { NewsRouter } from "./news.js";
 import { AdminRouter } from "./admin.js";
 import { loggedAsAdmin } from "../middlewares/auth/auth.js";
 import { UploadRouter } from "./upload.js";
+import { ReportRouter } from "./report.js";
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.use("/forums", ForumsRouter);
 router.use("/story", StoryRouter);
 router.use("/news", NewsRouter);
 router.use("/upload", UploadRouter);
+router.use("/report", ReportRouter);
 
 router.use("/admin", loggedAsAdmin, AdminRouter);
 
