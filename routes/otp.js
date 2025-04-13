@@ -33,7 +33,7 @@ router.post("/get", async (req, res) => {
     return res.conflict("Email already used by another user.");
   }
 
-  const generatedOtp = otp.generate();
+  const generatedOtp = otp.generate(4);
   const send = isMobile ? otp.sendMobile : otp.sendEmail;
   try {
     send(contact, generatedOtp);
