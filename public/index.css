@@ -1,7 +1,7 @@
-@import url("https://fonts.googleapis.com/css?family=Roboto+Mono|Source+Sans+Pro:300,400,600");
+@import url("https://fonts.googleapis.com/css?family=Space+Grotesk|Roboto+Mono|Source+Sans+Pro:300,400,600");
 
 body {
-    font-family: 'Roboto Mono', sans-serif;
+    font-family: 'Space Grotesk', 'Roboto Mono', sans-serif;
     line-height: 1.6;
     margin: 20px;
     padding: 0;
