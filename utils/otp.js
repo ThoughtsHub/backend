@@ -7,8 +7,12 @@ import { puppeteer } from "../env/env.config.js";
 const client = await create({
   session: "otp-sender",
   headless: "new",
-  browserArgs: ["--no-sandbox", "--disable-setuid-sandbox"],
-  addBrowserArgs: ["--no-sandbox", "--disable-setuid-sandbox"],
+  browserArgs: ["--no-sandbox", "--disable-setuid-sandbox", "--single-process"],
+  addBrowserArgs: [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--single-process",
+  ],
   ...(puppeteer.isOptions
     ? {
         puppeteerOptions: {
