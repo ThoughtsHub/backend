@@ -13,6 +13,7 @@ const client = await create({
     ? {
         puppeteerOptions: {
           executablePath: puppeteer.executablePath,
+          timeout: 30_000,
         },
       }
     : {}),
