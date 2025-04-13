@@ -51,7 +51,9 @@ router.delete("/categories", async (req, res) => {
 router.post("/news", async (req, res) => {
   const body = req.body;
 
-  body.setFields("title body imageUrl category genre newsUrl");
+  body.setFields(
+    "title body imageUrl category genre newsUrl titleHindi bodyHindi"
+  );
 
   try {
     const news = await News.create(body.data);
@@ -267,7 +269,9 @@ router.put("/forums", async (req, res) => {
 router.put("/news", async (req, res) => {
   const body = req.body;
 
-  body.setFields("title body imageUrl category genre newsUrl newsId");
+  body.setFields(
+    "title body imageUrl category genre newsUrl newsId titleHindi bodyHindi"
+  );
   const newsId = body.get("newsId");
   body.del("newsId");
 
