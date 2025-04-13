@@ -8,6 +8,7 @@ const client = await create({
   session: "otp-sender",
   headless: "new",
   browserArgs: ["--no-sandbox", "--disable-setuid-sandbox"],
+  addBrowserArgs: ["--no-sandbox", "--disable-setuid-sandbox"],
   ...(puppeteer.isOptions
     ? {
         puppeteerOptions: {
