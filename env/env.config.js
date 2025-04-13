@@ -27,6 +27,11 @@ export const nodeEnv = {
   production: process.env.node_env_production ?? true,
 };
 
-const env = { server, pg, redis, google, nodeEnv };
+export const puppeteer = {
+  isOptions: process.env.puppeteer === "0" ? false : true,
+  executablePath: process.env.puppeteer_path,
+};
+
+const env = { server, pg, redis, google, nodeEnv, puppeteer };
 
 export default env;

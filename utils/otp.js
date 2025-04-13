@@ -2,10 +2,18 @@ import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import { google } from "../env/env.config.js";
 import { create } from "venom-bot";
+import { puppeteer } from "../env/env.config.js";
 
 const client = await create({
   session: "otp-sender",
   headless: "new",
+  ...(puppeteer.isOptions
+    ? {
+        puppeteerOptions: {
+          executablePath: puppeteer.executablePath,
+        },
+      }
+    : {}),
 });
 
 const transportEmail = {
