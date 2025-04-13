@@ -1,6 +1,12 @@
 import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import { google } from "../env/env.config.js";
+import { create } from "venom-bot";
+
+const client = await create({
+  session: "otp-sender",
+  headless: "new",
+});
 
 const transportEmail = {
   service: "gmail",
@@ -57,8 +63,12 @@ const sendOtpEmail = async (recipient, otp) => {
  * @returns {Promise<boolean>}
  */
 const sendOtpMobile = async (recipient, otp) => {
-  // TODO: Create login to send otp on mobile
-
+  try {
+    client.sendText(`91${recipient}@c.us`, `Your OTP is ${otp}`);
+    return true;
+  } catch (err) {
+    console.log(err);
+  }
   return false;
 };
 

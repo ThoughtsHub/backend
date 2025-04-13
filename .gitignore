@@ -21,3 +21,6 @@ logs
 
 # admin panel files
 /public/dist
+
+# whatsapp tokens
+tokens
