@@ -92,7 +92,7 @@ router.put("/", loggedIn, haveProfile, async (req, res) => {
       return res.failure("Forum does not belong to you.");
     }
 
-    const newForum = await Forum.findByPk(forumId);
+    const newForum = await Forum.findOne({ where: { id: forumId, profileId } });
 
     res.ok("Forum Updated", { forum: newForum.get({ plain: true }) });
     await t.commit();
