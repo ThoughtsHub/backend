@@ -56,9 +56,9 @@ router.put("/", loggedIn, haveProfile, async (req, res) => {
   const profileId = req.user.Profile.id;
   const body = req.body;
 
-  body.setFields("title body localId imageUrl forumId");
+  body.setFields("title body localId imageUrl id");
 
-  const reqFields = body.anyNuldefined("title body forumId", ",");
+  const reqFields = body.anyNuldefined("title body id", ",");
   if (reqFields.length !== 0) {
     logger.warning("forum update failed", req.user, {
       reason: "required fields missing",
@@ -68,8 +68,8 @@ router.put("/", loggedIn, haveProfile, async (req, res) => {
     return res.failure(`Required: ${reqFields}`);
   }
 
-  const forumId = body.get("forumId");
-  body.del("forumId");
+  const forumId = body.get("id");
+  body.del("id");
 
   const t = await db.transaction();
   try {
