@@ -52,7 +52,7 @@ router.post("/news", async (req, res) => {
   const body = req.body;
 
   body.setFields(
-    "title body imageUrl category genre newsUrl titleHindi bodyHindi"
+    "title body imageUrl category genre newsUrl hindiTitle hindiBody"
   );
 
   try {
@@ -270,7 +270,7 @@ router.put("/news", async (req, res) => {
   const body = req.body;
 
   body.setFields(
-    "title body imageUrl category genre newsUrl newsId titleHindi bodyHindi"
+    "title body imageUrl category genre newsUrl newsId hindiTitle hindiBody"
   );
   const newsId = body.get("newsId");
   body.del("newsId");
