@@ -2,27 +2,19 @@ import db from "../db/pg.js";
 import Category from "../models/Category.js";
 import { parseFields } from "../utils/field_parser.js";
 import { sResult } from "../utils/service_return.js";
+import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
 const modelFields = "name* value*";
 const { fields, reqFields } = parseFields(modelFields);
 
 class CategoryService {
-  static status = {
-    CREATED: 100,
-    DELETED: 101,
-    ID_NOT_GIVEN: 200,
-    REQ_FIELDS_NOT_GIVEN: 201,
-    ID_INVALID: 202,
-    ERROR: 500,
-  };
-
   static createNew = async (body) => {
     body.setFields(fields);
 
     const reqFieldsNotGiven = body.anyNuldefined(reqFields, ", ");
     if (reqFieldsNotGiven.length !== 0)
       return sResult(
-        this.status.REQ_FIELDS_NOT_GIVEN,
+        SERVICE_CODE.REQ_FIELDS_MISSING,
         `Required: ${reqFieldsNotGiven}`
       );
 
@@ -30,9 +22,9 @@ class CategoryService {
       let category = await Category.create(body.data);
       category = category.get({ plain: true });
 
-      return sResult(this.status.CREATED, { category });
+      return sResult(SERVICE_CODE.CREATED, { category });
     } catch (err) {
-      return sResult(this.status.ERROR, err);
+      return sResult(SERVICE_CODE.ERROR, err);
     }
   };
 
@@ -40,7 +32,7 @@ class CategoryService {
     const id = body.get("id");
 
     if (typeof id !== "string")
-      return sResult(this.status.ID_INVALID, "Invalid Id");
+      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
 
     const t = await db.transaction();
     try {
@@ -52,14 +44,14 @@ class CategoryService {
 
       if (destroyResult !== 1) {
         await t.rollback();
-        return sResult(this.status.ID_INVALID, "Invalid Id");
+        return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
       }
 
       await t.commit();
-      return sResult(this.status.DELETED);
+      return sResult(SERVICE_CODE.DELETED);
     } catch (err) {
       await t.rollback();
-      return sResult(this.status.ERROR, err);
+      return sResult(SERVICE_CODE.ERROR, err);
     }
   };
 }

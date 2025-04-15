@@ -7,6 +7,7 @@ import { timestampsKeys } from "../constants/timestamps.js";
 import Profile from "../models/Profile.js";
 import db from "../db/pg.js";
 import CategoryService from "../services/category_service.js";
+import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
 const usersLimitPerPage = 30;
 
@@ -16,14 +17,14 @@ router.post("/categories", async (req, res) => {
   const { status, result } = await CategoryService.createNew(req.body);
 
   switch (status) {
-    case CategoryService.status.CREATED:
+    case SERVICE_CODE.CREATED:
       logger.info("New category created", req.user, result);
       return res.ok("Category created", result);
 
-    case CategoryService.status.REQ_FIELDS_NOT_GIVEN:
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
       return res.failure(result);
 
-    case CategoryService.status.ERROR:
+    case SERVICE_CODE.ERROR:
       logger.error("Category creation failed", result, req.user, {
         body: req.body.data,
       });
@@ -35,18 +36,18 @@ router.delete("/categories", async (req, res) => {
   const { status, result } = await CategoryService.deleteExisting(req.query);
 
   switch (status) {
-    case CategoryService.status.DELETED:
+    case SERVICE_CODE.DELETED:
       logger.info("Category deleted", req.user);
       return res.ok("Category deleted");
 
-    case CategoryService.status.ID_INVALID:
+    case SERVICE_CODE.ID_INVALID:
       logger.warning("Category deletion failed", req.user, {
         reason: result,
         body: req.query.data,
       });
       return res.failure(result);
 
-    case CategoryService.status.ERROR:
+    case SERVICE_CODE.ERROR:
       logger.error("Category deletion failed", result, req.user, {
         body: req.query.data,
       });
