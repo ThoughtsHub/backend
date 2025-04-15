@@ -53,20 +53,6 @@ router.delete("/categories", async (req, res) => {
       });
       return res.serverError();
   }
-
-  try {
-    const destroyResult = await Category.destroy({ where: { id } });
-    res.ok("Deleted successfully");
-    logger.info("Category deleted", req.user, {
-      body: req.query.data,
-      destroyResult,
-    });
-  } catch (err) {
-    logger.error("category deletion failed", err, req.user, {
-      body: req.query.data,
-    });
-    res.serverError();
-  }
 });
 
 router.post("/news", async (req, res) => {
