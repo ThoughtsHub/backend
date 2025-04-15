@@ -1,13 +1,12 @@
 import { Router } from "express";
 import News from "../models/News.js";
 import logger from "../constants/logger.js";
-import Category from "../models/Category.js";
 import Forum from "../models/Forums.js";
 import User from "../models/User.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import Profile from "../models/Profile.js";
 import db from "../db/pg.js";
-import CategoryService from "../services/categories.js";
+import CategoryService from "../services/category_service.js";
 
 const usersLimitPerPage = 30;
 
