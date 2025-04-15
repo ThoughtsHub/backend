@@ -16,7 +16,8 @@
     "main": "app.js",
     "scripts": {
         "start": "node app.js",
-        "dev": "nodemon --signal SIGINT app.js"
+        "dev": "nodemon --signal SIGINT app.js",
+        "test": "vitest"
     },
     "dependencies": {
         "bcryptjs": "^3.0.2",
@@ -35,6 +36,7 @@
     },
     "devDependencies": {
         "dotenv": "^16.4.7",
-        "nodemon": "^3.1.9"
+        "nodemon": "^3.1.9",
+        "vitest": "^3.1.1"
     }
 }

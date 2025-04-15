@@ -7,31 +7,52 @@ import User from "../models/User.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import Profile from "../models/Profile.js";
 import db from "../db/pg.js";
+import CategoryService from "../services/categories.js";
 
 const usersLimitPerPage = 30;
 
 const router = Router();
 
 router.post("/categories", async (req, res) => {
-  const body = req.body;
+  const { status, result } = await CategoryService.createNew(req.body);
 
-  body.setFields("name value");
+  switch (status) {
+    case CategoryService.status.CREATED:
+      logger.info("New category created", req.user, result);
+      return res.ok("Category created", result);
 
-  try {
-    const category = await Category.create(body.data);
-    res.ok("Category created", { category });
-    logger.info("Category created", req.user, { body: body.data, category });
-  } catch (err) {
-    logger.error("category creation failed", err, req.user, {
-      body: body.data,
-    });
+    case CategoryService.status.REQ_FIELDS_NOT_GIVEN:
+      return res.failure(result);
 
-    res.serverError();
+    case CategoryService.status.ERROR:
+      logger.error("Category creation failed", result, req.user, {
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 
 router.delete("/categories", async (req, res) => {
-  const id = req.query.get("id");
+  const { status, result } = await CategoryService.deleteExisting(req.query);
+
+  switch (status) {
+    case CategoryService.status.DELETED:
+      logger.info("Category deleted", req.user);
+      return res.ok("Category deleted");
+
+    case CategoryService.status.ID_INVALID:
+      logger.warning("Category deletion failed", req.user, {
+        reason: result,
+        body: req.query.data,
+      });
+      return res.failure(result);
+
+    case CategoryService.status.ERROR:
+      logger.error("Category deletion failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
+  }
 
   try {
     const destroyResult = await Category.destroy({ where: { id } });
