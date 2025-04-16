@@ -22,7 +22,6 @@ router.use("/otp", OtpRouter);
 router.use("/profile", ProfileRouter);
 router.use("/school", ProfileCollegeRouter);
 router.use("/forums", ForumsRouter);
-router.use("/story", StoryRouter);
 router.use("/news", NewsRouter);
 router.use("/upload", UploadRouter);
 router.use("/report", ReportRouter);
