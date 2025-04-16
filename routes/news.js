@@ -11,10 +11,10 @@ router.get("/", async (req, res) => {
 
   switch (status) {
     case SERVICE_CODE.ACQUIRED:
-      res.ok("News found", result);
+      return res.ok("News found", result);
 
     case SERVICE_CODE.NEWS_CATEGORY_INVALID:
-      res.failure(result);
+      return res.failure(result);
 
     case SERVICE_CODE.ERROR:
       logger.error("News get failed", err, req.user, {
