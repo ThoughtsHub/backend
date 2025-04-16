@@ -3,7 +3,6 @@ import writer from "../constants/writer.js";
 import Forum from "../models/Forums.js";
 import Profile from "../models/Profile.js";
 import ProfileCollege from "../models/ProfileCollege.js";
-import Story from "../models/Story.js";
 
 export const profileKey = "profileId";
 
@@ -17,13 +16,6 @@ const profileAssociations = () => {
     as: "forum",
   });
   Forum.belongsTo(Profile, { foreignKey: profileKey, as: writer });
-
-  Profile.hasMany(Story, {
-    foreignKey: profileKey,
-    onDelete: onDelete.cascade,
-    as: "story",
-  });
-  Story.belongsTo(Profile, { foreignKey: profileKey, as: writer });
 };
 
 export default profileAssociations;

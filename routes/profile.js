@@ -5,12 +5,10 @@ import User from "../models/User.js";
 import { usernameNotAvailable } from "../utils/username.js";
 import Profile from "../models/Profile.js";
 import logger from "../constants/logger.js";
-import Story from "../models/Story.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { validate as isUUID } from "uuid";
 import Forum from "../models/Forums.js";
 import ForumVote from "../models/ForumVote.js";
-import StoryLike from "../models/StoryLike.js";
 import { includeWriter } from "../constants/writer.js";
 
 const router = Router();
@@ -210,56 +208,6 @@ router.get("/me", loggedIn, async (req, res) => {
     });
 
     res.serverError();
-  }
-});
-
-router.get("/story", loggedIn, async (req, res) => {
-  const userProfileId = req.user.Profile.id;
-  const offset = req.query.isNumber(req.query.get("offset"))
-    ? req.query.get("offset")
-    : 0;
-
-  const profileId = isUUID(req.query.get("profileId"))
-    ? req.query.get("profileId")
-    : userProfileId;
-
-  try {
-    let stories = await Story.findAll({
-      where: { profileId },
-      offset,
-      limit: 40,
-      order: [[timestampsKeys.createdAt, "desc"]],
-      include: [
-        includeWriter,
-        { model: StoryLike, required: false, where: { profileId } },
-      ],
-    });
-
-    stories = stories.map((f) => {
-      f = f.get({ plain: true });
-      if (Array.isArray(f.StoryLikes) && f.StoryLikes.length === 1)
-        f.likedByUser = true;
-      else f.likedByUser = false;
-      delete f.StoryLikes;
-      return f;
-    });
-
-    res.ok("Stories", {
-      stories,
-      nextOffset: stories.length + offset,
-      endOfUserStories: stories.length < 40,
-    });
-    logger.info("Stories delivered", req.user, {
-      query: req.query.data,
-      stories,
-    });
-  } catch (err) {
-    console.log(err);
-    res.serverError();
-    logger.error("Internal server error", err, req.user, {
-      event: "stories requested by user could not be delivered /profile/story",
-      query: req.query.data,
-    });
   }
 });
 
