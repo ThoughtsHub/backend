@@ -1,265 +1,127 @@
 import { Router } from "express";
-import { timestampsKeys } from "../constants/timestamps.js";
-import { Op } from "sequelize";
-import Forum from "../models/Forums.js";
 import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
-import db from "../db/pg.js";
-import ForumVote from "../models/ForumVote.js";
 import { ForumCommentRouter } from "./forums_comments.js";
-import { includeWriter } from "../constants/writer.js";
 import logger from "../constants/logger.js";
 import { ForumsExtra } from "./forums_extra.js";
+import ForumsService from "../services/forums_service.js";
+import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
 const router = Router();
 
 router.post("/", loggedIn, haveProfile, async (req, res) => {
-  const profileId = req.user.Profile.id;
-  const body = req.body;
+  req.body.set("profileId", req.user?.Profile?.id);
+  const { status, result } = await ForumsService.createNew(req.body);
 
-  body.setFields("title body localId imageUrl");
+  switch (status) {
+    case SERVICE_CODE.CREATED:
+      logger.info("Forum created", req.user, result);
+      return res.ok("Forum created", result);
 
-  const reqFields = body.anyNuldefined("title body", ",");
-  if (reqFields.length !== 0) {
-    logger.warning("forum creation failed", req.user, {
-      reason: "required fields missing",
-      requires: reqFields,
-      body: body.data,
-    });
-    return res.failure(`Required: ${reqFields}`);
-  }
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
 
-  const t = await db.transaction();
-  try {
-    const newForum = await Forum.create(
-      { ...body.data, profileId },
-      { transaction: t }
-    );
-
-    res.ok("Forum Created", { forum: newForum });
-    await t.commit();
-    logger.info("forum created", req.user, {
-      body: body.data,
-      createdForum: newForum,
-    });
-  } catch (err) {
-    await t.rollback();
-    logger.error("Internal server error", req.user, {
-      event: "forum creation failed",
-      body: body.data,
-    });
-
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Forum creation failed", result, req.user, {
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 
 router.put("/", loggedIn, haveProfile, async (req, res) => {
-  const profileId = req.user.Profile.id;
-  const body = req.body;
+  req.body.set("profileId", req.user?.Profile?.id);
+  const { status, result } = await ForumsService.updateExistingFull(req.body);
 
-  body.setFields("title body localId imageUrl id");
+  switch (status) {
+    case SERVICE_CODE.UPDATED:
+      logger.info("Forum updated", req.user, result);
+      return res.ok("Forum updated", result);
 
-  const reqFields = body.anyNuldefined("title body id", ",");
-  if (reqFields.length !== 0) {
-    logger.warning("forum update failed", req.user, {
-      reason: "required fields missing",
-      requires: reqFields,
-      body: body.data,
-    });
-    return res.failure(`Required: ${reqFields}`);
-  }
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
 
-  const forumId = body.get("id");
-  body.del("id");
+    case SERVICE_CODE.ACCESS_INVALID:
+      return res.forbidden(result);
 
-  const t = await db.transaction();
-  try {
-    const [updateResult] = await Forum.update(
-      { ...body.data },
-      {
-        where: { id: forumId, profileId },
-        transaction: t,
-        individualHooks: true,
-      }
-    );
-
-    if (updateResult !== 1) {
-      await t.rollback();
-      logger.warning("Forum update failed", req.user, {
-        body: body.data,
-        forumId,
-        profileId,
+    case SERVICE_CODE.ERROR:
+      logger.error("Forum updation failed", result, req.user, {
+        body: req.body.data,
       });
-      return res.failure("Forum does not belong to you.");
-    }
-
-    const newForum = await Forum.findOne({
-      where: { id: forumId, profileId },
-      transaction: t,
-    });
-
-    res.ok("Forum Updated", { forum: newForum });
-    await t.commit();
-    logger.info("forum updated", req.user, {
-      body: body.data,
-      createdForum: newForum,
-    });
-  } catch (err) {
-    await t.rollback();
-    logger.error("Internal server error", req.user, {
-      event: "forum update failed",
-      body: body.data,
-    });
-
-    res.serverError();
+      return res.serverError();
   }
 });
 
 router.get("/", async (req, res) => {
-  const timestamp = req.query.get("timestamp");
+  req.query.set("profileId", req.user?.Profile?.id);
+  req.query.set("userLoggedIn", req.loggedIn);
+  const { status, result } = await ForumsService.getByTimestamp(req.query);
 
-  const whereObj = req.query.isNumber(timestamp)
-    ? { [timestampsKeys.createdAt]: { [Op.gte]: timestamp } }
-    : {};
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("Forum found", result);
 
-  try {
-    const includeObj =
-      req.loggedIn === true
-        ? [
-            {
-              model: ForumVote,
-              required: false,
-              where: { profileId: req.user.Profile.id, value: 1 },
-            },
-          ]
-        : [];
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+    case SERVICE_CODE.PROPERTY_TYPE_INVALID:
+      return res.failure(result);
 
-    let forums = await Forum.findAll({
-      where: { ...whereObj },
-      limit: 50,
-      order: [[timestampsKeys.createdAt, "DESC"]],
-      include: [includeWriter, ...includeObj],
-    });
-
-    forums = forums.map((f) => {
-      f = f.get({ plain: true });
-      if (Array.isArray(f.ForumVotes) && f.ForumVotes.length === 1)
-        f.isVoted = true;
-      else f.isVoted = false;
-      delete f.ForumVotes;
-      return f;
-    });
-
-    res.ok("Forums", { forums });
-    logger.info("forums delivered", req.user, {
-      forums,
-      timestamp,
-      body: req.query.data,
-      whereObj,
-      includeObj,
-    });
-  } catch (err) {
-    logger.error("Internal server error", err, req.user, {
-      event: "forum creation failed",
-      body: body.data,
-      whereObj,
-    });
-
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Forum get failed", result, req.user, {
+        type: "By Timestamp",
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 router.delete("/", async (req, res) => {
-  if (req.query.isNuldefined("forumId")) {
-    logger.warning("Forum deletion failed", req.user, { query: req.query });
-    return res.failure("ForumId is required");
-  }
+  req.query.set("profileId", req.user.Profile.id);
+  const { status, result } = await ForumsService.updateExistingFull(req.query);
 
-  const forumId = req.query.get("forumId");
-  const profileId = req.user.Profile.id;
+  switch (status) {
+    case SERVICE_CODE.DELETED:
+      logger.info("Forum deleted", req.user, { body: req.query.data });
+      return res.ok("Forum deleted");
 
-  const t = await db.transaction();
-  try {
-    const destroyResult = await Forum.destroy({
-      where: { id: forumId, profileId },
-    });
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
 
-    if (destroyResult !== 1) {
-      await t.rollback();
-      logger.warning("Forum deletion failed", req.user, {
-        query: req.query,
-        destroyResult,
+    case SERVICE_CODE.ACCESS_INVALID:
+      return res.forbidden(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Forum deletion failed", result, req.user, {
+        body: req.query.data,
       });
-      return res.failure(
-        "No forum found that belongs to you with that forum Id"
-      );
-    }
-
-    res.ok("Forum deleted");
-    await t.commit();
-    logger.info("Forum deleted", req.user, {
-      query: req.query,
-      destroyResult,
-    });
-  } catch (err) {
-    await t.rollback();
-    console.log(err);
-
-    logger.error("Internal server error", err, req.user, {
-      query: req.query,
-      event: "Forum deletion failed",
-    });
+      return res.serverError();
   }
 });
 
 router.post("/upvote", loggedIn, haveProfile, async (req, res) => {
-  const profileId = req.user.Profile.id;
-  const body = req.body;
-  body.setFields("forumId value");
+  req.body.set("profileId", req.user.Profile.id);
+  const { status, result } = await ForumsService.voteForum(req.body);
 
-  if (body.isNuldefined("forumId")) {
-    logger.warning("upvoting for forum failed", req.user, {
-      reason: "forum Id not given",
-      body: body.data,
-    });
-    return res.failure("Forum Id is required");
-  }
-  body.set("value", body.isTrue("value") ? 1 : 0);
+  switch (status) {
+    case SERVICE_CODE.VOTED:
+      logger.info("Forum voted", req.user, { body: req.body.data });
+      return res.ok("Voted");
 
-  const [forumId, value] = body.bulkGet("forumId value");
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
 
-  const t = await db.transaction();
-  try {
-    const forumVote = await ForumVote.findOne({
-      where: { forumId, profileId },
-    });
-
-    let vote;
-    if (forumVote !== null)
-      vote = await ForumVote.update(
-        { value: body.get("value") },
-        { where: { forumId, profileId } }
-      );
-    else
-      vote = await ForumVote.create(
-        { ...body.data, profileId },
-        { transaction: t }
-      );
-
-    res.ok("Voted");
-    await t.commit();
-    logger.info("voted on forum", req.user, {
-      body: body.data,
-      createdVote: vote,
-      forumVote,
-    });
-  } catch (err) {
-    await t.rollback();
-    logger.error("Internal server error", err, req.user, {
-      event: "voting on forum failed",
-      body: body.data,
-    });
-
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Forum voting failed", result, req.user, {
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 

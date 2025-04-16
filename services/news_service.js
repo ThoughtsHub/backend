@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { newsLimitPerPage } from "../constants/pagination.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";

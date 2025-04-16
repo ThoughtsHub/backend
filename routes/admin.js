@@ -1,6 +1,5 @@
 import { Router } from "express";
 import logger from "../constants/logger.js";
-import Forum from "../models/Forums.js";
 import User from "../models/User.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import Profile from "../models/Profile.js";
@@ -8,6 +7,7 @@ import db from "../db/pg.js";
 import CategoryService from "../services/category_service.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
 import NewsService from "../services/news_service.js";
+import ForumsService from "../services/forums_service.js";
 
 const usersLimitPerPage = 30;
 
@@ -79,7 +79,7 @@ router.delete("/all/news", async (req, res) => {
 
   switch (status) {
     case SERVICE_CODE.DELETED:
-      logger.info("Deleted all news", req.user);
+      logger.info("Deleted all news", req.user, result);
       return res.ok("Deleted all news", result);
 
     case SERVICE_CODE.ERROR:
@@ -91,14 +91,18 @@ router.delete("/all/news", async (req, res) => {
 });
 
 router.delete("/all/forums", async (req, res) => {
-  try {
-    const destroyResults = await Forum.destroy({ where: {} });
+  const { status, result } = await ForumsService.deleteAllExisting();
 
-    res.ok("Deleted All Forums", { numbers: destroyResults });
-    logger.info("Deleted all forums", req.user, { destroyResults });
-  } catch (err) {
-    res.serverError();
-    logger.error("Deletion of all forums failed", err, req.user);
+  switch (status) {
+    case SERVICE_CODE.DELETED:
+      logger.info("Deleted all forums", req.user, result);
+      return res.ok("Deleted all forums", result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Forums deletion failed", err, req.user, {
+        event: "All forums deletion",
+      });
+      return res.serverError();
   }
 });
 
@@ -129,15 +133,30 @@ router.delete("/news", async (req, res) => {
 });
 
 router.delete("/forums", async (req, res) => {
-  const forumId = req.query.get("forumId");
-  try {
-    const destroyResults = await Forum.destroy({ where: { id: forumId } });
+  const { status, result } = await ForumsService.deleteExistingWAdminRights(
+    req.query
+  );
 
-    res.ok("Deleted Forums", { numbers: destroyResults, forumId });
-    logger.info("Deleted forums", req.user, { destroyResults, forumId });
-  } catch (err) {
-    res.serverError();
-    logger.error("Deletion of forums failed", err, req.user, { forumId });
+  switch (status) {
+    case SERVICE_CODE.DELETED:
+      logger.info("Forum deleted", req.user, { body: req.query.data });
+      return res.ok("Forum deleted");
+
+    case SERVICE_CODE.ID_INVALID:
+      logger.warning("Forum deletion failed", req.user, {
+        reason: result,
+        body: req.query.data,
+      });
+      return res.failure(result);
+
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Forum deletion failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
@@ -272,22 +291,32 @@ router.put("/user", async (req, res) => {
 });
 
 router.put("/forums", async (req, res) => {
-  const body = req.body;
+  const { status, result } = await ForumsService.updateExistingFullWAdminRights(
+    req.body
+  );
 
-  body.setFields("title body forumId");
-  const { title, body: body_, forumId } = body.bulkGetMap("title body forumId");
+  switch (status) {
+    case SERVICE_CODE.UPDATED:
+      logger.info("Forum updated", req.user, {
+        body: req.body.data,
+        ...result,
+      });
 
-  try {
-    const forumUpdate = await Forum.update(
-      { title, body: body_ },
-      { where: { id: forumId }, individualHooks: true }
-    );
+    case SERVICE_CODE.ID_INVALID:
+      logger.warning("Forum updation failed", req.user, {
+        reason: result,
+        body: req.query.data,
+      });
+      return res.failure(result);
 
-    res.ok("Forum Updated");
-    logger.info("Forum Updated", req.user, { body: body.data, forumUpdate });
-  } catch (err) {
-    logger.error("Forum update failed", err, req.user, { body: body.data });
-    res.serverError();
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Forum updation failed", result, req.user, {
+        body: req.body.data,
+      });
   }
 });
 
