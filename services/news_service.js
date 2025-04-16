@@ -1,3 +1,5 @@
+import { newsLimitPerPage } from "../constants/pagination.js";
+import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
 import News from "../models/News.js";
 import { parseFields } from "../utils/field_parser.js";
@@ -102,6 +104,90 @@ class NewsService {
       return sResult(SERVICE_CODE.DELETED, {
         NumberOfNewsDeleted: destoryResult,
       });
+    } catch (err) {
+      return sResult(SERVICE_CODE.ERROR, err);
+    }
+  };
+
+  static countAll = async (body) => {
+    const category = body.get("category", "All");
+
+    if (typeof category !== "string")
+      return sResult(SERVICE_CODE.NEWS_CATEGORY_INVALID, "Invalid category");
+
+    try {
+      const newsCount = await News.count({
+        where: category === "All" ? {} : { category },
+      });
+
+      return sResult(SERVICE_CODE.ACQUIRED, newsCount);
+    } catch (err) {
+      return sResult(SERVICE_CODE.ERROR, err);
+    }
+  };
+
+  static getByID = async (id) => {
+    if (typeof id !== "string")
+      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+
+    try {
+      let news = await News.findByPk(id);
+      news = news.get({ plain: true });
+      return sResult(SERVICE_CODE.ACQUIRED, { news });
+    } catch (err) {
+      return sResult(SERVICE_CODE.ERROR, err);
+    }
+  };
+
+  static getByOffset = async (body) => {
+    const offset = body.toNumber("offset");
+    const category = body.get("category", "All");
+
+    if (typeof category !== "string")
+      return sResult(SERVICE_CODE.NEWS_CATEGORY_INVALID, "Invalid category");
+
+    try {
+      let news = await News.findAll({
+        where: category === "All" ? {} : { category },
+        offset: offset * newsLimitPerPage,
+        limit: newsLimitPerPage,
+        order: [[timestampsKeys.updatedAt, "DESC"]],
+      });
+
+      news = news.map((n) => n.get({ plain: true }));
+
+      return sResult(SERVICE_CODE.ACQUIRED, {
+        news,
+        totalNews: news.length,
+        newOffset: offset + news.length,
+      });
+    } catch (err) {
+      return sResult(SERVICE_CODE.ERROR, err);
+    }
+  };
+
+  static getByTimestamp = async (body) => {
+    const category = body.get("category", "All");
+    const timestamp = body.get("timestamp", null);
+
+    if (typeof category !== "string")
+      return sResult(SERVICE_CODE.NEWS_CATEGORY_INVALID, "Invalid category");
+
+    try {
+      let news = await News.findAll({
+        where: {
+          ...(category === "All" ? {} : { category }), // category
+          ...(body.isNumber("timestamp")
+            ? { [timestampsKeys.createdAt]: { [Op.gte]: timestamp } } // >= timestamp
+            : {}),
+        },
+        limit: newsLimitPerPage,
+        order: [[timestampsKeys.updatedAt, "DESC"]],
+      });
+
+      news = news.map((n) => n.get({ plain: true }));
+
+      return sResult(SERVICE_CODE.ACQUIRED, { news });
     } catch (err) {
       return sResult(SERVICE_CODE.ERROR, err);
     }

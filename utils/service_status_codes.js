@@ -10,4 +10,5 @@ export const SERVICE_CODE = {
   DELETED: 203,
 
   ID_INVALID: 300,
+  NEWS_CATEGORY_INVALID: 301,
 };

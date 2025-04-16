@@ -3,120 +3,87 @@ import News from "../models/News.js";
 import { Op } from "sequelize";
 import { timestampsKeys } from "../constants/timestamps.js";
 import logger from "../constants/logger.js";
-
-const newsLimitPerPage = 30;
+import NewsService from "../services/news_service.js";
+import { SERVICE_CODE } from "../utils/service_status_codes.js";
+import { newsLimitPerPage } from "../constants/pagination.js";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const body = req.query;
+  const { status, result } = await NewsService.getByTimestamp(req.query);
 
-  const category = body.get("category", "All");
-  const timestamp = body.get("timestamp", null);
-  const whereObj = category === "All" ? {} : { category };
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      res.ok("News found", result);
 
-  try {
-    let news;
-    if (body.isNumber("timestamp"))
-      news = await News.findAll({
-        where: {
-          ...whereObj,
-          [timestampsKeys.createdAt]: { [Op.gte]: timestamp },
-        },
-        limit: 30,
-        order: [[timestampsKeys.updatedAt, "DESC"]],
+    case SERVICE_CODE.NEWS_CATEGORY_INVALID:
+      res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("News get failed", err, req.user, {
+        type: "By Timestamp",
+        body: req.query.data,
       });
-    else
-      news = await News.findAll({
-        where: { ...whereObj },
-        limit: 30,
-        order: [[timestampsKeys.updatedAt, "DESC"]],
-      });
-
-    res.ok("News", { news });
-    logger.info("news delivered", req.user, {
-      body: body.data,
-      timestamp,
-      whereObj,
-      news,
-    });
-  } catch (err) {
-    logger.error("Internal server error", err, req.user, {
-      event: "news deliver failed",
-      body: body.data,
-      whereObj,
-      timestamp,
-    });
-
-    res.serverError();
+      return res.serverError();
   }
 });
 
 // by offset
 router.get("/bo", async (req, res) => {
-  const body = req.query;
+  const { status, result } = await NewsService.getByOffset(req.query);
 
-  const offset = body.toNumber("offset");
-  const category = body.get("category", "All");
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("News found", result);
 
-  try {
-    const news = await News.findAll({
-      where: category === "All" ? {} : { category },
-      offset: offset * newsLimitPerPage,
-      limit: newsLimitPerPage,
-      order: [[timestampsKeys.updatedAt, "DESC"]],
-    });
+    case SERVICE_CODE.NEWS_CATEGORY_INVALID:
+      return res.failure(result);
 
-    res.ok("News", { news, newOffset: offset + news.length });
-    logger.info("News delivered", req.user, { body: body.data, news });
-  } catch (err) {
-    logger.error("Internal server error", err, req.user, {
-      event: "News deliver failed",
-      body: body.data,
-    });
-
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("News get failed", err, req.user, {
+        type: "By Offset",
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 // get count of total news pages
 router.get("/pages", async (req, res) => {
-  const body = req.query;
-  const category = body.get("category", "All");
+  const { status, result } = await NewsService.countAll(req.query);
 
-  try {
-    const newsCount = await News.count({
-      where: category === "All" ? {} : { category },
-    });
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      const total = Math.ceil(result / newsLimitPerPage);
+      return res.ok("News count", { total });
 
-    const pages = Math.ceil(newsCount / newsLimitPerPage);
+    case SERVICE_CODE.NEWS_CATEGORY_INVALID:
+      return res.failure(result);
 
-    res.ok("News Count", { total: pages });
-    logger.info("News count delivered", req.user, {
-      body: body.data,
-      total: pages,
-    });
-  } catch (err) {
-    logger.error("Internal server error", err, req.user, {
-      event: "News count deliver failed",
-      body: body.data,
-    });
-
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("News count failed", err, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 router.get("/:id", async (req, res) => {
-  const { id } = req.params;
+  const { status, result } = await NewsService.getByID(req.params.id);
 
-  try {
-    const news = await News.findByPk(id);
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("News found", result);
 
-    res.ok("News", { news });
-    logger.info("News delivered", req.user, { news, id });
-  } catch (err) {
-    logger.error("News delivery failed", err, req.user, { id });
-    res.serverError();
+    case SERVICE_CODE.ID_INVALID:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("News get failed", err, req.user, {
+        type: "By ID",
+        id: req.params.id,
+      });
+      return res.serverError();
   }
 });
 
