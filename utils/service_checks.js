@@ -1,5 +1,5 @@
 import { sResult } from "./service_return.js";
-import { SERVICE_CODE } from "./service_status_codes";
+import { SERVICE_CODE } from "./service_status_codes.js";
 
 export const idInvalidOrMissing = (id = null, nameOfId = "") => {
   if (id === null)
