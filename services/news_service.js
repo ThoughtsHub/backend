@@ -6,7 +6,10 @@ import News from "../models/News.js";
 import { parseFields } from "../utils/field_parser.js";
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
-import { reqFieldsNotGiven } from "../utils/service_checks.js";
+import {
+  idInvalidOrMissing,
+  reqFieldsNotGiven,
+} from "../utils/service_checks.js";
 
 const modelFields =
   "title* body* hindiTitle hindiBody newsUrl* imageUrl* category*";
