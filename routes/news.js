@@ -1,7 +1,4 @@
 import { Router } from "express";
-import News from "../models/News.js";
-import { Op } from "sequelize";
-import { timestampsKeys } from "../constants/timestamps.js";
 import logger from "../constants/logger.js";
 import NewsService from "../services/news_service.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
