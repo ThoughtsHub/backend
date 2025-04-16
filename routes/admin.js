@@ -301,6 +301,7 @@ router.put("/forums", async (req, res) => {
         body: req.body.data,
         ...result,
       });
+      return res.ok("Forum updated", result);
 
     case SERVICE_CODE.ID_INVALID:
       logger.warning("Forum updation failed", req.user, {
