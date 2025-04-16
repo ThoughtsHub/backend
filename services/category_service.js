@@ -1,6 +1,7 @@
 import db from "../db/pg.js";
 import Category from "../models/Category.js";
 import { parseFields } from "../utils/field_parser.js";
+import { idInvalidOrMissing } from "../utils/service_checks.js";
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
@@ -31,8 +32,8 @@ class CategoryService {
   static deleteExisting = async (body) => {
     const id = body.get("id");
 
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+    let idCheck = idInvalidOrMissing(id);
+    if (idCheck !== false) return idCheck;
 
     const t = await db.transaction();
     try {

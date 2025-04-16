@@ -6,6 +6,7 @@ import News from "../models/News.js";
 import { parseFields } from "../utils/field_parser.js";
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
+import { reqFieldsNotGiven } from "../utils/service_checks.js";
 
 const modelFields =
   "title* body* hindiTitle hindiBody newsUrl* imageUrl* category*";
@@ -15,12 +16,8 @@ class NewsService {
   static createNew = async (body) => {
     body.setFields(fields);
 
-    const reqFieldsNotGiven = body.anyNuldefined(reqFields);
-    if (reqFieldsNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldsNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
     try {
       let news = await News.create(body.data);
@@ -35,18 +32,13 @@ class NewsService {
   static updateExistingFull = async (body) => {
     const id = body.get("newsId");
 
-    if (id === null) return sResult(SERVICE_CODE.ID_MISSING, "No Id provided");
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+    let idCheck = idInvalidOrMissing(id, "News");
+    if (idCheck !== false) return idCheck;
 
     body.setFields(fields);
 
-    const reqFieldsNotGiven = body.anyNuldefined(reqFields);
-    if (reqFieldsNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldsNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
     const t = await db.transaction();
     try {
@@ -74,9 +66,8 @@ class NewsService {
   static deleteExisting = async (body) => {
     const id = body.get("newsId");
 
-    if (id === null) return sResult(SERVICE_CODE.ID_MISSING, "No Id provided");
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+    let idCheck = idInvalidOrMissing(id, "News");
+    if (idCheck !== false) return idCheck;
 
     const t = await db.transaction();
     try {
@@ -128,8 +119,8 @@ class NewsService {
   };
 
   static getByID = async (id) => {
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+    let idCheck = idInvalidOrMissing(id, "News");
+    if (idCheck !== false) return idCheck;
 
     try {
       let news = await News.findByPk(id);

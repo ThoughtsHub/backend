@@ -12,6 +12,10 @@ import { parseFields } from "../utils/field_parser.js";
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
 import ForumComment from "../models/ForumComment.js";
+import {
+  idInvalidOrMissing,
+  reqFieldsNotGiven,
+} from "../utils/service_checks.js";
 
 const modelFields = "localId title* body*";
 const { fields, reqFields } = parseFields(modelFields);
@@ -36,17 +40,11 @@ class ForumsService {
     const profileId = body.get("profileId");
     body.setFields(fields);
 
-    const reqFieldNotGiven = body.anyNuldefined(reqFields, ", ");
-    if (reqFieldNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "Profile Id not provided");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
 
     const t = await db.transaction();
     try {
@@ -65,22 +63,13 @@ class ForumsService {
     const [id, profileId] = body.bulkGet("id profileId");
     body.setFields(fields);
 
-    const reqFieldNotGiven = body.anyNuldefined(reqFields, ", ");
-    if (reqFieldNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
-    if (id === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "Forum Id not provided");
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "Profile Id not provided");
-
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Forum Id");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(id, "Forum");
+    if (idCheck !== false) return idCheck;
 
     const forumBelongsToProfile = await this.isOwner(id, profileId);
     if (!forumBelongsToProfile)
@@ -116,18 +105,13 @@ class ForumsService {
   static updateExistingFullWAdminRights = async (body) => {
     const id = body.get("forumId");
 
-    if (id === null) return sResult(SERVICE_CODE.ID_MISSING, "No Id provided");
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+    let idCheck = idInvalidOrMissing(id, "Forum");
+    if (idCheck !== false) return idCheck;
 
     body.setFields(fields);
 
-    const reqFieldsNotGiven = body.anyNuldefined(reqFields);
-    if (reqFieldsNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldsNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
     const t = await db.transaction();
     try {
@@ -155,15 +139,10 @@ class ForumsService {
   static deleteExisting = async (body) => {
     const [id, profileId] = body.bulkGet("id profileId");
 
-    if (id === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "Forum Id not provided");
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "Profile Id not provided");
-
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Forum Id");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(id, "Forum");
+    if (idCheck !== false) return idCheck;
 
     const forumBelongsToProfile = await this.isOwner(id, profileId);
     if (!forumBelongsToProfile)
@@ -208,9 +187,8 @@ class ForumsService {
   static deleteExistingWAdminRights = async (body) => {
     const id = body.get("forumId");
 
-    if (id === null) return sResult(SERVICE_CODE.ID_MISSING, "No Id provided");
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+    let idCheck = idInvalidOrMissing(id, "Forum");
+    if (idCheck !== false) return idCheck;
 
     const t = await db.transaction();
     try {
@@ -238,22 +216,13 @@ class ForumsService {
 
     body.set("value", body.isTrue("value") ? 1 : 0);
 
-    const reqFieldNotGiven = body.anyNuldefined(voteReqFields, ", ");
-    if (reqFieldNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, voteReqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
-    if (forumId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "Forum Id not provided");
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "Profile Id not provided");
-
-    if (typeof forumId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Forum Id");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(forumId, "Forum");
+    if (idCheck !== false) return idCheck;
 
     const t = await db.transaction();
     try {
@@ -301,8 +270,8 @@ class ForumsService {
   };
 
   static getByID = async (id) => {
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Id");
+    let idCheck = idInvalidOrMissing(id, "Forum");
+    if (idCheck !== false) return idCheck;
 
     try {
       let forum = await Forum.findByPk(id);
@@ -319,10 +288,8 @@ class ForumsService {
     const userLoggedIn = body.get("userLoggedIn", false);
     const profileId = body.get("profileId");
 
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Profile Id provided");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
 
     if (typeof userLoggedIn !== "boolean")
       return sResult(
@@ -373,10 +340,8 @@ class ForumsService {
     const userLoggedIn = body.get("userLoggedIn", false);
     const profileId = body.get("profileId");
 
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Profile Id provided");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
 
     if (typeof userLoggedIn !== "boolean")
       return sResult(
@@ -428,24 +393,15 @@ class ForumsService {
   static createNewComment = async (body) => {
     const [forumId, profileId] = body.bulkGet("forumId profileId");
 
-    if (forumId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Forum Id provided");
-    if (typeof forumId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Forum Id");
-
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Profile Id provided");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(forumId, "Forum");
+    if (idCheck !== false) return idCheck;
 
     body.setFields(commentFields);
 
-    const reqFieldsNotGiven = body.anyNuldefined(commentReqFields);
-    if (reqFieldsNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldsNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, commentReqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
     const t = await db.transaction();
     try {
@@ -475,29 +431,17 @@ class ForumsService {
       "forumId commentId profileId"
     );
 
-    if (id === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Comment Id provided");
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Comment Id");
-
-    if (forumId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Forum Id provided");
-    if (typeof forumId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Forum Id");
-
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Profile Id provided");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(forumId, "Forum");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(id, "Comment");
+    if (idCheck !== false) return idCheck;
 
     body.setFields(commentFields);
 
-    const reqFieldsNotGiven = body.anyNuldefined(commentReqFields);
-    if (reqFieldsNotGiven.length !== 0)
-      return sResult(
-        SERVICE_CODE.REQ_FIELDS_MISSING,
-        `Required: ${reqFieldsNotGiven}`
-      );
+    let reqFieldsCheck = reqFieldsNotGiven(body, commentReqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
     const t = await db.transaction();
     try {
@@ -543,15 +487,10 @@ class ForumsService {
   static deleteExistingComment = async (body) => {
     const [id, profileId] = body.bulkGet("commentId profileId");
 
-    if (id === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Comment Id provided");
-    if (typeof id !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Comment Id");
-
-    if (profileId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Profile Id provided");
-    if (typeof profileId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Profile Id");
+    let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(id, "Comment");
+    if (idCheck !== false) return idCheck;
 
     const t = await db.transaction();
     try {
@@ -587,10 +526,8 @@ class ForumsService {
     const forumId = body.get("forumId");
     const timestamp = body.get("timestamp", null);
 
-    if (forumId === null)
-      return sResult(SERVICE_CODE.ID_MISSING, "No Forum Id provided");
-    if (typeof forumId !== "string")
-      return sResult(SERVICE_CODE.ID_INVALID, "Invalid Forum Id");
+    let idCheck = idInvalidOrMissing(forumId, "Forum");
+    if (idCheck !== false) return idCheck;
 
     const whereObj = body.isNumber("timestamp")
       ? { [timestampsKeys.createdAt]: { [Op.gte]: timestamp } }
