@@ -1,5 +1,4 @@
 import { Router } from "express";
-import News from "../models/News.js";
 import logger from "../constants/logger.js";
 import Forum from "../models/Forums.js";
 import User from "../models/User.js";
@@ -8,6 +7,7 @@ import Profile from "../models/Profile.js";
 import db from "../db/pg.js";
 import CategoryService from "../services/category_service.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
+import NewsService from "../services/news_service.js";
 
 const usersLimitPerPage = 30;
 
@@ -56,32 +56,37 @@ router.delete("/categories", async (req, res) => {
 });
 
 router.post("/news", async (req, res) => {
-  const body = req.body;
+  const { status, result } = await NewsService.createNew(req.body);
 
-  body.setFields(
-    "title body imageUrl category genre newsUrl hindiTitle hindiBody"
-  );
+  switch (status) {
+    case SERVICE_CODE.CREATED:
+      logger.info("News created", req.user, result);
+      return res.ok("News created", result);
 
-  try {
-    const news = await News.create(body.data);
-    res.ok("News created", { news });
-    logger.info("news created", req.user, { body: body.data, news });
-  } catch (err) {
-    logger.error("news creation failed", err, req.user, { body: body.data });
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+      return res.failure(result);
 
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("News creation failed", result, req.user, {
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 
 router.delete("/all/news", async (req, res) => {
-  try {
-    const destroyResults = await News.destroy({ where: {} });
+  const { status, result } = await NewsService.deleteAllExisting();
 
-    res.ok("Deleted All News", { numbers: destroyResults });
-    logger.info("Deleted all news", req.user, { destroyResults });
-  } catch (err) {
-    res.serverError();
-    logger.error("Deletion of all news failed", err, req.user);
+  switch (status) {
+    case SERVICE_CODE.DELETED:
+      logger.info("Deleted all news", req.user);
+      return res.ok("Deleted all news", result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("News deletion failed", err, req.user, {
+        event: "All news deletion",
+      });
+      return res.serverError();
   }
 });
 
@@ -98,15 +103,28 @@ router.delete("/all/forums", async (req, res) => {
 });
 
 router.delete("/news", async (req, res) => {
-  const newsId = req.query.get("newsId");
-  try {
-    const destroyResults = await News.destroy({ where: { id: newsId } });
+  const { status, result } = await NewsService.deleteExisting(req.query);
 
-    res.ok("Deleted News", { numbers: destroyResults, newsId });
-    logger.info("Deleted News", req.user, { destroyResults, newsId });
-  } catch (err) {
-    res.serverError();
-    logger.error("Deletion of News failed", err, req.user, { newsId });
+  switch (status) {
+    case SERVICE_CODE.DELETED:
+      logger.info("News deleted", req.user, { body: req.query.data });
+      return res.ok("News deleted");
+
+    case SERVICE_CODE.ID_INVALID:
+      logger.warning("News deletion failed", req.user, {
+        reason: result,
+        body: req.query.data,
+      });
+      return res.failure(result);
+
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("News deletion failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
@@ -274,29 +292,27 @@ router.put("/forums", async (req, res) => {
 });
 
 router.put("/news", async (req, res) => {
-  const body = req.body;
+  const { status, result } = await NewsService.updateExistingFull(req.body);
 
-  body.setFields(
-    "title body imageUrl category genre newsUrl newsId hindiTitle hindiBody"
-  );
-  const newsId = body.get("newsId");
-  body.del("newsId");
+  switch (status) {
+    case SERVICE_CODE.UPDATED:
+      logger.info("News updated", req.user, { body: req.body.data, ...result });
 
-  try {
-    const newsUpdate = await News.update(body.data, {
-      where: { id: newsId },
-      individualHooks: true,
-    });
+    case SERVICE_CODE.ID_INVALID:
+      logger.warning("News updation failed", req.user, {
+        reason: result,
+        body: req.query.data,
+      });
+      return res.failure(result);
 
-    res.ok("News Updated");
-    logger.info("News updated", req.user, {
-      body: body.data,
-      newsId,
-      newsUpdate,
-    });
-  } catch (err) {
-    logger.error("News update failed", err, req.user, { body: body.data });
-    res.serverError();
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("News updation failed", result, req.user, {
+        body: req.body.data,
+      });
   }
 });
 
