@@ -153,10 +153,6 @@ class ProfileService {
 
     body.removeNulDefined();
 
-    if (typeof username !== "string")
-      return sResult(SERVICE_CODE.PROPERTY_TYPE_INVALID, "Username invalid");
-    const updateUsername_Q = true;
-
     let idCheck = idInvalidOrMissing(userId, "User");
     if (idCheck !== false) return idCheck;
     idCheck = idInvalidOrMissing(id, "Profile");
@@ -173,7 +169,7 @@ class ProfileService {
         return sResult(SERVICE_CODE.ID_INVALID, "Invalid user Id");
       }
 
-      if (updateUsername_Q) {
+      if (username !== null) {
         const usernameUpdatedInUser = await UserService.updateUsernameByID(
           userId,
           username,
