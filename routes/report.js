@@ -15,6 +15,11 @@ router.post("/forum", loggedIn, haveProfile, async (req, res) => {
       logger.info("Report filled", req.user, result);
       return res.ok("Report filled", result);
 
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+      return res.failure(result);
+
     case SERVICE_CODE.ERROR:
       logger.error("Report filling failed", result, req.user, {
         body: req.body.data,

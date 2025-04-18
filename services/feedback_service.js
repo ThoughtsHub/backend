@@ -5,7 +5,7 @@ import { idInvalidOrMissing, reqFieldsNotGiven } from "../utils/service_checks.j
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
-modelFields = "message*";
+const modelFields = "message*";
 const { fields, reqFields } = parseFields(modelFields);
 
 class FeedbackService {
