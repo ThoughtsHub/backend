@@ -239,7 +239,7 @@ class ProfileService {
 
   static getForumsByID = async (body) => {
     const profileId = body.get("profileId");
-    const offset = body.isNumber("offset") ? body.get("offset") : 0;
+    const offset = body.toNumber("offset");
 
     let idCheck = idInvalidOrMissing(profileId, "Profile");
     if (idCheck !== false) return idCheck;
