@@ -6,7 +6,10 @@ import Forum from "../models/Forums.js";
 import ForumVote from "../models/ForumVote.js";
 import Profile from "../models/Profile.js";
 import { parseFields } from "../utils/field_parser.js";
-import { idInvalidOrMissing } from "../utils/service_checks.js";
+import {
+  idInvalidOrMissing,
+  reqFieldsNotGiven,
+} from "../utils/service_checks.js";
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
 import UserService from "./user_service.js";
@@ -73,7 +76,7 @@ class ProfileService {
     }
   };
 
-  static updateExistingFull = async (body) => {
+  static updateExistingFull = async (body, wAdminRights = false) => {
     const userId = body.get("userId");
     const id = body.get("profileId");
     const username = body.get("username");
@@ -82,36 +85,43 @@ class ProfileService {
 
     let idCheck = idInvalidOrMissing(userId, "User");
     if (idCheck !== false) return idCheck;
-    idCheck = idInvalidOrMissing(id, "Profile");
-    if (idCheck !== false) return idCheck;
+    if (!wAdminRights) {
+      idCheck = idInvalidOrMissing(id, "Profile");
+      if (idCheck !== false) return idCheck;
 
-    let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
-    if (reqFieldsCheck !== false) return reqFieldsCheck;
+      let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
+      if (reqFieldsCheck !== false) return reqFieldsCheck;
+    }
 
     const t = await db.transaction();
     try {
-      const profileBelongs = await this.profileBelongsToUserByUserID(
-        id,
-        userId
-      );
-      if (!profileBelongs) {
-        await t.rollback();
-        return sResult(SERVICE_CODE.ID_INVALID, "Invalid user Id");
+      if (!wAdminRights) {
+        const profileBelongs = await this.profileBelongsToUserByUserID(
+          id,
+          userId
+        );
+        if (!profileBelongs) {
+          await t.rollback();
+          return sResult(SERVICE_CODE.ID_INVALID, "Invalid user Id");
+        }
       }
 
-      const usernameUpdatedInUser = await UserService.updateUsernameByID(
-        userId,
-        username,
-        { transaction: t }
-      );
+      if (username !== null) {
+        const usernameUpdatedInUser = await UserService.updateUsernameByID(
+          userId,
+          username,
+          { transaction: t }
+        );
 
-      if (usernameUpdatedInUser !== true) {
-        await t.rollback();
-        return usernameUpdatedInUser;
+        if (usernameUpdatedInUser !== true) {
+          await t.rollback();
+          return usernameUpdatedInUser;
+        }
       }
+      body.removeNulDefined();
 
       let [updateResult] = await Profile.update(body.data, {
-        where: { id },
+        where: { userId },
         transaction: t,
         individualHooks: true,
       });
@@ -121,7 +131,8 @@ class ProfileService {
         return sResult(SERVICE_CODE.ID_INVALID, "Invalid user Id");
       }
 
-      let profile = await Profile.findByPk(id, {
+      let profile = await Profile.findOne({
+        where: { userId },
         transaction: t,
         attributes: { include: [["id", "profileId"]], exclude: ["id"] },
       });
@@ -214,6 +225,26 @@ class ProfileService {
       profile = profile.get({ plain: true });
 
       return sResult(SERVICE_CODE.ACQUIRED, { profile });
+    } catch (err) {
+      return sResult(SERVICE_CODE.ERROR, err);
+    }
+  };
+
+  static getByUserID = async (body) => {
+    const userId = body.get("userId");
+
+    let idCheck = idInvalidOrMissing(userId, "User");
+    if (idCheck !== false) return idCheck;
+
+    try {
+      // TODO: hide things that user wants to not show
+      let profile = await Profile.findOne({
+        where: { userId },
+        attributes: { include: [["id", "profileId"]], exclude: ["id"] },
+      });
+      profile = profile.get({ plain: true });
+
+      return sResult(SERVICE_CODE.ACQUIRED, { user: profile });
     } catch (err) {
       return sResult(SERVICE_CODE.ERROR, err);
     }

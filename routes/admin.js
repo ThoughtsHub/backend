@@ -1,15 +1,12 @@
 import { Router } from "express";
 import logger from "../constants/logger.js";
-import User from "../models/User.js";
-import { timestampsKeys } from "../constants/timestamps.js";
-import Profile from "../models/Profile.js";
-import db from "../db/pg.js";
-import CategoryService from "../services/category_service.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
+import { usersLimitPerPage } from "../constants/pagination.js";
+import CategoryService from "../services/category_service.js";
 import NewsService from "../services/news_service.js";
 import ForumsService from "../services/forums_service.js";
-
-const usersLimitPerPage = 30;
+import UserService from "../services/user_service.js";
+import ProfileService from "../services/profile_service.js";
 
 const router = Router();
 
@@ -161,132 +158,120 @@ router.delete("/forums", async (req, res) => {
 });
 
 router.get("/users", async (req, res) => {
-  const offset = req.query.toNumber("offset");
+  const { status, result } = await UserService.getWAdminRights(req.query);
 
-  try {
-    const users = await User.findAll({
-      offset: offset * usersLimitPerPage,
-      limit: usersLimitPerPage,
-      order: [[timestampsKeys.updatedAt, "DESC"]],
-      include: [{ model: Profile }],
-    });
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("Users found", result);
 
-    res.ok("Users", { users });
-    logger.info("User delivered", req.user, { offset, users });
-  } catch (err) {
-    logger.error("User delivery failed", err, req.user, { offset });
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Users get failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 router.get("/users/pages", async (req, res) => {
-  try {
-    const pages = await User.count({ where: {} });
+  const { status, result } = await UserService.countAll();
 
-    const total = Math.ceil(pages / usersLimitPerPage);
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      const total = Math.ceil(result / usersLimitPerPage);
+      return res.ok("Users count", { total });
 
-    res.ok("Users", { total });
-    logger.info("User delivered", req.user, { total });
-  } catch (err) {
-    logger.error("User delivery failed", err, req.user);
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Users count get failed", result, req.user);
+      return res.serverError();
   }
 });
 
 router.delete("/users", async (req, res) => {
-  const userId = req.query.get("userId");
+  const { status, result } = await UserService.deleteExistingWAdminRights(
+    req.query
+  );
 
-  try {
-    const destroyResults = await User.destroy({ where: { id: userId } });
+  switch (status) {
+    case SERVICE_CODE.DELETED:
+      logger.info("User deleted by admin", req.user, { body: req.query.data });
+      return res.ok("User deleted");
 
-    res.ok("Deleted User", { numbers: destroyResults, userId });
-    logger.info("Deleted user", req.user, { destroyResults, userId });
-  } catch (err) {
-    res.serverError();
-    logger.error("Deletion of user failed", err, req.user, { userId });
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Users deletion failed", result, req.user, {
+        by: "admin",
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 router.post("/users", async (req, res) => {
-  const body = req.body;
+  const { status, result } = await UserService.createNewWAdminRights(req.body);
 
-  body.setFields("username password fullName about gender profileImageUrl");
+  switch (status) {
+    case SERVICE_CODE.CREATED:
+      logger.info("User created by admin", req.user, result);
+      return res.ok("User created", result);
 
-  const reqFields = body.anyNuldefined("username password fullName about", ",");
-  if (reqFields.length !== 0) return res.failure(`Required : ${reqFields}`);
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+        console.log(result)
+      return res.failure(result);
 
-  const [username, password, fullName, about, gender, profileImageUrl] =
-    body.bulkGet("username password fullName about gender profileImageUrl");
-
-  const t = await db.transaction();
-  try {
-    const user = await User.create({ username, password }, { transaction: t });
-    const profile = await Profile.create(
-      { fullName, about, gender, username, profileImageUrl, userId: user.id },
-      { transaction: t }
-    );
-
-    res.ok("User created");
-    await t.commit();
-    logger.info("User created", req.user, { body: body.data, user, profile });
-  } catch (err) {
-    await t.rollback();
-    res.serverError();
-    logger.error("User creation failed", err, req.user, { body: body.data });
+    case SERVICE_CODE.ERROR:
+      logger.error("Users creation failed", result, req.user, {
+        by: "admin",
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 
 router.get("/user", async (req, res) => {
-  const userId = req.query.get("userId");
+  const { status, result } = await ProfileService.getByUserID(req.query);
 
-  try {
-    const profile = await Profile.findOne({ where: { userId } });
-    if (profile !== null) {
-      logger.info("Profile delivered", req.user, { userId, profile });
-      return res.ok("Profile found", { user: profile });
-    }
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("User found", result);
 
-    res.failure("No profile found with the given userId");
-    logger.warning("Profile get failure", req.user, { userId });
-  } catch (err) {
-    res.serverError();
-    logger.error("Profile delivery failed", err, req.user, { userId });
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("User get failed", result, req.user, {
+        by: "admin",
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 router.put("/user", async (req, res) => {
-  const body = req.body;
-
-  body.setFields("fullName about gender profileImageUrl userId");
-  const [userId, fullName, about, gender, profileImageUrl] = body.bulkGet(
-    "userId fullName about gender profileImageUrl"
+  const { status, result } = await ProfileService.updateExistingFull(
+    req.body,
+    true
   );
 
-  try {
-    const profile = await Profile.findOne({ where: { userId } });
+  switch (status) {
+    case SERVICE_CODE.UPDATED:
+      logger.info("Profile updated (by admin)", req.user, result);
+      return res.ok("Profile updated", result);
 
-    if (profile === null) {
-      const user = await User.findByPk(userId);
-      await Profile.create({
-        fullName,
-        username: user.username,
-        about,
-        gender,
-        profileImageUrl,
-        userId,
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+    case SERVICE_CODE.USERNAME_UNAVAILABLE:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Profile updation failed", result, req.user, {
+        body: req.body.data,
       });
-    } else {
-      await Profile.update(
-        { fullName, about, gender, profileImageUrl },
-        { where: { id: profile.id, userId }, individualHooks: true }
-      );
-    }
-
-    res.ok("Profile Updated");
-    logger.info("Profile Updated", req.user, { body: body.data, profile });
-  } catch (err) {
-    res.serverError();
-    logger.error("Profile update failed", err, req.user, { body: body.data });
+      return res.serverError();
   }
 });
 
