@@ -63,10 +63,11 @@ class ProfileService {
       }
 
       let profile = await Profile.create(body.data, {
-        attributes: { include: [["id", "profileId"]], exclude: ["id"] },
         transaction: t,
       });
       profile = profile.get({ plain: true });
+      profile.profileId = profile.id;
+      delete profile.id;
 
       await t.commit();
       return sResult(SERVICE_CODE.CREATED, { user: profile });
