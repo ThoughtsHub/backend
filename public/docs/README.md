@@ -792,6 +792,53 @@ Only the fields given will be updated
 
 ---
 
+## **POST /feedback**
+
+**Body Parameters**:
+
+- `message` (String, required): Message for feedback.
+
+**Response**:
+
+```json
+{
+  "message": "Feedback created",
+  "success": true,
+  "feedback": {
+    "id": "1",
+    "profileId": "2",
+    "message": "local123"
+  }
+}
+```
+
+---
+
+## **POST /report/forum**
+
+To report on forums
+
+**Body Parameters**:
+
+- `reason` (String, required): Reason for report.
+- `reason` (String, required): Reason for report.
+
+**Response**:
+
+```json
+{
+  "message": "Report created",
+  "success": true,
+  "report": {
+    "id": "1",
+    "profileId": "2",
+    "reason": "local123"
+  }
+}
+```
+
+---
+
 Based on the provided content, here are the endpoints that were missing from the previous API documentation:
 
 ---
