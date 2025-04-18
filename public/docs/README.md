@@ -821,7 +821,7 @@ To report on forums
 **Body Parameters**:
 
 - `reason` (String, required): Reason for report.
-- `reason` (String, required): Reason for report.
+- `forumId` (String, required): Forum Id of forum to report.
 
 **Response**:
 
