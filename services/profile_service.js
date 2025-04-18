@@ -24,7 +24,7 @@ class ProfileService {
   };
 
   static profileBelongsToUserByUserID = async (profileId, userId) => {
-    const profile = await Profile.findOne({ where: { id, userId } });
+    const profile = await Profile.findOne({ where: { id: profileId, userId } });
     return profile !== null;
   };
 
