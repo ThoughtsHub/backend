@@ -1,50 +1,25 @@
 import { Router } from "express";
-import Report from "../models/Report.js";
 import logger from "../constants/logger.js";
-import User from "../models/User.js";
-import Forum from "../models/Forums.js";
+import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
+import ReportService from "../services/report_service.js";
+import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
 const router = Router();
 
-router.post("/user", async (req, res) => {
-  const body = req.body;
+router.post("/forum", loggedIn, haveProfile, async (req, res) => {
+  req.body.set("profileId", req.user?.Profile?.id);
+  const { status, result } = await ReportService.createNew(req.body);
 
-  body.setFields("userId title message");
+  switch (status) {
+    case SERVICE_CODE.CREATED:
+      logger.info("Report filled", req.user, result);
+      return res.ok("Report filled", result);
 
-  const reqFields = body.anyNuldefined("userId message", ",");
-  if (reqFields.length !== 0) return res.failure(`Required : ${reqFields}`);
-
-  try {
-    const user = await User.findByPk(body.get("userId"));
-    if (user === null) return res.failure("Bad userId, no user found");
-
-    const report = await Report.create(body.data);
-
-    res.ok("Reported", { report });
-  } catch (err) {
-    logger.error("report on user failed", err, req.user, { body: body.data });
-    res.serverError();
-  }
-});
-
-router.post("/forum", async (req, res) => {
-  const body = req.body;
-
-  body.setFields("forumId title message");
-
-  const reqFields = body.anyNuldefined("forumId message", ",");
-  if (reqFields.length !== 0) return res.failure(`Required : ${reqFields}`);
-
-  try {
-    const forum = await Forum.findByPk(body.get("forumId"));
-    if (forum === null) return res.failure("Bad forumId, no forum found");
-
-    const report = await Report.create(body.data);
-
-    res.ok("Reported", { report });
-  } catch (err) {
-    logger.error("report on forum failed", err, req.user, { body: body.data });
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Report filling failed", result, req.user, {
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 
