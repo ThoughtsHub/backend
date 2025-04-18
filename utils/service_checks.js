@@ -1,3 +1,4 @@
+import User from "../models/User.js";
 import { sResult } from "./service_return.js";
 import { SERVICE_CODE } from "./service_status_codes.js";
 
@@ -25,4 +26,9 @@ export const reqFieldsNotGiven = (body, reqFields) => {
     );
 
   return false;
+};
+
+export const usernameValid = async (username) => {
+  const user = await User.findOne({ where: { username } });
+  return user === null;
 };

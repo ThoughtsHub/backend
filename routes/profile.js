@@ -1,267 +1,148 @@
 import { Router } from "express";
-import { loggedIn } from "../middlewares/auth/auth.js";
-import db from "../db/pg.js";
-import User from "../models/User.js";
-import { usernameNotAvailable } from "../utils/username.js";
-import Profile from "../models/Profile.js";
+import { haveProfile, loggedIn } from "../middlewares/auth/auth.js";
 import logger from "../constants/logger.js";
-import { timestampsKeys } from "../constants/timestamps.js";
 import { validate as isUUID } from "uuid";
-import Forum from "../models/Forums.js";
-import ForumVote from "../models/ForumVote.js";
-import { includeWriter } from "../constants/writer.js";
+import ProfileService from "../services/profile_service.js";
+import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
 const router = Router();
 
 router.post("/", loggedIn, async (req, res) => {
-  const body = req.body;
+  req.body.set("userId", req.user.id);
+  const { status, result } = await ProfileService.createNew(req.body);
 
-  body.setFields("fullName username profileImageUrl gender dob about");
+  switch (status) {
+    case SERVICE_CODE.CREATED:
+      logger.info("Profile created", req.user, result);
+      return res.ok("Profile created", result);
 
-  const requiredFields = body.anyNuldefined("fullName username about", ",");
-  if (requiredFields.length !== 0) {
-    logger.warning("Profile creation failed", req.user, {
-      reason: "required fields not given",
-      requires: requiredFields,
-      body: body.data,
-    });
-    return res.failure(`Required : ${requiredFields}`);
-  }
+    case SERVICE_CODE.USERNAME_UNAVAILABLE:
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+      return res.failure(result);
 
-  const transaction = await db.transaction();
-
-  try {
-    const username = body.get("username");
-    if (await usernameNotAvailable(username)) {
+    case SERVICE_CODE.PROFILE_ALREADY_EXISTS:
       logger.warning("Profile creation failed", req.user, {
-        reason: "username unavailablity",
-        username,
-        body: body.data,
+        reason: "Profile already exists",
+        body: req.body.data,
       });
-      return res.failure("Username not avalilable");
-    }
-    const [userUpdate] = await User.update(
-      { username },
-      { where: { id: req.userId }, transaction }
-    );
+      return res.failure(result);
 
-    if (userUpdate !== 1) {
-      await transaction.rollback();
-      logger.warning("Profile creation failed", req.user, {
-        reason: "user update was not just in one field, or maybe in any field",
-        username,
-        updatedInRows: userUpdate,
-        body: body.data,
+    case SERVICE_CODE.ERROR:
+      logger.error("Profile creation failed", result, req.user, {
+        body: req.body.data,
       });
-      return res.failure("username could not be set, contact admin");
-    }
-
-    body.set("userId", req.userId);
-    let profile = await Profile.create(body.data, { transaction });
-
-    profile = profile.get({ plain: true });
-    profile.profileId = profile.id;
-    delete profile.id;
-
-    res.ok("Profile created", { user: profile });
-    await transaction.commit();
-    logger.info("Profile created", req.user, {
-      body: body.data,
-      profile,
-      username,
-      userUpdate,
-    });
-  } catch (err) {
-    await transaction.rollback();
-
-    logger.error("Internal server error", err, req.user, { body: body.data });
-
-    res.serverError();
+      return res.serverError();
   }
 });
 
-router.put("/", async (req, res) => {
-  const body = req.body;
+router.put("/", loggedIn, haveProfile, async (req, res) => {
+  req.body.set("userId", req.user.id);
+  req.body.set("profileId", req.user.Profile.id);
+  const { status, result } = await ProfileService.updateExistingFull(req.body);
 
-  body.setFields("fullName profileImageUrl gender dob about");
+  switch (status) {
+    case SERVICE_CODE.UPDATED:
+      logger.info("Profile updated", req.user, result);
+      return res.ok("Profile updated", result);
 
-  const requiredFields = body.anyNuldefined("fullName about", ",");
-  if (requiredFields.length !== 0) {
-    logger.warning("Profile update failed", req.user, {
-      reason: "required fields not given",
-      requires: requiredFields,
-      body: body.data,
-    });
-    return res.failure(`Required : ${requiredFields}`);
-  }
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+    case SERVICE_CODE.REQ_FIELDS_MISSING:
+      return res.failure(result);
 
-  const transaction = await db.transaction();
-  try {
-    let profile = await Profile.update(body.data, {
-      where: { userId: req.userId },
-      transaction,
-    });
-
-    profile = profile.get({ plain: true });
-    profile.profileId = profile.id;
-    delete profile.id;
-
-    res.ok("Profile updated", { user: profile });
-    await transaction.commit();
-    logger.info("Profile updated", req.user, {
-      body: body.data,
-      profile,
-      username,
-      userUpdate,
-    });
-  } catch (err) {
-    await transaction.rollback();
-
-    logger.error("Internal server error", err, req.user, { body: body.data });
-
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Profile updation failed", result, req.user, {
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 
 router.patch("/", async (req, res) => {
-  const body = req.body;
+  req.body.set("userId", req.user.id);
+  req.body.set("profileId", req.user.Profile.id);
+  const { status, result } = await ProfileService.updateExistingPartial(
+    req.body
+  );
 
-  body.setFields("fullName profileImageUrl gender dob about username");
-  body.removeNulDefined();
+  switch (status) {
+    case SERVICE_CODE.UPDATED:
+      logger.info("Profile updated (partial)", req.user, result);
+      return res.ok("Profile updated", result);
 
-  const transaction = await db.transaction();
-  try {
-    if (!body.isNuldefined("username"))
-      await User.update(
-        { username: body.get("username") },
-        { where: { id: req.userId }, transaction }
-      );
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+    case SERVICE_CODE.PROPERTY_TYPE_INVALID:
+    case SERVICE_CODE.USERNAME_UNAVAILABLE:
+      return res.failure(result);
 
-    let profile = await Profile.update(body.data, {
-      where: { userId: req.userId },
-      transaction,
-      individualHooks: true,
-    });
-
-    profile = await Profile.findOne({
-      where: { userId: req.userId },
-      transaction,
-    });
-
-    profile = profile.get({ plain: true });
-    profile.profileId = profile.id;
-    delete profile.id;
-
-    res.ok("Profile updated", { user: profile });
-    await transaction.commit();
-    logger.info("Profile updated", req.user, {
-      body: body.data,
-      profile,
-      username: body.get("username"),
-    });
-  } catch (err) {
-    await transaction.rollback();
-    res.serverError();
-    logger.error("Internal server error", err, req.user, { body: body.data });
+    case SERVICE_CODE.ERROR:
+      logger.error("Profile updation failed", result, req.user, {
+        body: req.body.data,
+      });
+      return res.serverError();
   }
 });
 
 router.get("/", loggedIn, async (req, res) => {
-  if (req.query.isNuldefined("profileId"))
-    return res.failure("Profile Id is required");
-  const profileId = req.query.get("profileId");
+  const { status, result } = await ProfileService.getByID(req.query);
 
-  try {
-    const profile = await Profile.findByPk(profileId, {
-      attributes: { include: [["id", "profileId"]], exclude: ["id"] },
-    });
-    const user = await User.findByPk(profile.userId);
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("Profile found", result);
 
-    res.ok("Profile found", {
-      profile: { ...profile.get({ plain: true }), username: user.username },
-    });
-    logger.info("Profile was delivered", req.user, {
-      profile,
-      body: req.query.data,
-    });
-  } catch (err) {
-    logger.error("Internal server error", err, req.user, { body: body.data });
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
 
-    res.serverError();
+    case SERVICE_CODE.ERROR:
+      logger.error("Profile get failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 router.get("/me", loggedIn, async (req, res) => {
-  try {
-    const profile = await Profile.findByPk(req.user.Profile.id, {
-      attributes: { include: [["id", "profileId"]], exclude: ["id"] },
-    });
-    const user = await User.findByPk(profile.userId);
+  req.query.set("profileId", req.user.Profile.id);
+  const { status, result } = await ProfileService.getByID(req.query);
 
-    res.ok("Your Profile", {
-      profile: { ...profile.get({ plain: true }), username: user.username },
-    });
-    logger.info("User's Profile was delivered", req.user, { profile });
-  } catch (err) {
-    logger.error("Internal server error", err, req.user, {
-      happened: "user's own profile couldn't be delivered",
-    });
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("Profile found", result);
 
-    res.serverError();
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Profile get failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
 router.get("/forums", loggedIn, async (req, res) => {
-  const userProfileId = req.user.Profile.id;
-  const offset = req.query.isNumber(req.query.get("offset"))
-    ? req.query.get("offset")
-    : 0;
+  if (!isUUID(req.query.get("profileId")))
+    req.query.set("profileId", req.user.Profile.id);
+  const { status, result } = await ProfileService.getForumsByID(req.query);
 
-  const profileId = isUUID(req.query.get("profileId"))
-    ? req.query.get("profileId")
-    : userProfileId;
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("Profile forums found", result);
 
-  try {
-    let forums = await Forum.findAll({
-      where: { profileId },
-      offset,
-      limit: 40,
-      order: [[timestampsKeys.createdAt, "desc"]],
-      include: [
-        includeWriter,
-        {
-          model: ForumVote,
-          required: false,
-          where: { profileId, value: 1 },
-        },
-      ],
-    });
+    case SERVICE_CODE.ID_INVALID:
+    case SERVICE_CODE.ID_MISSING:
+      return res.failure(result);
 
-    forums = forums.map((f) => {
-      f = f.get({ plain: true });
-      if (Array.isArray(f.ForumVotes) && f.ForumVotes.length === 1)
-        f.isVoted = true;
-      else f.isVoted = false;
-      delete f.ForumVotes;
-      return f;
-    });
-
-    res.ok("Forums", {
-      forums,
-      nextOffset: forums.length + offset,
-      endOfUserForums: forums.length < 40,
-    });
-    logger.info("Forums delivered", req.user, {
-      query: req.query.data,
-      forums,
-    });
-  } catch (err) {
-    console.log(err);
-    res.serverError();
-    logger.error("Internal server error", err, req.user, {
-      event: "forums requested by user could not be delivered /profile/forums",
-      query: req.query.data,
-    });
+    case SERVICE_CODE.ERROR:
+      logger.error("Profile forums get failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
   }
 });
 
