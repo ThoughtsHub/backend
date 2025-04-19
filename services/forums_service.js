@@ -338,10 +338,6 @@ class ForumsService {
   static getByTimestamp = async (body) => {
     const timestamp = body.get("timestamp", null);
     const userLoggedIn = body.get("userLoggedIn", false);
-    const profileId = body.get("profileId");
-
-    let idCheck = idInvalidOrMissing(profileId, "Profile");
-    if (idCheck !== false) return idCheck;
 
     if (typeof userLoggedIn !== "boolean")
       return sResult(
