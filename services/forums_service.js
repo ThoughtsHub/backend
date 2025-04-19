@@ -48,7 +48,7 @@ class ForumsService {
 
     const t = await db.transaction();
     try {
-      let forum = await Forum.create(body.data, { transaction: t });
+      let forum = await Forum.create({...body.data, profileId}, { transaction: t });
       forum = forum.get({ plain: true });
 
       await t.commit();

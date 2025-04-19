@@ -19,7 +19,7 @@ const { fields, reqFields } = parseFields(modelFields);
 
 class ProfileService {
   static profileExistsByUserID = async (userId) => {
-    const profile = await Profile.findOne({ where: userId });
+    const profile = await Profile.findOne({ where: { userId } });
     return profile !== null;
   };
 
@@ -62,7 +62,7 @@ class ProfileService {
         return usernameUpdatedInUser;
       }
 
-      let profile = await Profile.create(body.data, {
+      let profile = await Profile.create({...body.data, userId}, {
         transaction: t,
       });
       profile = profile.get({ plain: true });
