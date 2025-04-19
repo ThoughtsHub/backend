@@ -63,7 +63,7 @@ class ForumsService {
   };
 
   static updateExistingFull = async (body) => {
-    const [id, profileId] = body.bulkGet("forumId profileId");
+    const [id, profileId] = body.bulkGet("id profileId");
     body.setFields(fields);
 
     let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
