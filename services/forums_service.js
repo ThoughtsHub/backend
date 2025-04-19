@@ -48,7 +48,10 @@ class ForumsService {
 
     const t = await db.transaction();
     try {
-      let forum = await Forum.create({...body.data, profileId}, { transaction: t });
+      let forum = await Forum.create(
+        { ...body.data, profileId },
+        { transaction: t }
+      );
       forum = forum.get({ plain: true });
 
       await t.commit();
@@ -338,6 +341,12 @@ class ForumsService {
   static getByTimestamp = async (body) => {
     const timestamp = body.get("timestamp", null);
     const userLoggedIn = body.get("userLoggedIn", false);
+    const profileId = body.get("profileId");
+
+    if (userLoggedIn === true) {
+      let idCheck = idInvalidOrMissing(profileId, "Profile");
+      if (idCheck !== false) return idCheck;
+    }
 
     if (typeof userLoggedIn !== "boolean")
       return sResult(

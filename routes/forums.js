@@ -56,6 +56,7 @@ router.put("/", loggedIn, haveProfile, async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
+  req.query.set("profileId", req.user?.Profile?.id);
   req.query.set("userLoggedIn", req.loggedIn);
   const { status, result } = await ForumsService.getByTimestamp(req.query);
 
