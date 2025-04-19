@@ -80,7 +80,7 @@ router.get("/", async (req, res) => {
 
 router.delete("/", async (req, res) => {
   req.query.set("profileId", req.user.Profile.id);
-  const { status, result } = await ForumsService.updateExistingFull(req.query);
+  const { status, result } = await ForumsService.deleteExisting(req.query);
 
   switch (status) {
     case SERVICE_CODE.DELETED:
