@@ -137,7 +137,7 @@ class ForumsService {
   };
 
   static deleteExisting = async (body) => {
-    const [id, profileId] = body.bulkGet("id profileId");
+    const [id, profileId] = body.bulkGet("forumId profileId");
 
     let idCheck = idInvalidOrMissing(profileId, "Profile");
     if (idCheck !== false) return idCheck;
