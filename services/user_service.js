@@ -12,6 +12,7 @@ import { usersLimitPerPage } from "../constants/pagination.js";
 import db from "../db/pg.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { UpgradedBody } from "../middlewares/body.js";
+import { usernameCheck } from "../utils/field_checks.js";
 
 const modelFields = "username email mobile password*";
 const { fields, reqFields } = parseFields(modelFields);
@@ -31,7 +32,14 @@ class UserService {
     if (idCheck !== false) return idCheck;
 
     try {
-      const usernameAvailable = await usernameValid(username);
+      const checkedUsername = usernameCheck(username);
+      if (checkedUsername === false)
+        return sResult(
+          SERVICE_CODE.PROPERTY_TYPE_INVALID,
+          "Invalid username format"
+        );
+
+      const usernameAvailable = await usernameValid(checkedUsername, id);
 
       if (!usernameAvailable) {
         return sResult(

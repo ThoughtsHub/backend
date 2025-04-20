@@ -5,6 +5,12 @@ import db from "../db/pg.js";
 import Forum from "../models/Forums.js";
 import ForumVote from "../models/ForumVote.js";
 import Profile from "../models/Profile.js";
+import {
+  aboutCheck,
+  dobCheck,
+  fullNameCheck,
+  genderCheck,
+} from "../utils/field_checks.js";
 import { parseFields } from "../utils/field_parser.js";
 import {
   idInvalidOrMissing,
@@ -26,6 +32,54 @@ class ProfileService {
   static profileBelongsToUserByUserID = async (profileId, userId) => {
     const profile = await Profile.findOne({ where: { id: profileId, userId } });
     return profile !== null;
+  };
+
+  static afterChecks = (body) => {
+    if (!body.isNull("fullName")) {
+      const checkedFullName = fullNameCheck(body.get("fullName"));
+      if (checkedFullName === false)
+        return sResult(
+          SERVICE_CODE.PROPERTY_TYPE_INVALID,
+          "Invalid fullName format"
+        );
+
+      body.set("fullName", checkedFullName);
+    }
+
+    if (!body.isNull("about")) {
+      const checkedAbout = aboutCheck(body.get("about"));
+      if (checkedAbout === false)
+        return sResult(
+          SERVICE_CODE.PROPERTY_TYPE_INVALID,
+          "Invalid about format"
+        );
+
+      body.set("about", checkedAbout);
+    }
+
+    if (!body.isNull("gender")) {
+      const checkedGender = genderCheck(body.get("gender"));
+      if (checkedGender === false)
+        return sResult(
+          SERVICE_CODE.PROPERTY_TYPE_INVALID,
+          "Invalid gender format"
+        );
+
+      body.set("gender", checkedGender);
+    }
+
+    if (!body.isNull("dob")) {
+      const checkedDob = dobCheck(body.get("dob"));
+      if (checkedDob === false)
+        return sResult(
+          SERVICE_CODE.PROPERTY_TYPE_INVALID,
+          "Invalid dob format"
+        );
+
+      body.set("dob", checkedDob);
+    }
+
+    return true;
   };
 
   static createNew = async (body) => {
@@ -50,6 +104,9 @@ class ProfileService {
           "Profile was already created, if you want to update, use PUT /profile"
         );
       }
+
+      const checkedResult = this.afterChecks(body);
+      if (checkedResult !== true) return checkedResult;
 
       const usernameUpdatedInUser = await UserService.updateUsernameByID(
         userId,
@@ -109,6 +166,9 @@ class ProfileService {
           return sResult(SERVICE_CODE.ID_INVALID, "Invalid user Id");
         }
       }
+
+      const checkedResult = this.afterChecks(body);
+      if (checkedResult !== true) return checkedResult;
 
       if (username !== null) {
         const usernameUpdatedInUser = await UserService.updateUsernameByID(
@@ -179,6 +239,9 @@ class ProfileService {
         return sResult(SERVICE_CODE.ID_INVALID, "Invalid user Id");
       }
 
+      const checkedResult = this.afterChecks(body);
+      if (checkedResult !== true) return checkedResult;
+
       if (username !== null) {
         const usernameUpdatedInUser = await UserService.updateUsernameByID(
           userId,
@@ -247,7 +310,6 @@ class ProfileService {
     if (idCheck !== false) return idCheck;
 
     try {
-      // TODO: hide things that user wants to not show
       let profile = await Profile.findOne({
         where: { userId },
         attributes: { include: [["id", "profileId"]], exclude: ["id"] },

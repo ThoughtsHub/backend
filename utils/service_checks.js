@@ -28,7 +28,7 @@ export const reqFieldsNotGiven = (body, reqFields) => {
   return false;
 };
 
-export const usernameValid = async (username) => {
+export const usernameValid = async (username, userId = null) => {
   const user = await User.findOne({ where: { username } });
-  return user === null;
+  return user === null || user.id === userId;
 };

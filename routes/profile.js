@@ -20,6 +20,7 @@ router.post("/", loggedIn, async (req, res) => {
     case SERVICE_CODE.ID_INVALID:
     case SERVICE_CODE.ID_MISSING:
     case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.PROPERTY_TYPE_INVALID:
       return res.failure(result);
 
     case SERVICE_CODE.PROFILE_ALREADY_EXISTS:
@@ -50,6 +51,8 @@ router.put("/", loggedIn, haveProfile, async (req, res) => {
     case SERVICE_CODE.ID_INVALID:
     case SERVICE_CODE.ID_MISSING:
     case SERVICE_CODE.REQ_FIELDS_MISSING:
+    case SERVICE_CODE.PROPERTY_TYPE_INVALID:
+    case SERVICE_CODE.USERNAME_UNAVAILABLE:
       return res.failure(result);
 
     case SERVICE_CODE.ERROR:
