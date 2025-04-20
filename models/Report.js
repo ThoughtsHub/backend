@@ -7,8 +7,8 @@ const Report = db.define(
   {
     id: { ...types.ID },
     reason: { ...types.STR_REQ },
-    userId: { ...types.ID },
-    forumId: { ...types.ID },
+    userId: { ...types.UUID },
+    forumId: { ...types.UUID },
     ...timestamps,
   },
   { hooks }

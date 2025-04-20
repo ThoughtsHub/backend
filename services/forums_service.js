@@ -424,7 +424,7 @@ class ForumsService {
       comment = comment.get({ plain: true });
 
       await t.commit();
-      return sResult(SERVICE_CODE.CREATED);
+      return sResult(SERVICE_CODE.CREATED, { comment });
     } catch (err) {
       await t.rollback();
       return sResult(SERVICE_CODE.ERROR, err);
