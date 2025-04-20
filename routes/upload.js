@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
     // Step 2: Construct custom file name
     const username = req.loggedIn === true ? req.user.username : "null";
     const fileName =
-      Date.now() + "-" + uuidv4() + "-" + username + "-" + file.originalname;
+      Date.now() + "-" + uuidv4() + "-" + username + "-" + file.originalname + ".jpeg";
     const outputPath = path.join(uploadPath, fileName);
 
     // Step 3: Compress/resize image
