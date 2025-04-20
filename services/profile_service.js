@@ -62,9 +62,12 @@ class ProfileService {
         return usernameUpdatedInUser;
       }
 
-      let profile = await Profile.create({...body.data, userId}, {
-        transaction: t,
-      });
+      let profile = await Profile.create(
+        { ...body.data, userId },
+        {
+          transaction: t,
+        }
+      );
       profile = profile.get({ plain: true });
       profile.profileId = profile.id;
       delete profile.id;
@@ -119,7 +122,12 @@ class ProfileService {
           return usernameUpdatedInUser;
         }
       }
+
       body.removeNulDefined();
+
+      const pfp = body.get("profileImageUrl");
+      if (typeof pfp === "string" && pfp.trim() === "")
+        body.set("profileImageUrl", null);
 
       let [updateResult] = await Profile.update(body.data, {
         where: { userId },
@@ -151,7 +159,7 @@ class ProfileService {
     const userId = body.get("userId");
     const id = body.get("profileId");
     const username = body.get("username");
-    
+
     body.setFields(fields);
     body.removeNulDefined();
 
@@ -183,6 +191,10 @@ class ProfileService {
           return usernameUpdatedInUser;
         }
       }
+
+      const pfp = body.get("profileImageUrl");
+      if (typeof pfp === "string" && pfp.trim() === "")
+        body.set("profileImageUrl", null);
 
       let [updateResult] = await Profile.update(body.data, {
         where: { id },
