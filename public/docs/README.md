@@ -267,6 +267,8 @@ Creates the profile for the logged in user.
   - Required fields were not provided
   - Username unavailable
   - If the profile has already been created. for update, use PUT/PATCH request type
+  - If fullName is not >=3 three characters, excluding the spaces
+  - If current age is not in range 15 - 80 years
 - `500` : Some error occured at server, contact admin.
 
 #### PUT /profile
@@ -312,7 +314,10 @@ To update the user profile completely.
 **Response status codes**
 
 - `200` : Request successful, profile has been updated
-- `400` : Required fields were not provided
+- `400` :
+  - Required fields were not provided
+  - If fullName is not >=3 three characters, excluding the spaces
+  - If current age is not in range 15 - 80 years
 - `500` : Some error occured at server, contact admin.
 
 #### PATCH /profile
@@ -358,7 +363,10 @@ Update only requested fields.
 **Response status codes**
 
 - `200` : Request successful, profile updated
-- `400` : Username invalid, or not available
+- `400` :
+  - Username invalid, or not available
+  - If fullName is not >=3 three characters, excluding the spaces
+  - If current age is not in range 15 - 80 years
 - `500` : Some error occured at server, contact admin.
 
 #### GET /profile
