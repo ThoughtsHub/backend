@@ -21,7 +21,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   helmet({
-    contentSecurityPolicy: false,
     crossOriginOpenerPolicy: false, // for development
   })
 );
