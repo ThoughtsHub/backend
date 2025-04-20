@@ -187,6 +187,35 @@ Creates a user with the OTP requested contact and the password user sets.
   - Provided otpToken is invalid, or 5 minutes time out
 - `500` : Some error occured at server, contact admin.
 
+#### GET /check-username
+
+Checks if username is available or not
+
+**Query :**
+
+```js
+{
+  username: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  isAvailable: boolean;
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, username is available
+- `400` : Required fields were not provided
+- `404` : Username is not available
+- `500` : Some error occured at server, contact admin.
+
 ---
 
 ### Profile
@@ -1128,6 +1157,7 @@ Reports a forum
 - `500` : Some error occured at server, contact admin.
 
 ---
+
 # **API Documentation**
 
 To use the API, There are some pre-requisites that need to cleared:
