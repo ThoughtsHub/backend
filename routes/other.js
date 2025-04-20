@@ -5,6 +5,7 @@ import { loggedAsAdmin, setupAuth } from "../middlewares/auth/auth.js";
 import User from "../models/User.js";
 import { spawn } from "child_process";
 import Category from "../models/Category.js";
+import { usernameCheck } from "../utils/field_checks.js";
 
 const isWindows = process.platform === "win32";
 
@@ -31,7 +32,10 @@ router.get("/check-username", async (req, res) => {
   const username = req.query.get("username");
 
   try {
-    if (await usernameAvailable(username)) {
+    const checkedUsername = usernameCheck(username);
+    if (checkedUsername === false) return res.failure("Username invalid");
+
+    if (await usernameAvailable(checkedUsername)) {
       logger.info("username available", req.user, {
         username,
         body: req.query.data,
