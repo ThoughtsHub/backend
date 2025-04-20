@@ -1,5 +1,5 @@
-const usernameRegex = /^[A-Za-z][A-Za-z0-9]+$/;
-const fullNameRegex = /^[A-Za-z ]{3,}$/;
+const usernameRegex = /^[a-zA-Z][a-zA-Z0-9]{3,}$/;
+const fullNameRegex = /^[A-Za-z]{3,}$/;
 
 export const usernameCheck = (username) => {
   if (typeof username !== "string") return false;
@@ -39,8 +39,6 @@ export const dobCheck = (dob) => {
   // current age should be 15-80
   const ageInMs = Date.now() - dob;
   const ageInYears = ageInMs / (365.25 * 24 * 60 * 60 * 1000); // account for leap years
-
-  console.log("current age: ",ageInYears);
 
   if (ageInYears < 15 || ageInYears > 80) return false;
 

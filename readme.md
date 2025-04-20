@@ -985,22 +985,6 @@ Updates the whole comment.
   - If the requested comment is not assciated with the forum
 - `500` : Some error occured at server, contact admin.
 
-```js
-{
-  message: string;
-  success: boolean;
-  comment: {
-    id: string;
-    localId: string;
-    forumId: string;
-    profileId: string;
-    body: string;
-    createDate: number;
-    updateDate: number;
-  }
-}
-```
-
 #### GET /forums/comments
 
 Gets the comments on a forum, by using timestamp.
