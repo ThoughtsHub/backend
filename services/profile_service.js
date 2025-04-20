@@ -106,7 +106,10 @@ class ProfileService {
       }
 
       const checkedResult = this.afterChecks(body);
-      if (checkedResult !== true) return checkedResult;
+      if (checkedResult !== true) {
+        await t.rollback();
+        return checkedResult;
+      }
 
       const usernameUpdatedInUser = await UserService.updateUsernameByID(
         userId,
@@ -168,7 +171,10 @@ class ProfileService {
       }
 
       const checkedResult = this.afterChecks(body);
-      if (checkedResult !== true) return checkedResult;
+      if (checkedResult !== true) {
+        await t.rollback();
+        return checkedResult;
+      }
 
       if (username !== null) {
         const usernameUpdatedInUser = await UserService.updateUsernameByID(
@@ -240,7 +246,10 @@ class ProfileService {
       }
 
       const checkedResult = this.afterChecks(body);
-      if (checkedResult !== true) return checkedResult;
+      if (checkedResult !== true) {
+        await t.rollback();
+        return checkedResult;
+      }
 
       if (username !== null) {
         const usernameUpdatedInUser = await UserService.updateUsernameByID(

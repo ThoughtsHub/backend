@@ -37,12 +37,12 @@ export const dobCheck = (dob) => {
   if (typeof dob !== "number") return false;
 
   // current age should be 15-80
-  const timeFromCurrentDate = Date.now() - dob;
-  if (
-    timeFromCurrentDate < 15 * 365 * 24 * 60 * 60 ||
-    timeFromCurrentDate > 80 * 365 * 24 * 60 * 60
-  )
-    return false;
+  const ageInMs = Date.now() - dob;
+  const ageInYears = ageInMs / (365.25 * 24 * 60 * 60 * 1000); // account for leap years
+
+  console.log("current age: ",ageInYears);
+
+  if (ageInYears < 15 || ageInYears > 80) return false;
 
   return dob;
 };
