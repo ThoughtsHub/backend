@@ -1,6 +1,10 @@
 import User from "../models/User.js";
 import { parseFields } from "../utils/field_parser.js";
-import { idInvalidOrMissing, usernameValid, reqFieldsNotGiven } from "../utils/service_checks.js";
+import {
+  idInvalidOrMissing,
+  usernameValid,
+  reqFieldsNotGiven,
+} from "../utils/service_checks.js";
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
 import Profile from "../models/Profile.js";
@@ -86,8 +90,6 @@ class UserService {
   static createNewWAdminRights = async (body) => {
     const userBody = new UpgradedBody(body.data, fields),
       profileBody = new UpgradedBody(body.data, profileFields);
-
-      console.log(userBody, profileBody)
 
     let reqFieldsCheck = reqFieldsNotGiven(userBody, reqFields);
     if (reqFieldsCheck !== false) return reqFieldsCheck;
