@@ -305,6 +305,7 @@ router.put("/forums", async (req, res) => {
       logger.error("Forum updation failed", result, req.user, {
         body: req.body.data,
       });
+      return res.serverError();
   }
 });
 
@@ -314,6 +315,7 @@ router.put("/news", async (req, res) => {
   switch (status) {
     case SERVICE_CODE.UPDATED:
       logger.info("News updated", req.user, { body: req.body.data, ...result });
+      return res.ok("News updated", result);
 
     case SERVICE_CODE.ID_INVALID:
       logger.warning("News updation failed", req.user, {
@@ -330,6 +332,7 @@ router.put("/news", async (req, res) => {
       logger.error("News updation failed", result, req.user, {
         body: req.body.data,
       });
+      return res.serverError();
   }
 });
 
