@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
     const outputPath = path.join(uploadPath, fileName);
 
     // Step 3: Compress/resize image
-    const compressedBuffer = await compressToTargetSize(file.buffer, 200);
+    const compressedBuffer = await compressToTargetSize(file.buffer, 60);
 
     // Step 4: Save the compressed image to disk
     fs.writeFileSync(outputPath, compressedBuffer);
