@@ -1,943 +1,1130 @@
 # **API Documentation**
 
-**Success Status Code**: `200` \
-**Headers Token for Authorization (Login)**: `auth_token`
+To use the API, There are some pre-requisites that need to cleared:
+
+Login and signup both will return a `token` at the end of its own process.
+After recieving the `token`, send the `token` in each subsequent request, until logout, for being authorized as a **user** of the application.
+This `token` has to sent in headers in a custom field `auth_token`.
+
+Each request, whether `GET`, `POST`, `PUT`, `PATCH` or `DELETE`, will return status code of **200** for a successful request.
+Each response will always be json, except for html pages/user uploads, containing these two fields at least:
+
+- **message** : Describes response. if error, then why?
+- **success** : A bool value representing if the request was successfull or not.
 
 ---
 
-## **GET /check-username**
-
-**Query Parameters**:
-
-- `username` (String): The username to check.
-
-**Response**:
-
-```json
-{
-  "message": "Username available",
-  "success": true,
-  "isAvailable": true
-}
-```
-
-OR
-
-```json
-{
-  "message": "Username not available",
-  "success": false,
-  "isAvailable": false
-}
-```
+Success Status Code: **200**\
+Headers Token for Authorization (Login): **auth_token**
 
 ---
 
-## **GET /categories**
+## **Routes**
 
-**Response**:
+Each section in **Routes** is divided by the action that can be performed on the API.
+The format of each endpoint is **`REQUEST TYPE`** **`ENDPOINT`**
 
-```json
-{
-  "message": "Username available",
-  "success": true,
-  "categories": ["Crime", "Economy"]
-}
-```
+for example, in POST /forums, `POST -> Request Type` and `/forums -> Endpoint` to which request to send.
 
 ---
 
-## **POST /login**
+### Login
 
-**Body Parameters**:
+#### POST /login
 
-- `username` (String, optional): Username of the user.
-- `email` (String, optional): Email of the user.
-- `mobile` (String, optional): Mobile number of the user.
-- `password` (String, required): Password of the user.
+To login the user.
 
-**Response**:
+**Body :**
 
-```json
+```js
 {
-  "message": "Log in successful",
-  "success": true,
-  "userToken": "abc123",
-  "user": {}
+  email: string { Required }
+  password: string { Required }
 }
 ```
 
----
+> **email** here is the umbrella term for username/mobile/email, and password.
 
-## **POST /otp/get**
+**Response :**
 
-**Body Parameters**:
-
-- `email` (String, optional): Email of the user.
-- `mobile` (String, optional): Mobile number of the user.
-- `isMobile` (Boolean, optional): Indicates if the contact is a mobile number.
-
-**Response**:
-
-```json
+```js
 {
-  "message": "Otp sent",
-  "success": true
+    message: string
+    success: boolean
+    auth_token: string
+    user: {
+            userId: string
+            profileId: string
+            username: string
+            fullName: string
+            about: string
+            profileImageUrl: string | null
+            gender: string
+            dob: number | null
+            forumsCount: number
+            createDate: number
+            updateDate: number
+            ...
+          } | null
 }
 ```
 
+> **user** field can be `null` if no profile was created by the user.
+
+**Response status codes**
+
+- `200` : Request was fulfilled, an auth_token was sent by the server
+- `400` :
+  - Required fields were not given
+  - If no user found, with given **credentials**
+- `401` : Password for the given email did not match correctly
+- `500` : Some error occured at server, contact admin.
+
 ---
 
-## **POST /otp/verify**
+### Signup
 
-**Body Parameters**:
+#### POST /otp/get
 
-- `otp` (String, required): OTP to verify.
-- `contact` (String, required): Contact with which to verify.
+Sends a unique OTP at the given email/mobile.
 
-**Response**:
+**Body :**
 
-```json
+```js
 {
-  "message": "OTP verified",
-  "success": true,
-  "otpToken": "xyz789"
+    [email | mobile]: string
+    isMobile: boolean { Required, default: false }
 }
 ```
 
----
+> email or mobile have to be sent, and isMobile have to be set to `true` if requesting for mobile.
 
-## **POST /signup/create-password**
+**Response :**
 
-**Body Parameters**:
-
-- `password` (String, required): Password for the new account.
-- `otpToken` (String, required): OTP token received from `/otp/verify`.
-
-**Response**:
-
-```json
+```js
 {
-  "message": "Sign up successful",
-  "success": true,
-  "userToken": "abc123",
-  "user": {}
+  message: string;
+  success: boolean;
 }
 ```
 
+> `otp` will be sent to the requested email/mobile
+
+**Response status codes**
+
+- `200` : Request successful, otp may have been sent to requested email/mobile
+- `400` : Email and mobile both were not provided
+- `409` : Requested email/mobile have already been used by another user
+- `500` : Some error occured at server, contact admin.
+
+#### POST /otp/verify
+
+Verifies the otp sent to requested email/mobile.
+
+**Body :**
+
+```js
+{
+  contact: string { Required }
+  otp: string { Required }
+}
+```
+
+> `contact` is the requested email/mobile
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  otpToken: string;
+}
+```
+
+> `otpToken` will only be valid for 5 minutes, in that 5 minutes, user will have to set the password for the account, or else, will have to restart from otp generation
+
+**Response status codes**
+
+- `200` : Request successful, otp verified, and a otpToken has been sent in request
+- `400` : Required fields were not provided
+- `401` : OTP for the requested email/mobile is not matched correctly
+- `500` : Some error occured at server, contact admin.
+
+#### POST /signup/create-password
+
+Creates a user with the OTP requested contact and the password user sets.
+
+**Body :**
+
+```js
+{
+  otpToken: string { Required }
+  password: string { Required }
+}
+```
+
+> `otpToken` will only be valid for 5 minutes
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  auth_token: string;
+  user: null;
+}
+```
+
+> `user` will be sent as `null` because no profile has been created yet
+
+**Response status codes**
+
+- `200` : Request successful, user has been created, and now user can login with auth_token
+- `400` :
+  - Required fields were not provided
+  - Provided otpToken is invalid, or 5 minutes time out
+- `500` : Some error occured at server, contact admin.
+
 ---
 
-## **POST /profile**
+### Profile
 
-**Body Parameters**:
+#### POST /profile
 
-- `fullName` (String, required): Full name of the user.
-- `username` (String, required): Desired username.
-- `profileImageUrl` (String, optional): URL of the profile image.
-- `dob` (Number, optional): Date of birth as a timestamp.
-- `about` (String, required): Short description about the user.
+Creates the profile for the logged in user.
 
-**Response**:
+**Body :**
 
-```json
+```js
 {
-  "message": "Profile created",
-  "success": true,
-  "user": {
-    "profileId": "12345",
-    "fullname": "John Doe",
-    "profileImageUrl": "https://example.com/image.jpg",
-    "about": "A short bio",
-    "dob": 1609459200
+  username: string { Required }
+  fullName: string { Required }
+  about: string { Required }
+  profileImageUrl: string
+  gender: string
+  dob: number
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    user: {
+            userId: string
+            profileId: string
+            username: string
+            fullName: string
+            about: string
+            profileImageUrl: string | null
+            gender: string
+            dob: number | null
+            forumsCount: number
+            createDate: number
+            updateDate: number
+            ...
+          }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, profile has been created, and many functionalities for user has been opened
+- `400` :
+  - Required fields were not provided
+  - Username unavailable
+  - If the profile has already been created. for update, use PUT/PATCH request type
+- `500` : Some error occured at server, contact admin.
+
+#### PUT /profile
+
+To update the user profile completely.
+
+**Body :**
+
+```js
+{
+  username: string { Required }
+  fullName: string { Required }
+  about: string { Required }
+  profileImageUrl: string
+  gender: string
+  dob: number
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    user: {
+            userId: string
+            profileId: string
+            username: string
+            fullName: string
+            about: string
+            profileImageUrl: string | null
+            gender: string
+            dob: number | null
+            forumsCount: number
+            createDate: number
+            updateDate: number
+            ...
+          }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, profile has been updated
+- `400` : Required fields were not provided
+- `500` : Some error occured at server, contact admin.
+
+#### PATCH /profile
+
+Update only requested fields.
+
+**Body :**
+
+```js
+{
+  username: string;
+  fullName: string;
+  about: string;
+  profileImageUrl: string;
+  gender: string;
+  dob: number;
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    user: {
+            userId: string
+            profileId: string
+            username: string
+            fullName: string
+            about: string
+            profileImageUrl: string | null
+            gender: string
+            dob: number | null
+            forumsCount: number
+            createDate: number
+            updateDate: number
+            ...
+          }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, profile updated
+- `400` : Username invalid, or not available
+- `500` : Some error occured at server, contact admin.
+
+#### GET /profile
+
+Gets the profile of a certain user.
+
+**Query :**
+
+```js
+{
+  profileId: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    profile: {
+            userId: string
+            profileId: string
+            username: string
+            fullName: string
+            about: string
+            profileImageUrl: string | null
+            gender: string
+            dob: number | null
+            forumsCount: number
+            createDate: number
+            updateDate: number
+            ...
+          }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, user profile has been sent
+- `400` : Invalid profile Id, or, No Id provided
+- `500` : Some error occured at server, contact admin.
+
+#### GET /profile/me
+
+Gets the profile of currently logged in user.
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    profile: {
+            userId: string
+            profileId: string
+            username: string
+            fullName: string
+            about: string
+            profileImageUrl: string | null
+            gender: string
+            dob: number | null
+            forumsCount: number
+            createDate: number
+            updateDate: number
+            ...
+          }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, got profile
+- `400` : Username invalid, or not available
+- `500` : Some error occured at server, contact admin.
+
+#### GET /profile/forums
+
+Gets the forums of requested user, or currently logged in user.
+
+**Query :**
+
+```js
+{
+  profileId: string { Required }
+  offset: number { Required, default: 0 }
+}
+```
+
+> when requesting for currently logged in user, `profileId` should not be sent. It will be automatically placed using the provided `auth_token` in headers.
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    forums: [
+        {
+            id: string
+            localId: string
+            profileId: string
+            title: string
+            body: string
+            createDate: number
+            updateDate: number
+            isVoted: boolean
+            writer: {
+                        userId: string
+                        profileId: string
+                        username: string
+                        fullName: string
+                        about: string
+                        profileImageUrl: string
+                        gender: string
+                        dob: string
+                    }
+            ...
+        }
+    ]
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, forums sent
+- `400` : Profile Id invalid
+- `500` : Some error occured at server, contact admin.
+
+---
+
+### Logout
+
+#### GET /logout
+
+Logs out the current user, makes the `auth_token` invalid for any use afterwards.
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, logged out
+- `500` : Some error occured at server, contact admin.
+
+---
+
+### News
+
+#### GET /news
+
+Gets the news, by using timestamp.
+
+**Query :**
+
+```js
+{
+  category: string { Required, default: "All" }
+  timestamp: number { Required, default: 0 | null }
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    news: [
+        {
+            id: string
+            title: string
+            body: string
+            hindiTitle: string | "" | null
+            hindiBody: string | "" | null
+            imageUrl: string | null
+            newsUrl: string
+            category: string
+            createDate: number
+            updateDate: number
+            ...
+        }
+    ]
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, news sent
+- `400` : News category invalid
+- `500` : Some error occured at server, contact admin.
+
+#### GET /news/bo
+
+Gets the news, by using offset, mainly used by admin panel of API.
+
+**Query :**
+
+```js
+{
+  category: string { Required, default: "All" }
+  offset: number { Required, default: 0 }
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    totalNews: number
+    nextOffset: number
+    news: [
+        {
+            id: string
+            title: string
+            body: string
+            hindiTitle: string | "" | null
+            hindiBody: string | "" | null
+            imageUrl: string | null
+            newsUrl: string
+            category: string
+            createDate: number
+            updateDate: number
+            ...
+        }
+    ]
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, news sent
+- `400` : News category invalid
+- `500` : Some error occured at server, contact admin.
+
+#### GET /news/pages
+
+Gets the total news pages, mainly used by admin panel for API.
+
+**Query :**
+
+```js
+{
+  category: string { Required, default: "All" }
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  total: number;
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, news sent
+- `400` : News category invalid
+- `500` : Some error occured at server, contact admin.
+
+#### GET /news/:id
+
+Gets a specific news by its ID, mainly used by admin panel
+
+**Params :**
+
+```js
+{
+  id: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    news: {
+            id: string
+            title: string
+            body: string
+            hindiTitle: string | "" | null
+            hindiBody: string | "" | null
+            imageUrl: string | null
+            newsUrl: string
+            category: string
+            createDate: number
+            updateDate: number
+            ...
+          }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, news sent
+- `400` : News category invalid
+- `500` : Some error occured at server, contact admin.
+
+#### GET /categories
+
+Gets all the categories in the news.
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    categories: [
+        {
+            name: string
+            value: string
+        }
+    ]
+}
+```
+
+> Right now, `name` is what is being set for news category
+
+**Response status codes**
+
+- `200` : Request successful, news sent
+- `500` : Some error occured at server, contact admin.
+
+---
+
+### Forums
+
+#### POST /forums
+
+Creates a forum post by the logged in user.
+
+**Body :**
+
+```js
+{
+  localId: string
+  title: number { Required }
+  body: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    forum: {
+            id: string
+            localId: string
+            profileId: string
+            title: string
+            body: string
+            createDate: number
+            updateDate: number
+            ...
+           }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, forum created
+- `400` : Required fields were not provided
+- `500` : Some error occured at server, contact admin.
+
+#### PUT /forums
+
+Updates the forum completely.
+
+**Body :**
+
+```js
+{
+  id: string { Required }
+  localId: string
+  title: number { Required }
+  body: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    forum: {
+            id: string
+            localId: string
+            profileId: string
+            title: string
+            body: string
+            createDate: number
+            updateDate: number
+            ...
+           }
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, forum updated
+- `400` : Required fields were not provided
+- `403` : When trying to update the forum of different user.
+- `500` : Some error occured at server, contact admin.
+
+#### GET /forums
+
+Gets the forums, by using timestamp.
+
+**Query :**
+
+```js
+{
+  timestamp: string { Required, default: 0 | null }
+}
+```
+
+**Response :**
+
+```js
+{
+    message: string
+    success: boolean
+    totalForums: number
+    forums: [
+        {
+            id: string
+            localId: string
+            profileId: string
+            title: string
+            body: string
+            createDate: number
+            updateDate: number
+            isVoted: boolean
+            writer: {
+                        userId: string
+                        profileId: string
+                        username: string
+                        fullName: string
+                        about: string
+                        profileImageUrl: string
+                        gender: string
+                        dob: string
+                    }
+            ...
+        }
+    ]
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, forums sent
+- `500` : Some error occured at server, contact admin.
+
+#### DELETE /forums
+
+Deletes a specific forum associated with the logged in user.
+
+**Query :**
+
+```js
+{
+  forumId: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, forum deleted
+- `400` : Required fields were not provided
+- `403` : When trying to delete the forum of different user.
+- `500` : Some error occured at server, contact admin.
+
+---
+
+### Forums - Voting
+
+#### POST /forums/upvote
+
+Upvotes the forum post by the logged in user.
+
+**Body :**
+
+```js
+{
+  forumId: string { Required }
+  value: boolean { Required, default: false }
+}
+```
+
+> If `value` is `true`, that means user has upvoted, and if `value` is `false`, then user has chosen to remain neutral
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, forum voted
+- `500` : Some error occured at server, contact admin.
+
+---
+
+### Forums - Comments
+
+#### POST /forums/comments
+
+Creates a comment by user on a specific forum post.
+
+**Body :**
+
+```js
+{
+  forumId: string { Required }
+  localId: string
+  body: boolean { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  comment: {
+    id: string;
+    localId: string;
+    forumId: string;
+    profileId: string;
+    body: string;
+    createDate: number;
+    updateDate: number;
   }
 }
 ```
 
----
+**Response status codes**
 
-## **PATCH /profile**
+- `200` : Request successful, comment created
+- `400` :
+  - Required fields were not provided
+  - forumId is Invalid
+- `500` : Some error occured at server, contact admin.
 
-Only the fields given will be updated
+#### PUT /forums/comments
 
-**Body Parameters**:
+Updates the whole comment.
 
-- `fullName` (String, optional): Full name of the user.
-- `username` (String, optional): Desired username.
-- `profileImageUrl` (String, optional): URL of the profile image.
-- `dob` (Number, optional): Date of birth as a timestamp.
-- `about` (String, optional): Short description about the user.
+**Body :**
 
-**Response**:
-
-```json
+```js
 {
-  "message": "Profile created",
-  "success": true,
-  "user": {
-    "profileId": "12345",
-    "fullname": "John Doe",
-    "profileImageUrl": "https://example.com/image.jpg",
-    "about": "A short bio",
-    "dob": 1609459200
+  localId: string
+  commentId: string { Required }
+  forumId: string { Required }
+  body: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  comment: {
+    id: string;
+    localId: string;
+    forumId: string;
+    profileId: string;
+    body: string;
+    createDate: number;
+    updateDate: number;
   }
 }
 ```
 
----
+**Response status codes**
 
-## **GET /profile**
+- `200` : Request successful, comment updated
+- `400` :
+  - Required fields were not provided
+  - commentId or forumId is invalid
+  - If the requested comment is not assciated with the forum
+- `500` : Some error occured at server, contact admin.
 
-**Query Parameters**:
-
-- `profileId` (String, required): ID of the profile to fetch.
-
-**Response**:
-
-```json
+```js
 {
-  "message": "Profile found",
-  "success": true,
-  "profile": {
-    "profileId": "12345",
-    "fullname": "John Doe",
-    "username": "johndoe",
-    "profileImageUrl": "https://example.com/image.jpg",
-    "about": "A short bio",
-    "followers": 100,
-    "following": 50,
-    "storyCount": 10,
-    "forumsCount": 20
+  message: string;
+  success: boolean;
+  comment: {
+    id: string;
+    localId: string;
+    forumId: string;
+    profileId: string;
+    body: string;
+    createDate: number;
+    updateDate: number;
   }
 }
 ```
 
----
+#### GET /forums/comments
 
-## **GET /profile/story**
+Gets the comments on a forum, by using timestamp.
 
-**Query Parameters**:
+**Query :**
 
-- `profileId` (String, optional): ID of the profile to fetch. if not given, takes the currently logged in user profile id
-- `offset` (Number, optional): How many you have got from server
-
-**Response**:
-
-```json
+```js
 {
-  "message": "Stories of the user",
-  "success": true,
-  "nextOffset": 10,
-  "endOfUserStories": true,
-  "stories": [
-    {
-      "id": "1",
-      "localId": "local123",
-      "title": "Story Title",
-      "body": "This is the body of the story.",
-      "caption": "A caption",
-      "category": "Fiction",
-      "genre": "Drama",
-      "color": "#FFFFFF",
-      "backgroundImageId": "image123",
-      "alignment": 0
-    }
+  forumId: string { Required }
+  timestamp: string { Required, default : 0 | null }
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string
+  success: boolean
+  comments: [
+        {
+            id: string
+            localId: string
+            forumId: string
+            profileId: string
+            body: string
+            createDate: number
+            updateDate: number
+            writer: {
+                        userId: string
+                        profileId: string
+                        username: string
+                        fullName: string
+                        about: string
+                        profileImageUrl: string
+                        gender: string
+                        dob: string
+                    }
+                ...
+        }
   ]
 }
 ```
 
----
+**Response status codes**
 
-## **GET /profile/forums**
+- `200` : Request successful, comments sent
+- `400` :
+  - Required fields were not provided
+  - forumId is invalid
+- `500` : Some error occured at server, contact admin.
 
-**Query Parameters**:
+#### DELETE /forums/comments
 
-- `profileId` (String, optional): ID of the profile to fetch. if not given, takes the currently logged in user profile id
-- `offset` (Number, optional): How many you have got from server
+Deletes a specific comment, commented by user.
 
-**Response**:
+**Query :**
 
-```json
+```js
 {
-  "message": "Forums of the user",
-  "success": true,
-  "nextOffset": 10,
-  "endOfUserStories": true,
-  "forums": [
-    {
-      "id": "1",
-      "title": "Forum Title",
-      "body": "This is the body of the forum.",
-      "imageUrl": "https://example.com/image.jpg",
-      "createDate": 1609459200,
-      "updateDate": 1609459200,
-      "isVoted": true
-    }
-  ]
+  commentId: string { Required }
 }
 ```
 
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, comment deleted
+- `400` :
+  - Required fields were not provided
+  - commentId is invalid
+  - Comment does not belong to the current logged in user
+- `500` : Some error occured at server, contact admin.
+
 ---
 
-## **GET /profile/me**
+### Feedback
 
-**Response**:
+#### POST /feedback
 
-```json
+Creates a feedback by user.
+
+**Body :**
+
+```js
 {
-  "message": "Your Profile",
-  "success": true,
-  "profile": {
-    "profileId": "12345",
-    "fullname": "John Doe",
-    "username": "johndoe",
-    "profileImageUrl": "https://example.com/image.jpg",
-    "about": "A short bio",
-    "followers": 100,
-    "following": 50,
-    "storyCount": 10,
-    "forumsCount": 20
+  message: string { Required }
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  feedback: {
+    id: string;
+    profileId: string;
+    message: string;
+    createDate: number;
+    updateDate: number;
   }
 }
 ```
 
+**Response status codes**
+
+- `200` : Request successful, feedback created
+- `400` : Required fields were not provided
+- `500` : Some error occured at server, contact admin.
+
 ---
 
-## **POST /school**
+### Report
 
-**Body Parameters**:
+#### POST /report/forum
 
-- A list of college objects with fields:
-  - `collegeId` (String): ID of the college.
-  - `degreeId` (String): ID of the degree.
-  - `fieldId` (String): ID of the field.
-  - `description` (String): Description of the college.
-  - `startYear` (Number): Start year.
-  - `endYear` (Number): End year.
+Reports a forum
 
-**Response**:
+**Body :**
 
-```json
+```js
 {
-  "message": "College added",
-  "success": true
+  forumId: string { Required }
+  reason: string { Required }
 }
 ```
 
----
+**Response :**
 
-## **GET /news**
-
-**Query Parameters**:
-
-- `category` (String, optional, default="All"): Category of news to fetch.
-- `timestamp` (Number, optional): Fetch news newer than this timestamp.
-
-**Response**:
-
-```json
+```js
 {
-  "message": "News",
-  "success": true,
-  "news": [
-    {
-      "id": "1",
-      "title": "Breaking News",
-      "body": "This is the body of the news.",
-      "imageUrl": "https://example.com/image.jpg",
-      "category": "Politics",
-      "newsUrl": "https://example.com/news",
-      "timeStamp": 1609459200
-    }
-  ]
-}
-```
-
----
-
-## **GET /forums**
-
-**Query Parameters**:
-
-- `timestamp` (Number, optional): Fetch forums newer than this timestamp.
-
-**Response**:
-
-```json
-{
-  "message": "Forums",
-  "success": true,
-  "forums": [
-    {
-      "id": "1",
-      "title": "Forum Title",
-      "body": "This is the body of the forum.",
-      "imageUrl": "https://example.com/image.jpg",
-      "createDate": 1609459200,
-      "updateDate": 1609459200,
-      "writer": {
-        "profileId": "12345",
-        "fullname": "John Doe",
-        "about": "A short bio",
-        "profileImageUrl": "https://example.com/image.jpg",
-        "username": "johndoe"
-      },
-      "isVoted": true
-    }
-  ]
-}
-```
-
----
-
-## **POST /forums**
-
-**Body Parameters**:
-
-- `localId` (String, optional): Local ID of the forum.
-- `title` (String, required): Title of the forum.
-- `body` (String, required): Body of the forum.
-- `imageUrl` (String, optional): URL of the image.
-
-**Response**:
-
-```json
-{
-  "message": "Forum Created",
-  "success": true,
-  "forum": {
-    "id": "1",
-    "localId": "local123",
-    "title": "Forum Title",
-    "body": "This is the body of the forum.",
-    "imageUrl": "https://example.com/image.jpg",
-    "createDate": 1609459200,
-    "updateDate": 1609459200,
-    "writer": {
-      "profileId": "12345",
-      "fullname": "John Doe",
-      "about": "A short bio",
-      "profileImageUrl": "https://example.com/image.jpg",
-      "username": "johndoe"
-    }
+  message: string;
+  success: boolean;
+  report: {
+    id: string;
+    userId: string | null;
+    forumId: string | null;
+    profileId: string;
+    reason: string;
+    createDate: number;
+    updateDate: number;
   }
 }
 ```
 
----
-
-## **PUT /forums**
-
-**Body Parameters**:
-
-- `forumId` (String, required): Forum ID of the forum.
-- `localId` (String, optional): Local ID of the forum.
-- `title` (String, required): Title of the forum.
-- `body` (String, required): Body of the forum.
-- `imageUrl` (String, optional): URL of the image.
-
-**Response**:
-
-```json
-{
-  "message": "Forum Updated",
-  "success": true,
-  "forum": {
-    "id": "#####",
-    "localId": "local123",
-    "title": "Forum Title",
-    "body": "This is the body of the forum.",
-    "imageUrl": "https://example.com/image.jpg",
-    "createDate": 1609459200,
-    "updateDate": 1609459200
-  }
-}
-```
-
----
-
-## **DELETE /forums**
-
-**Query Parameters**:
-
-- `forumId` (String, required): Forum ID of the forum.
-
-**Response**:
-
-```json
-{
-  "message": "Forum deleted",
-  "success": true
-}
-```
-
----
-
-## **POST /forums/upvote**
-
-**Body Parameters**:
-
-- `forumId` (String, required): ID of the forum.
-- `value` (Boolean, required): `true` for upvote, `false` for downvote.
-
-**Response**:
-
-```json
-{
-  "message": "Voted",
-  "success": true
-}
-```
-
----
-
-## **GET /forums/comments**
-
-**Query Parameters**:
-
-- `forumId` (String, required): ID of the forum.
-- `timestamp` (Number, optional): Fetch comments newer than this timestamp.
-
-**Response**:
-
-```json
-{
-  "message": "Comments",
-  "success": true,
-  "comments": [
-    {
-      "id": "asdf",
-      "postId": "1",
-      "commentId": "2",
-      "body": "This is a comment.",
-      "createDate": 1609459200,
-      "writer": {
-        "profileId": "12345",
-        "fullname": "John Doe",
-        "about": "A short bio",
-        "profileImageUrl": "https://example.com/image.jpg",
-        "username": "johndoe"
-      }
-    }
-  ]
-}
-```
-
----
-
-## **POST /forums/comments**
-
-**Body Parameters**:
-
-- `body` (String, required): Body of the comment.
-- `forumId` (String, required): ID of the forum.
-- `localId` (String, optional): Local ID of the comment.
-
-**Response**:
-
-```json
-{
-  "message": "Commented",
-  "success": true,
-  "comment": {
-    "id": "1",
-    "postId": "2",
-    "localId": "local123",
-    "body": "This is a comment.",
-    "createDate": 1609459200,
-    "writer": {
-      "profileId": "12345",
-      "fullname": "John Doe",
-      "about": "A short bio",
-      "profileImageUrl": "https://example.com/image.jpg",
-      "username": "johndoe"
-    }
-  }
-}
-```
-
----
-
-## **PUT /forums/comments**
-
-**Body Parameters**:
-
-- `commentId` (String, required): Comment Id of the comment.
-- `body` (String, required): Body of the comment.
-- `forumId` (String, required): ID of the forum.
-- `localId` (String, optional): Local ID of the comment.
-
-**Response**:
-
-```json
-{
-  "message": "Comment Updated",
-  "success": true,
-  "comment": {
-    "id": "####",
-    "postId": "2",
-    "localId": "local123",
-    "body": "This is a comment.",
-    "createDate": 1609459200,
-    "updateDate": 241234124
-  }
-}
-```
-
----
-
-## **DELETE /forums/comments**
-
-**Query Parameters**:
-
-- `commentId` (String, required): Comment Id of the comment.
-
-**Response**:
-
-```json
-{
-  "message": "Comment deleted",
-  "success": true
-}
-```
-
----
-
-## **POST /upload**
-
-**Body Parameters**:
-
-- `file` (File, required): File to upload.
-
-**Response**:
-
-```json
-{
-  "message": "File Uploaded",
-  "success": true,
-  "fileUrl": "/uploads/filename.jpg"
-}
-```
-
----
-
-## **POST /story**
-
-**Body Parameters**:
-
-- `content` (Object, required):
-  - `title` (String, required): Title of the story.
-  - `body` (String, required): Body of the story.
-  - `caption` (String, optional): Caption for the story.
-- `categorization` (Object, required):
-  - `category` (String, required): Category of the story.
-  - `genre` (String, optional): Genre of the story.
-- `decoration` (Object, required):
-  - `color` (String, optional): Text color.
-  - `backgroundColor` (String, optional): Background color.
-  - `backgroundImageId` (String, optional): ID of the background image.
-  - `alignment` (Number, optional): Alignment (0 for left, 1 for center).
-
-**Response**:
-
-```json
-{
-  "message": "Story Created",
-  "success": true,
-  "story": {
-    "id": "1",
-    "localId": "local123",
-    "title": "Story Title",
-    "body": "This is the body of the story.",
-    "caption": "A caption",
-    "category": "Fiction",
-    "genre": "Drama",
-    "color": "#FFFFFF",
-    "backgroundImageId": "image123",
-    "alignment": 0,
-    "writer": {
-      "profileId": "12345",
-      "fullname": "John Doe",
-      "about": "A short bio",
-      "profileImageUrl": "https://example.com/image.jpg",
-      "username": "johndoe"
-    }
-  }
-}
-```
-
----
-
-## **GET /story**
-
-**Query Parameters**:
-
-- `timestamp` (Number, optional): Fetch stories newer than this timestamp.
-
-**Response**:
-
-```json
-{
-  "message": "Stories",
-  "success": true,
-  "stories": [
-    {
-      "id": "1",
-      "title": "Story Title",
-      "body": "This is the body of the story.",
-      "caption": "A caption",
-      "category": "Fiction",
-      "genre": "Drama",
-      "color": "#FFFFFF",
-      "backgroundImageIndex": 0,
-      "alignment": 0,
-      "createDate": 1609459200,
-      "updateDate": 1609459200,
-      "writer": {
-        "profileId": "12345",
-        "fullname": "John Doe",
-        "about": "A short bio",
-        "profileImageUrl": "https://example.com/image.jpg",
-        "username": "johndoe"
-      },
-      "likedByUser": true
-    }
-  ]
-}
-```
-
----
-
-## **POST /story/like**
-
-**Body Parameters**:
-
-- `storyId` (String, required): ID of the story.
-- `value` (Boolean, required): Tells whether you are liking or unliking the story (true to like, false to not like)
-
-**Response**:
-
-```json
-{
-  "message": "Liked",
-  "success": true
-}
-```
-
----
-
-## **GET /story/comments**
-
-**Query Parameters**:
-
-- `storyId` (String, required): ID of the story.
-- `timestamp` (Number, optional): Fetch comments newer than this timestamp.
-
-**Response**:
-
-```json
-{
-  "message": "Comments",
-  "success": true,
-  "comments": [
-    {
-      "id": "1",
-      "postId": "2",
-      "localId": "local123",
-      "body": "This is a comment.",
-      "createDate": 1609459200,
-      "writer": {
-        "profileId": "12345",
-        "fullname": "John Doe",
-        "about": "A short bio",
-        "profileImageUrl": "https://example.com/image.jpg",
-        "username": "johndoe"
-      }
-    }
-  ]
-}
-```
-
----
-
-## **POST /story/comments**
-
-**Body Parameters**:
-
-- `body` (String, required): Body of the comment.
-- `storyId` (String, required): ID of the story.
-- `localId` (String, optional): Local ID of the comment.
-
-**Response**:
-
-```json
-{
-  "message": "Commented",
-  "success": true,
-  "comment": {
-    "id": "1",
-    "postId": "2",
-    "localId": "local123",
-    "body": "This is a comment.",
-    "createDate": 1609459200,
-    "writer": {
-      "profileId": "12345",
-      "fullname": "John Doe",
-      "about": "A short bio",
-      "profileImageUrl": "https://example.com/image.jpg",
-      "username": "johndoe"
-    }
-  }
-}
-```
-
----
-
-## **POST /feedback**
-
-**Body Parameters**:
-
-- `message` (String, required): Message for feedback.
-
-**Response**:
-
-```json
-{
-  "message": "Feedback created",
-  "success": true,
-  "feedback": {
-    "id": "1",
-    "profileId": "2",
-    "message": "local123"
-  }
-}
-```
-
----
-
-## **POST /report/forum**
-
-To report on forums
-
-**Body Parameters**:
-
-- `reason` (String, required): Reason for report.
-- `forumId` (String, required): Forum Id of forum to report.
-
-**Response**:
-
-```json
-{
-  "message": "Report created",
-  "success": true,
-  "report": {
-    "id": "1",
-    "profileId": "2",
-    "reason": "local123"
-  }
-}
-```
-
----
-
-Based on the provided content, here are the endpoints that were missing from the previous API documentation:
-
----
-
-## **POST /admin/news**
-
-**Description**:It requires you to be **admin** to post news
-
-```
-ADMIN USERNAME: admin
-ADMIN PASSWORD: admin
-```
-
-**Body Parameters**:
-
-- `title` (String, required): Title of the news.
-- `body` (String, required): Body of the news.
-- `imageUrl` (String, optional): URL of the image.
-- `category` (String, required): Category of the news.
-- `newsUrl` (String, optional): URL of the full news article.
-
-**Response**:
-
-```json
-{
-  "message": "News created",
-  "success": true,
-  "news": {
-    "id": "1",
-    "title": "Breaking News",
-    "body": "This is the body of the news.",
-    "imageUrl": "https://example.com/image.jpg",
-    "category": "Politics",
-    "newsUrl": "https://example.com/news",
-    "timeStamp": 1609459200
-  }
-}
-```
-
----
-
-## **GET /test**
-
-**Description**: Returns the user object referenced to the session ID.  
-**Requires**: User must be logged in (`loggedIn` middleware).
-
-**Response**:
-
-```json
-{
-  "user": {
-    "profileId": "12345",
-    "fullname": "John Doe",
-    "about": "A short bio",
-    "profileImageUrl": "https://example.com/image.jpg"
-  }
-}
-```
-
----
-
-## **GET /reload-website**
-
-**Description**: Reloads the website by pulling the latest commit.  
-**Note**: Only for development purposes.
-
-**Response**:
-
-```text
-Restarting....
-```
-
----
-
-## **GET /delete-user**
-
-**Query Parameters**:
-
-- `email` (String, optional): Email of the user to delete.
-- `mobile` (String, optional): Mobile number of the user to delete.
-
-**Description**: Deletes a user account. If both `email` and `mobile` are provided, `email` takes precedence.
-
-**Response**:
-
-```json
-{
-  "message": "Deletion Successful",
-  "success": true
-}
-```
-
-OR
-
-```json
-{
-  "message": "No user like that to delete",
-  "success": false
-}
-```
+**Response status codes**
+
+- `200` : Request successful, forum reported
+- `400` :
+  - Required fields were not provided
+  - Invalid forum Id
+- `500` : Some error occured at server, contact admin.
 
 ---
