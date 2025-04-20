@@ -151,7 +151,8 @@ class ProfileService {
     const userId = body.get("userId");
     const id = body.get("profileId");
     const username = body.get("username");
-
+    
+    body.setFields(fields);
     body.removeNulDefined();
 
     let idCheck = idInvalidOrMissing(userId, "User");
