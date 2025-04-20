@@ -10,12 +10,12 @@ export default upload;
 export const compressToTargetSize = async (
   buffer,
   maxSizeKB = 200,
-  minQuality = 30
+  minQuality = 10
 ) => {
   let quality = 80;
   let outputBuffer;
 
-  for (; quality >= minQuality; quality -= 10) {
+  for (; quality >= minQuality; quality -= 5) {
     outputBuffer = await sharp(buffer)
       .resize({ width: 1000, withoutEnlargement: true }) // Optional: adjust width to help compression
       .jpeg({ quality })

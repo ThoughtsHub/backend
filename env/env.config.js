@@ -32,6 +32,8 @@ export const puppeteer = {
   executablePath: process.env.puppeteer_path,
 };
 
+export const maxImageSizeFile = "./env/max_image_size.config.txt";
+
 const env = { server, pg, redis, google, nodeEnv, puppeteer };
 
 export default env;

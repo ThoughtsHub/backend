@@ -3,8 +3,8 @@ import upload, { compressToTargetSize } from "../middlewares/uploads/upload.js";
 import logger from "../constants/logger.js";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
-import sharp from "sharp";
 import fs from "fs";
+import { maxImageSizeFile } from "../env/env.config.js";
 
 const router = Router();
 
@@ -13,6 +13,10 @@ router.use(upload.single("file"));
 router.post("/", async (req, res) => {
   const fileLocDir = "/uploads";
   const uploadPath = path.join("public", "uploads");
+
+  const size = Number(
+    fs.readFileSync(maxImageSizeFile, "ascii")
+  );
 
   try {
     const file = req.file;
@@ -30,7 +34,7 @@ router.post("/", async (req, res) => {
     const outputPath = path.join(uploadPath, fileName);
 
     // Step 3: Compress/resize image
-    const compressedBuffer = await compressToTargetSize(file.buffer, 60);
+    const compressedBuffer = await compressToTargetSize(file.buffer, size);
 
     // Step 4: Save the compressed image to disk
     fs.writeFileSync(outputPath, compressedBuffer);

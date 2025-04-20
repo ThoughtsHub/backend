@@ -7,6 +7,8 @@ import NewsService from "../services/news_service.js";
 import ForumsService from "../services/forums_service.js";
 import UserService from "../services/user_service.js";
 import ProfileService from "../services/profile_service.js";
+import fs from "fs";
+import { maxImageSizeFile } from "../env/env.config.js";
 
 const router = Router();
 
@@ -218,7 +220,7 @@ router.post("/users", async (req, res) => {
       return res.ok("User created", result);
 
     case SERVICE_CODE.REQ_FIELDS_MISSING:
-        console.log(result)
+      console.log(result);
       return res.failure(result);
 
     case SERVICE_CODE.ERROR:
@@ -328,6 +330,29 @@ router.put("/news", async (req, res) => {
       logger.error("News updation failed", result, req.user, {
         body: req.body.data,
       });
+  }
+});
+
+router.put("/max-image-size", async (req, res) => {
+  let size = req.body.get("size");
+  try {
+    size = Number(size);
+    if (size > 0) fs.writeFileSync(maxImageSizeFile, String(size));
+    else return res.failure("Invalid size");
+    return res.ok("Max size updated", { size });
+  } catch (err) {
+    logger.error("Image max size change failed", err, req.user, { size });
+    return res.serverError();
+  }
+});
+
+router.get("/max-image-size", async (req, res) => {
+  try {
+    const size = Number(fs.readFileSync(maxImageSizeFile, "ascii"));
+    return res.ok("Max Size", { size });
+  } catch (err) {
+    logger.error("Image max size get failed", err, req.user);
+    return res.serverError();
   }
 });
 
