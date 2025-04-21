@@ -26,4 +26,4 @@ logs
 tokens
 
 # image file size
-./env/max*.txt
+env/max*.txt
