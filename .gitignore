@@ -24,3 +24,6 @@ logs
 
 # whatsapp tokens
 tokens
+
+# image file size
+./env/max*.txt
