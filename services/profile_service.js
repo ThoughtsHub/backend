@@ -152,10 +152,10 @@ class ProfileService {
     if (!wAdminRights) {
       idCheck = idInvalidOrMissing(id, "Profile");
       if (idCheck !== false) return idCheck;
-
-      let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
-      if (reqFieldsCheck !== false) return reqFieldsCheck;
     }
+
+    let reqFieldsCheck = reqFieldsNotGiven(body, reqFields);
+    if (reqFieldsCheck !== false) return reqFieldsCheck;
 
     const t = await db.transaction();
     try {
