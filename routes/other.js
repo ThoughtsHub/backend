@@ -35,6 +35,10 @@ router.get("/check-username", async (req, res) => {
     const checkedUsername = usernameCheck(username);
     if (checkedUsername === false) return res.failure("Username invalid");
 
+    const reqUsername = req.user?.username;
+    if (checkedUsername === reqUsername)
+      return res.ok("Username is assigned to you", { isAvailable: true });
+
     if (await usernameAvailable(checkedUsername)) {
       logger.info("username available", req.user, {
         username,
