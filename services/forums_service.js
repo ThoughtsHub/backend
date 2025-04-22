@@ -5,7 +5,7 @@ import {
 } from "../constants/pagination.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { includeWriter } from "../constants/writer.js";
-import db from "../db/pg.js";
+import db, { randomOrder } from "../db/pg.js";
 import Forum from "../models/Forums.js";
 import ForumVote from "../models/ForumVote.js";
 import { parseFields } from "../utils/field_parser.js";
@@ -339,7 +339,6 @@ class ForumsService {
   };
 
   static getByTimestamp = async (body) => {
-    const timestamp = body.get("timestamp", null);
     const userLoggedIn = body.get("userLoggedIn", false);
     const profileId = body.get("profileId");
 
@@ -365,17 +364,39 @@ class ForumsService {
           ]
         : [];
 
-    const whereObj = body.isNumber("timestamp")
-      ? { [timestampsKeys.createdAt]: { [Op.gte]: timestamp } }
-      : {};
+    const timestamp = body.toNumber("timestamp", 0);
+    const whereObj =
+      timestamp !== 0
+        ? { [timestampsKeys.createdAt]: { [Op.gt]: timestamp } }
+        : {};
 
     try {
+      let offset = 0;
+      if (timestamp === 0) {
+        const { result } = await this.countAll();
+        offset =
+          result > 100
+            ? 100
+            : result - forumsLimitPerPage >= 0
+            ? result - forumsLimitPerPage
+            : offset;
+      }
+
       let forums = await Forum.findAll({
         where: { ...whereObj },
         limit: forumsLimitPerPage,
+        ...(timestamp === 0 ? { offset } : {}),
         order: [[timestampsKeys.createdAt, "DESC"]],
         include: [includeWriter, ...includeVoteObj],
       });
+
+      if (forums.length === 0) {
+        forums = await Forum.findAll({
+          order: randomOrder,
+          limit: forumsLimitPerPage,
+          include: [includeWriter, ...includeVoteObj],
+        });
+      }
 
       forums = forums.map((f) => {
         f = f.get({ plain: true });

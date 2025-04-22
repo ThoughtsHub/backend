@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
       return res.failure(result);
 
     case SERVICE_CODE.ERROR:
-      logger.error("News get failed", err, req.user, {
+      logger.error("News get failed", result, req.user, {
         type: "By Timestamp",
         body: req.query.data,
       });
@@ -37,7 +37,7 @@ router.get("/bo", async (req, res) => {
       return res.failure(result);
 
     case SERVICE_CODE.ERROR:
-      logger.error("News get failed", err, req.user, {
+      logger.error("News get failed", result, req.user, {
         type: "By Offset",
         body: req.query.data,
       });
@@ -58,7 +58,7 @@ router.get("/pages", async (req, res) => {
       return res.failure(result);
 
     case SERVICE_CODE.ERROR:
-      logger.error("News count failed", err, req.user, {
+      logger.error("News count failed", result, req.user, {
         body: req.query.data,
       });
       return res.serverError();
@@ -76,7 +76,7 @@ router.get("/:id", async (req, res) => {
       return res.failure(result);
 
     case SERVICE_CODE.ERROR:
-      logger.error("News get failed", err, req.user, {
+      logger.error("News get failed", result, req.user, {
         type: "By ID",
         id: req.params.id,
       });

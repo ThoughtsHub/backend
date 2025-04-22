@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import { newsLimitPerPage } from "../constants/pagination.js";
 import { timestampsKeys } from "../constants/timestamps.js";
-import db from "../db/pg.js";
+import db, { randomOrder } from "../db/pg.js";
 import News from "../models/News.js";
 import { parseFields } from "../utils/field_parser.js";
 import { sResult } from "../utils/service_return.js";
@@ -163,22 +163,45 @@ class NewsService {
 
   static getByTimestamp = async (body) => {
     const category = body.get("category", "All");
-    const timestamp = body.get("timestamp", null);
 
     if (typeof category !== "string")
       return sResult(SERVICE_CODE.NEWS_CATEGORY_INVALID, "Invalid category");
 
+    const timestamp = body.toNumber("timestamp", 0);
+    const whereObj =
+      timestamp !== 0
+        ? { [timestampsKeys.createdAt]: { [Op.gt]: timestamp } }
+        : {};
+
     try {
+      let offset = 0;
+      if (timestamp === 0) {
+        const { result } = await this.countAll(body);
+        offset =
+          result > 100
+            ? 100
+            : result - newsLimitPerPage >= 0
+            ? result - newsLimitPerPage
+            : offset;
+      }
+
       let news = await News.findAll({
         where: {
           ...(category === "All" ? {} : { category }), // category
-          ...(body.isNumber("timestamp")
-            ? { [timestampsKeys.createdAt]: { [Op.gte]: timestamp } } // >= timestamp
-            : {}),
+          ...whereObj,
         },
         limit: newsLimitPerPage,
+        ...(timestamp === 0 ? { offset } : {}),
         order: [[timestampsKeys.updatedAt, "DESC"]],
       });
+
+      if (news.length === 0) {
+        news = await News.findAll({
+          where: category === "All" ? {} : { category },
+          order: randomOrder,
+          limit: newsLimitPerPage,
+        });
+      }
 
       news = news.map((n) => n.get({ plain: true }));
 

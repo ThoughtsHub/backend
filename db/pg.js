@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { literal, Sequelize } from "sequelize";
 import { nodeEnv, pg } from "../env/env.config.js";
 
 const db = new Sequelize(pg.database, pg.username, pg.password, {
@@ -19,5 +19,7 @@ export const closePg = async () => {
 
   console.log("Closed Postgresql connection");
 };
+
+export const randomOrder = literal("RANDOM()");
 
 export default db;
