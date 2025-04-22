@@ -9,6 +9,7 @@ import UserService from "../services/user_service.js";
 import ProfileService from "../services/profile_service.js";
 import fs from "fs";
 import { maxImageSizeFile } from "../env/env.config.js";
+import Category from "../models/Category.js";
 
 const router = Router();
 
