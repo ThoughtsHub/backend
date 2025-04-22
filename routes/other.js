@@ -17,7 +17,12 @@ const reloadOptions = isWindows ? ["-File", scriptPath] : [scriptPath];
 const router = Router();
 
 router.get("/categories", async (req, res) => {
-  const categories = await Category.findAll();
+  let categories = await Category.findAll();
+
+  categories = categories.map((c) => {
+    c = c.get({ plain: true });
+    return c.name;
+  });
 
   return res.ok("Categories", { categories });
 });
