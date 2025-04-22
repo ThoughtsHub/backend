@@ -75,7 +75,8 @@ class ReqBody {
   toNumber = (field, def = 0) => {
     const value = this.get(field);
     try {
-      return this.isNumber(field) ? value : Number(value);
+      const numValue = this.isNumber(field) ? value : Number(value);
+      if (isNaN(numValue)) throw new Error("Not a number");
     } catch {
       return def ?? 0;
     }
