@@ -12,6 +12,14 @@ import { maxImageSizeFile } from "../env/env.config.js";
 
 const router = Router();
 
+router.get("/categories", async (req, res) => {
+  let categories = await Category.findAll();
+
+  categories = categories.map((c) => (c = c.get({ plain: true })));
+
+  return res.ok("Categories", { categories });
+});
+
 router.post("/categories", async (req, res) => {
   const { status, result } = await CategoryService.createNew(req.body);
 

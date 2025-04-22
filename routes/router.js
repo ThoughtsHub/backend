@@ -27,7 +27,7 @@ router.use("/feedback", FeedbackRouter);
 
 router.use("/admin", loggedAsAdmin, AdminRouter);
 
-router.get(["/admin-panel/", "/admin-panel/:other"], async (req, res) => {
+router.get(["/admin-panel/", "/admin-panel/:other", "/admin-panel/*"], async (req, res) => {
   res.sendFile("/dist/index.html", { root: "./public" });
 });
 
