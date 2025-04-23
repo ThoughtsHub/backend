@@ -130,7 +130,8 @@ router.get("/me", loggedIn, async (req, res) => {
 
 router.get("/forums", loggedIn, async (req, res) => {
   if (!isUUID(req.query.get("profileId")))
-    req.query.set("profileId", req.user.Profile.id);
+    req.query.set("profileId", req.user?.Profile?.id);
+  req.query.set("reqProfileId", req.user?.Profile?.id);
   const { status, result } = await ProfileService.getForumsByID(req.query);
 
   switch (status) {

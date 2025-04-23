@@ -352,8 +352,11 @@ class ProfileService {
   static getForumsByID = async (body) => {
     const profileId = body.get("profileId");
     const offset = body.toNumber("offset");
+    const profileIdOfRequester = body.get("reqProfileId");
 
     let idCheck = idInvalidOrMissing(profileId, "Profile");
+    if (idCheck !== false) return idCheck;
+    idCheck = idInvalidOrMissing(profileIdOfRequester, "Requester's Profile");
     if (idCheck !== false) return idCheck;
 
     try {
@@ -367,7 +370,7 @@ class ProfileService {
           {
             model: ForumVote,
             required: false,
-            where: { profileId, value: 1 },
+            where: { profileId: profileIdOfRequester, value: 1 },
           },
         ],
       });
