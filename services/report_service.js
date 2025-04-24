@@ -14,7 +14,7 @@ const { fields, reqFields } = parseFields(modelFields);
 class ReportService {
   static createNew = async (body) => {
     const profileId = body.get("profileId");
-    const forumId = body.get("forumId");
+    const forumId = body.get("postId");
     const userId = body.get("userId");
     body.setFields(fields);
 
