@@ -173,7 +173,7 @@ class NewsService {
       const areAllStrings = category.every((e) => typeof e === "string");
       if (!areAllStrings) throw new Error("Categories are not all strings");
     } catch (err) {
-      if (typeof category !== "string")
+      if (typeof category !== "string" && !Array.isArray(category))
         return sResult(SERVICE_CODE.NEWS_CATEGORY_INVALID, "Invalid category");
     }
 
