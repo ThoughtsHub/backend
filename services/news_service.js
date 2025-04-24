@@ -162,10 +162,19 @@ class NewsService {
   };
 
   static getByTimestamp = async (body) => {
-    const category = body.get("category", "All");
+    let category = body.get("categories", "[]");
+    category = body.get("category", category);
 
-    if (typeof category !== "string")
-      return sResult(SERVICE_CODE.NEWS_CATEGORY_INVALID, "Invalid category");
+    if (category === "All") category = "[]";
+
+    try {
+      category = JSON.parse(category);
+      const areAllStrings = category.every((e) => typeof e === "string");
+      if (!areAllStrings) throw new Error("Categories are not all strings");
+    } catch (err) {
+      if (typeof category !== "string")
+        return sResult(SERVICE_CODE.NEWS_CATEGORY_INVALID, "Invalid category");
+    }
 
     const timestamp = body.toNumber("timestamp", 0);
     const whereObj =
@@ -187,7 +196,7 @@ class NewsService {
 
       let news = await News.findAll({
         where: {
-          ...(category === "All" ? {} : { category }), // category
+          ...(category.length === 0 ? {} : { category }), // category
           ...whereObj,
         },
         limit: newsLimitPerPage,
@@ -197,7 +206,7 @@ class NewsService {
 
       if (news.length === 0) {
         news = await News.findAll({
-          where: category === "All" ? {} : { category },
+          where: category.length === 0 ? {} : { category },
           order: randomOrder,
           limit: newsLimitPerPage,
         });
