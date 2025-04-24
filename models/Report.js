@@ -6,7 +6,7 @@ const Report = db.define(
   "Report",
   {
     id: { ...types.ID },
-    reason: { ...types.STR_REQ },
+    reason: { ...types.STRING },
     userId: { ...types.UUID },
     forumId: { ...types.UUID },
     ...timestamps,

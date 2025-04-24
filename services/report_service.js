@@ -8,7 +8,7 @@ import {
 import { sResult } from "../utils/service_return.js";
 import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
-const modelFields = "reason* userId forumId";
+const modelFields = "reason userId forumId";
 const { fields, reqFields } = parseFields(modelFields);
 
 class ReportService {
