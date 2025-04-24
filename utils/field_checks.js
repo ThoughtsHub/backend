@@ -1,5 +1,5 @@
 const usernameRegex = /^[a-zA-Z][a-zA-Z0-9]{3,}$/;
-const fullNameRegex = /^[.]{3,}$/;
+const fullNameRegex = /^.{3,}$/;
 
 export const usernameCheck = (username) => {
   if (typeof username !== "string") return false;
