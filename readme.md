@@ -530,7 +530,7 @@ Gets the news, by using timestamp.
 
 ```js
 {
-  category: string { Required, default: "All" }
+  categories: string[] { Required, default: [] }
   timestamp: number { Required, default: 0 | null }
 }
 ```
@@ -1117,7 +1117,7 @@ Reports a forum
 
 ```js
 {
-  forumId: string { Required }
+  postId: string { Required }
   reason: string { Required }
 }
 ```
@@ -1145,7 +1145,7 @@ Reports a forum
 - `200` : Request successful, forum reported
 - `400` :
   - Required fields were not provided
-  - Invalid forum Id
+  - Invalid post Id
 - `500` : Some error occured at server, contact admin.
 
 ---
