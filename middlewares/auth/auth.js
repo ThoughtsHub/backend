@@ -13,8 +13,9 @@ export const setupAuth = async (userId) => {
   // unique user token
   const userToken = `${nowTime}-${randomUniqueString}-${userIdHash}`;
 
-  // expiry of 5 days
-  await client.setEx(userToken, 5 * 24 * 60 * 60, userId); // set userToken to userId
+  // removed expiry, mismatch between the frontend and backend
+  // the userToken will be valid till logout/deletion of account.
+  await client.set(userToken, userId); // set userToken to userId
 
   return userToken;
 };
