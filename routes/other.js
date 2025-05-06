@@ -6,6 +6,8 @@ import User from "../models/User.js";
 import { spawn } from "child_process";
 import Category from "../models/Category.js";
 import { usernameCheck } from "../utils/field_checks.js";
+import UserService from "../services/user_service.js";
+import { SERVICE_CODE } from "../utils/service_status_codes.js";
 
 const isWindows = process.platform === "win32";
 
@@ -15,6 +17,21 @@ const reloadProgram = isWindows ? "powershell.exe" : "bash";
 const reloadOptions = isWindows ? ["-File", scriptPath] : [scriptPath];
 
 const router = Router();
+
+router.get("/users", async (req, res) => {
+  const { status, result } = await UserService.getWAdminRights(req.query);
+
+  switch (status) {
+    case SERVICE_CODE.ACQUIRED:
+      return res.ok("Users found", result);
+
+    case SERVICE_CODE.ERROR:
+      logger.error("Users get failed", result, req.user, {
+        body: req.query.data,
+      });
+      return res.serverError();
+  }
+});
 
 router.get("/categories", async (req, res) => {
   let categories = await Category.findAll();
