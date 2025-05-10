@@ -17,7 +17,7 @@ import {
   reqFieldsNotGiven,
 } from "../utils/service_checks.js";
 
-const modelFields = "localId title* body*";
+const modelFields = "localId title* body* imageUrl";
 const { fields, reqFields } = parseFields(modelFields);
 
 const voteModelFields = "value*";

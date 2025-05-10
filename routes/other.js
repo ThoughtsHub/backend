@@ -19,7 +19,7 @@ const reloadOptions = isWindows ? ["-File", scriptPath] : [scriptPath];
 const router = Router();
 
 router.get("/users", async (req, res) => {
-  const { status, result } = await UserService.getWAdminRights(req.query);
+  const { status, result } = await UserService.get(req.query);
 
   switch (status) {
     case SERVICE_CODE.ACQUIRED:

@@ -719,6 +719,7 @@ Creates a forum post by the logged in user.
   localId: string
   title: number { Required }
   body: string { Required }
+  imageUrl: string
 }
 ```
 
@@ -759,6 +760,7 @@ Updates the forum completely.
   localId: string
   title: number { Required }
   body: string { Required }
+  imageUrl: string
 }
 ```
 
@@ -812,6 +814,7 @@ Gets the forums, by using timestamp.
             id: string
             localId: string
             profileId: string
+            imageUrl: string | null
             title: string
             body: string
             createDate: number
@@ -1146,6 +1149,49 @@ Reports a forum
 - `400` :
   - Required fields were not provided
   - Invalid post Id
+- `500` : Some error occured at server, contact admin.
+
+---
+
+### Users
+
+#### GET /users
+
+Gets suggested users
+
+**Query :**
+
+```js
+{
+  offset: number {default: 0}
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string
+  success: boolean
+  users: [
+            {
+                userId: string
+                profileId: string
+                username: string
+                fullName: string
+                about: string
+                profileImageUrl: string
+                gender: string
+                dob: string
+                ...
+            }
+         ]
+}
+```
+
+**Response status codes**
+
+- `200` : Request successful, users found
 - `500` : Some error occured at server, contact admin.
 
 ---

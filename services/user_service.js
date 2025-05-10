@@ -66,6 +66,29 @@ class UserService {
     }
   };
 
+  static get = async (body) => {
+    const offset = body.toNumber("offset");
+
+    try {
+      let users = await Profile.findAll({
+        where: {},
+        offset: offset * usersLimitPerPage,
+        limit: usersLimitPerPage,
+        order: [[timestampsKeys.updatedAt, "DESC"]],
+        include: [{ model: Profile }],
+      });
+      users = users.map((u) => {
+        u = u.get({ plain: true });
+        u.profileId = u.id;
+        delete u.id;
+      });
+
+      return sResult(SERVICE_CODE.ACQUIRED, { users });
+    } catch (err) {
+      return sResult(SERVICE_CODE.ERROR, err);
+    }
+  };
+
   static getWAdminRights = async (body) => {
     const offset = body.toNumber("offset");
 
