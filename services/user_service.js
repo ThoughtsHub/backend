@@ -71,7 +71,6 @@ class UserService {
 
     try {
       let users = await Profile.findAll({
-        where: {},
         offset: offset * usersLimitPerPage,
         limit: usersLimitPerPage,
         order: [[timestampsKeys.updatedAt, "DESC"]],
