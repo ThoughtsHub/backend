@@ -75,7 +75,6 @@ class UserService {
         offset: offset * usersLimitPerPage,
         limit: usersLimitPerPage,
         order: [[timestampsKeys.updatedAt, "DESC"]],
-        include: [{ model: Profile }],
       });
       users = users.map((u) => {
         u = u.get({ plain: true });
