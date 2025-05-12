@@ -79,6 +79,7 @@ class UserService {
         u = u.get({ plain: true });
         u.profileId = u.id;
         delete u.id;
+        return u;
       });
 
       return sResult(SERVICE_CODE.ACQUIRED, { users });
