@@ -1,4 +1,4 @@
-import { types } from "./db.js";
+import { types } from "./types.js";
 
 export const timestampsKeys = {
   createdAt: "createDate",

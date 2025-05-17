@@ -1,34 +1,22 @@
 import { Router } from "express";
-import { LoginRouter } from "./login.js";
-import { OtpRouter } from "./otp.js";
-import { TestRouter } from "./extras_testing.js";
-import { OtherRouter } from "./other.js";
-import { ProfileRouter } from "./profile.js";
-import { ForumsRouter } from "./forums.js";
-import { NewsRouter } from "./news.js";
-import { AdminRouter } from "./admin.js";
-import { loggedAsAdmin } from "../middlewares/auth/auth.js";
-import { UploadRouter } from "./upload.js";
-import { ReportRouter } from "./report.js";
-import { FeedbackRouter } from "./feedback.js";
+import { LoginRouter } from "./LoginRouter.js";
+import { OtpRouter } from "./OtpRouter.js";
+import { ProfileRouter } from "./ProfileRouter.js";
+import { ForumRouter } from "./ForumRouter.js";
+import { ReportRouter } from "./ReportRouter.js";
+import { FeedbackRouter } from "./FeedbackRouter.js";
+import { OtherRouter } from "./OtherRouter.js";
+import { NewsRouter } from "./NewsRouter.js";
 
 const router = Router();
 
 router.use("/", LoginRouter);
-router.use("/", TestRouter);
 router.use("/", OtherRouter);
 router.use("/otp", OtpRouter);
 router.use("/profile", ProfileRouter);
-router.use("/forums", ForumsRouter);
 router.use("/news", NewsRouter);
-router.use("/upload", UploadRouter);
+router.use("/forums", ForumRouter);
 router.use("/report", ReportRouter);
 router.use("/feedback", FeedbackRouter);
-
-router.use("/admin", loggedAsAdmin, AdminRouter);
-
-router.get(["/admin-panel/", "/admin-panel/:other", "/admin-panel/*"], async (req, res) => {
-  res.sendFile("/dist/index.html", { root: "./public" });
-});
 
 export const AppRouter = router;

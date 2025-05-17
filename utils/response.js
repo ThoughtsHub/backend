@@ -1,4 +1,5 @@
 import { response } from "express";
+import { RC } from "./codes.js";
 
 response.modSend = function (
   message,
@@ -9,24 +10,28 @@ response.modSend = function (
   this.status(statusCode).json({ message, success, ...otherData });
 };
 
-response.failure = function (message, statusCode = 400, otherData = {}) {
+response.failure = function (
+  message,
+  statusCode = RC.BAD_REQUEST,
+  otherData = {}
+) {
   this.modSend(message, statusCode, false, otherData);
 };
 
 response.ok = function (message, otherData = {}) {
-  this.modSend(message, 200, true, otherData);
+  this.modSend(message, RC.OK, true, otherData);
 };
 
 response.serverError = function () {
-  this.modSend("Internal Server Error", 500, false);
+  this.modSend("Internal Server Error", RC.INTERNAL_SERVER_ERROR, false);
 };
 
 response.created = function (message, otherData = {}) {
-  this.modSend(message, 201, true, otherData);
+  this.modSend(message, RC.CREATED, true, otherData);
 };
 
 response.unauth = function (message, otherData = {}) {
-  this.modSend(message, 401, false, otherData);
+  this.modSend(message, RC.UNAUTHORIZED, false, otherData);
 };
 
 response.deleted = function () {
@@ -34,9 +39,9 @@ response.deleted = function () {
 };
 
 response.conflict = function (message, otherData = {}) {
-  this.modSend(message, 409, false, otherData);
+  this.modSend(message, RC.CONFLICT, false, otherData);
 };
 
 response.forbidden = function (message, otherData = {}) {
-  this.modSend(message, 403, false, otherData);
+  this.modSend(message, RC.FORBIDDEN, false, otherData);
 };

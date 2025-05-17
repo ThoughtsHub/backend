@@ -1,0 +1,16 @@
+import db from "../db/pg.js";
+import { forumAssociation } from "./forumAssociations.js";
+import { NewsAssociation } from "./newsAssociations.js";
+import { profileAssociation } from "./profileAssociations.js";
+import { userAssociation } from "./userAssociations.js";
+import Activity from "../models/Activity.js";
+import Log from "../models/Log.js";
+
+export const initLink = async () => {
+  userAssociation();
+  profileAssociation();
+  forumAssociation();
+  NewsAssociation();
+
+  await db.sync({ alter: true });
+};

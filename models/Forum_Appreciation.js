@@ -2,30 +2,24 @@ import { types } from "../constants/types.js";
 import { hooks, timestamps } from "../constants/timestamps.js";
 import db from "../db/pg.js";
 import Profile from "./Profile.js";
+import Forum from "./Forum.js";
 
-export const status = {
-  PENDING: "Pending",
-  CHECKED: "Checked",
-  USED: "Used",
-};
-
-const Feedback = db.define(
-  "Feedback",
+const ForumAppreciation = db.define(
+  "ForumAppreciation",
   {
     id: { ...types.ID },
     profileId: {
-      ...types.FOREIGN_ID,
+      ...types.FOREIGN_ID_REQ,
       references: { model: Profile, key: "id" },
     },
-    message: { ...types.STR_REQ },
-    status: {
-      ...types.ENUM,
-      values: Object.values(status),
-      defaultValue: status.PENDING,
+    forumId: {
+      ...types.FOREIGN_ID_REQ,
+      references: { model: Forum, key: "id" },
     },
+    value: { ...types.INTEGER_REQ, defaultValue: 1 },
     ...timestamps,
   },
   { hooks }
 );
 
-export default Feedback;
+export default ForumAppreciation;

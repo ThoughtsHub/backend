@@ -2,14 +2,16 @@ import { types } from "../constants/types.js";
 import { hooks, timestamps } from "../constants/timestamps.js";
 import db from "../db/pg.js";
 
-const Category = db.define(
-  "Category",
+const Activity = db.define(
+  "Activity",
   {
     id: { ...types.ID },
-    name: { ...types.UNIQUE_STR_REQ },
+    type: { ...types.STR_REQ },
+    title: { ...types.STR_REQ },
+    description: { ...types.TEXT },
     ...timestamps,
   },
   { hooks }
 );
 
-export default Category;
+export default Activity;

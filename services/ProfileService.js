@@ -1,0 +1,230 @@
+import db from "../db/pg.js";
+import Profile from "../models/Profile.js";
+import Forum from "../models/Forum.js";
+import { serviceCodes, sRes } from "../utils/services.js";
+import { Validate } from "./ValidationService.js";
+import { isNumber } from "../utils/checks.js";
+import { timestampsKeys } from "../constants/timestamps.js";
+import { includeAppreciation, includeWriter } from "../constants/include.js";
+import { Op } from "sequelize";
+
+class ProfileService {
+  static forumsLimit = 30;
+  static usersLimit = 30;
+
+  static create = async (
+    fullName,
+    about,
+    gender,
+    profileImageUrl = "",
+    dob,
+    username,
+    userId
+  ) => {
+    if (!Validate.fullName(fullName))
+      return sRes(codes.BAD_FULLNAME, { fullName });
+
+    if (!Validate.about(about)) return sRes(codes.BAD_ABOUT, { about });
+
+    if (!Validate.gender(gender)) return sRes(codes.BAD_GENDER, { gender });
+
+    if (!Validate.profileImageUrl(profileImageUrl))
+      return sRes(codes.BAD_PFP, { profileImageUrl });
+
+    if (!Validate.dob(dob)) return sRes(codes.BAD_DOB, { dob });
+
+    if (!Validate.username(username))
+      return sRes(codes.BAD_USERNAME, { username });
+
+    if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
+
+    try {
+      let profile = await Profile.create({
+        fullName,
+        about,
+        gender,
+        dob,
+        profileImageUrl,
+        username,
+        userId,
+      });
+      profile = profile.get({ plain: true });
+
+      return sRes(serviceCodes.OK, { profile });
+    } catch (err) {
+      return sRes(
+        serviceCodes.DB_ERR,
+        { fullName, about, gender, dob, profileImageUrl, username, userId },
+        err
+      );
+    }
+  };
+
+  static update = async (values, profileId) => {
+    const valuesToBeUpdated = {};
+    for (const key in values) {
+      const val = values[key];
+      switch (key) {
+        case "fullName":
+          if (Validate.fullName(val)) valuesToBeUpdated.fullName = val;
+          break;
+
+        case "about":
+          if (Validate.about(val)) valuesToBeUpdated.about = val;
+          break;
+
+        case "gender":
+          if (Validate.gender(val)) valuesToBeUpdated.gender = val;
+          break;
+
+        case "dob":
+          if (Validate.dob(val)) valuesToBeUpdated.dob = val;
+          break;
+
+        case "profileImageUrl":
+          if (Validate.profileImageUrl(val))
+            valuesToBeUpdated.profileImageUrl = val;
+          break;
+
+        case "username":
+          if (Validate.username(val)) valuesToBeUpdated.username = val;
+          break;
+      }
+    }
+
+    const t = await db.transaction();
+    try {
+      const [updateResult] = await Profile.update(valuesToBeUpdated, {
+        where: { id: profileId },
+        individualHooks: true,
+      });
+
+      if (updateResult !== 1) {
+        await t.rollback();
+        return sRes(codes.BAD_UPDATE, { values, profileId });
+      }
+
+      let profile = await Profile.findByPk(profileId);
+      profile = profile.get({ plain: true });
+
+      await t.commit();
+      return sRes(serviceCodes.OK, { profile });
+    } catch (err) {
+      await t.rollback();
+      return sRes(serviceCodes.DB_ERR, { values, profileId }, err);
+    }
+  };
+
+  static usernameAvailable = async (username) => {
+    if (!Validate.username(username))
+      return sRes(codes.BAD_USERNAME, { username });
+
+    try {
+      const user = await Profile.findOne({ where: { username } });
+      const available = user === null;
+
+      return sRes(serviceCodes.OK, available);
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { username }, err);
+    }
+  };
+
+  static getById = async (profileId) => {
+    if (!Validate.id(profileId))
+      return sRes(serviceCodes.BAD_ID, { profileId });
+
+    try {
+      let profile = await Profile.findByPk(profileId);
+
+      if (profile !== null) {
+        profile = profile.get({ plain: true });
+        profile.profileId = profile.id;
+        delete profile.id;
+      }
+
+      return sRes(serviceCodes.OK, { profile });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { profileId }, err);
+    }
+  };
+
+  static getByUserId = async (userId) => {
+    if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
+
+    try {
+      let profile = await Profile.findOne({ where: { userId } });
+      profile = profile?.get({ plain: true });
+
+      return sRes(serviceCodes.OK, { profile });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { profileId }, err);
+    }
+  };
+
+  static getForums = async (profileId, requesterProfileId, offset) => {
+    if (!Validate.id(profileId))
+      return sRes(serviceCodes.BAD_ID, { profileId });
+    if (
+      !Validate.id(requesterProfileId) &&
+      ![null, undefined].includes(requesterProfileId)
+    )
+      return sRes(serviceCodes.BAD_ID, { requesterProfileId });
+
+    if (!isNumber(offset)) offset = 0;
+
+    try {
+      let forums = await Forum.findAll({
+        where: { profileId },
+        offset,
+        limit: this.forumsLimit,
+        order: [[timestampsKeys.createdAt, "desc"]],
+        include: [null, undefined].includes(requesterProfileId)
+          ? [includeWriter]
+          : [includeWriter, includeAppreciation(requesterProfileId)],
+      });
+      forums = forums.map((f) => {
+        f = f.get({ plain: true });
+        f.isVoted =
+          Array.isArray(f.appreciations_) && f.appreciations_.length === 1;
+        delete f.appreciations_;
+        return f;
+      });
+
+      return sRes(serviceCodes.OK, { forums });
+    } catch (err) {
+      return sRes(
+        serviceCodes.DB_ERR,
+        { profileId, requesterProfileId, offset },
+        err
+      );
+    }
+  };
+
+  static getAll = async (offset) => {
+    try {
+      const users = await Profile.findAll({
+        where: { [Op.not]: { username: "admin" } }, // should not list admins in the users list
+        offset,
+        limit: this.usersLimit,
+        order: [[timestampsKeys.createdAt, "desc"]],
+      });
+
+      return sRes(serviceCodes.OK, { users });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { offset }, err);
+    }
+  };
+}
+
+// Profile service response codes
+export const codes = {
+  BAD_FULLNAME: "Bad Fullname",
+  BAD_ABOUT: "Bad About",
+  BAD_GENDER: "Bad Gender",
+  BAD_USERNAME: "Bad Username",
+  BAD_PFP: "Bad ProfileImageUrl",
+  BAD_DOB: "Bad Date of Birth",
+  BAD_UPDATE: "Bad Update",
+};
+
+export const Profile_ = ProfileService;

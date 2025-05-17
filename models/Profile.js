@@ -1,12 +1,14 @@
-import { types } from "../constants/db.js";
+import { types } from "../constants/types.js";
 import { hooks, timestamps } from "../constants/timestamps.js";
 import db from "../db/pg.js";
+import User from "./User.js";
 
 const Profile = db.define(
   "Profile",
   {
     id: { ...types.ID },
-    username: { ...types.STRING },
+    userId: { ...types.FOREIGN_ID_REQ, references: { model: User, key: "id" } },
+    username: { ...types.UNIQUE_STR_REQ },
     fullName: { ...types.STR_REQ },
     about: { ...types.TEXT_REQ },
     profileImageUrl: { ...types.STRING },
@@ -14,8 +16,7 @@ const Profile = db.define(
     dob: { ...types.BIGINT },
     followers: { ...types.INT_REQ_0 },
     following: { ...types.INT_REQ_0 },
-    storyCount: { ...types.INT_REQ_0 },
-    forumsCount: { ...types.INT_REQ_0 },
+    forums: { ...types.INT_REQ_0 },
     ...timestamps,
   },
   { hooks }
