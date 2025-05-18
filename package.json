@@ -17,7 +17,7 @@
     "scripts": {
         "start": "node app.js",
         "dev": "nodemon --signal SIGINT app.js",
-        "test": "vitest"
+        "test": "node ./tests/routesTest.js"
     },
     "dependencies": {
         "bcryptjs": "^3.0.2",
@@ -36,8 +36,10 @@
         "uuid": "^11.1.0"
     },
     "devDependencies": {
+        "chalk": "^5.4.1",
         "dotenv": "^16.4.7",
         "nodemon": "^3.1.9",
+        "prompt-sync": "^4.2.0",
         "vitest": "^3.1.1"
     }
 }

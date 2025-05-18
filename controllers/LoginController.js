@@ -1,7 +1,7 @@
 import { logBad, logOk, logServerErr } from "../services/LogService.js";
 import { User_ } from "../services/UserService.js";
 import { Profile_ } from "../services/ProfileService.js";
-import { serviceCodes } from "../utils/services.js";
+import { serviceCodes, serviceResultBadHandler } from "../utils/services.js";
 import { setupAuth } from "../middlewares/auth.js";
 import activity from "../services/ActivityService.js";
 import client from "../db/redis.js";
@@ -14,20 +14,23 @@ class LoginController {
       let result = null; // check with email and password
       {
         result = await User_.getByEmailAndPassword(email, password);
-        if (result.code !== serviceCodes.OK)
+        if (
+          ![User_.codes.INCORRECT_PASS[0], serviceCodes.OK[0]].includes(
+            result.code
+          )
+        )
           result = await User_.getByUsernameAndPassword(email, password);
       }
 
-      if (result.code !== serviceCodes.OK) {
-        logBad("Login failed", `Error Message: ${result.code}`, result.info);
-        return res.failure(result.code);
-      }
+      if (serviceResultBadHandler(result, res, "Login failed")) return;
 
       const userId = result.info.user.id;
 
       result = await Profile_.getByUserId(userId);
-      const user = result.info.profile;
+      if (serviceResultBadHandler(result, res, "User information get failed"))
+        return;
 
+      const user = result.info.profile;
       const authToken = await setupAuth(userId);
 
       res.ok("Login success", { auth_token: authToken, user });
@@ -52,7 +55,7 @@ class LoginController {
       activity("Logout", "A user logged out");
     } catch (err) {
       logServerErr(err);
-      return res.serverError();
+      res.serverError();
     }
   };
 
@@ -76,10 +79,9 @@ class LoginController {
       const [givenField, contact] = otpTokenValue.split(":");
 
       const result = await User_.create(contact, password);
-      if (result.code !== serviceCodes.OK) {
-        logBad("Signup failed", `Reason: ${result.code}`, result.info);
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Create Password failed"))
+        return;
 
       const userId = result.info.user.id;
       const authToken = await setupAuth(userId);

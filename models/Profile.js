@@ -7,10 +7,13 @@ const Profile = db.define(
   "Profile",
   {
     id: { ...types.ID },
-    userId: { ...types.FOREIGN_ID_REQ, references: { model: User, key: "id" } },
+    userId: {
+      ...types.UNIQUE_FOREIGN_ID_REQ,
+      references: { model: User, key: "id" },
+    },
     username: { ...types.UNIQUE_STR_REQ },
     fullName: { ...types.STR_REQ },
-    about: { ...types.TEXT_REQ },
+    about: { ...types.TEXT },
     profileImageUrl: { ...types.STRING },
     gender: { ...types.STRING },
     dob: { ...types.BIGINT },

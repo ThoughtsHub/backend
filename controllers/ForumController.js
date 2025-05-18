@@ -1,9 +1,10 @@
 import activity from "../services/ActivityService.js";
 import { Forum_ } from "../services/ForumService.js";
 import { ForumComment_ } from "../services/ForumCommentService.js";
-import { logBad, logOk, logServerErr } from "../services/LogService.js";
+import { logOk, logServerErr } from "../services/LogService.js";
 import { toNumber } from "../utils/number.js";
-import { serviceCodes } from "../utils/services.js";
+import { serviceResultBadHandler } from "../utils/services.js";
+import { toString } from "../utils/string.js";
 
 class ForumController {
   static create = async (req, res) => {
@@ -18,14 +19,8 @@ class ForumController {
         body.imageUrl,
         profileId
       );
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Forum creation failed",
-          `A user failed to create a forum; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Forum creation failed")) return;
 
       const forum = result.info.forum;
 
@@ -44,14 +39,8 @@ class ForumController {
 
     try {
       let result = await Forum_.update(req.body, profileId, req.body.id);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Forum updation failed",
-          `A user failed to update a forum; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Forum updation failed")) return;
 
       const forum = result.info.forum;
 
@@ -67,20 +56,12 @@ class ForumController {
 
   static delete = async (req, res) => {
     const profileId = req.user.profile.id;
-    let forumId = req.query.forumId;
-
-    forumId = forumId.split("|");
+    let forumId = toString(req.query.forumId).split("|");
 
     try {
       let result = await Forum_.delete(forumId, profileId);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Forum deletion failed",
-          `A user failed to delete forums; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Forum deletion failed")) return;
 
       res.ok("Forum deleted");
 
@@ -93,22 +74,15 @@ class ForumController {
   };
 
   static get = async (req, res) => {
-    let { timestamp } = req.query;
-    timestamp = toNumber(timestamp);
+    let timestamp = toNumber(req.query.timestamp);
 
     try {
       let result = await Forum_.getByTimestamp(
         timestamp,
         req?.user?.profile?.id
       );
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Forum fetch failed",
-          `A user failed to delete forums; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Forums fetch failed")) return;
 
       const forums = result.info.forums;
 
@@ -131,14 +105,9 @@ class ForumController {
       let result = await (value
         ? Forum_.appreciate(forumId, profileId)
         : Forum_.unappreciate(forumId, profileId));
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Forum appreciation failed",
-          `A user failed to appreciate forum; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Forums appreciation failed"))
+        return;
 
       res.ok(`${value ? "A" : "Una"}ppreciated forum`);
 
@@ -167,14 +136,9 @@ class ForumController {
         body.forumId,
         profileId
       );
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Comment on forum failed",
-          `A user failed to comment on forum; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Comment on forum failed"))
+        return;
 
       const comment = result.info.comment;
 
@@ -198,14 +162,9 @@ class ForumController {
         req.body.forumId,
         profileId
       );
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Comment update on forum failed",
-          `A user failed to update its comment on forum; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Comment updation failed"))
+        return;
 
       const comment = result.info.comment;
 
@@ -226,14 +185,9 @@ class ForumController {
     const profileId = req.user.profile.id;
     try {
       let result = await ForumComment_.deleteOne(commentId, profileId);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Comment delete on forum failed",
-          `A user failed to delete its comment on forum; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Comment deletion failed"))
+        return;
 
       res.ok("Deleted");
 
@@ -251,14 +205,8 @@ class ForumController {
 
     try {
       let result = await ForumComment_.getByTimestamp(timestamp, forumId);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Comment delete on forum failed",
-          `A user failed to delete its comment on forum; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Comments fetch failed")) return;
 
       const comments = result.info.comments;
 

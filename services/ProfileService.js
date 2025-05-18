@@ -9,6 +9,25 @@ import { includeAppreciation, includeWriter } from "../constants/include.js";
 import { Op } from "sequelize";
 
 class ProfileService {
+  // Profile service response codes
+  static codes = {
+    BAD_FULLNAME: [
+      "Bad Fullname",
+      "Full name should at least contain 3 letters",
+    ],
+    BAD_ABOUT: ["Bad About", "Invalid about"],
+    BAD_GENDER: ["Bad Gender", `Gender can only be Male, Female or Other`],
+    BAD_USERNAME: [
+      "Bad Username",
+      "Invalid username, username cannot contain special characters and should at least contain 3 letters",
+    ],
+    BAD_PFP: ["Bad ProfileImageUrl", "Invalid url"],
+    BAD_DOB: [
+      "Bad Date of Birth",
+      "Current age should be in between 15-80 years old",
+    ],
+  };
+
   static forumsLimit = 30;
   static usersLimit = 30;
 
@@ -22,19 +41,20 @@ class ProfileService {
     userId
   ) => {
     if (!Validate.fullName(fullName))
-      return sRes(codes.BAD_FULLNAME, { fullName });
+      return sRes(this.codes.BAD_FULLNAME, { fullName });
 
-    if (!Validate.about(about)) return sRes(codes.BAD_ABOUT, { about });
+    if (!Validate.about(about)) return sRes(this.codes.BAD_ABOUT, { about });
 
-    if (!Validate.gender(gender)) return sRes(codes.BAD_GENDER, { gender });
+    if (!Validate.gender(gender))
+      return sRes(this.codes.BAD_GENDER, { gender });
 
     if (!Validate.profileImageUrl(profileImageUrl))
-      return sRes(codes.BAD_PFP, { profileImageUrl });
+      return sRes(this.codes.BAD_PFP, { profileImageUrl });
 
-    if (!Validate.dob(dob)) return sRes(codes.BAD_DOB, { dob });
+    if (!Validate.dob(dob)) return sRes(this.codes.BAD_DOB, { dob });
 
     if (!Validate.username(username))
-      return sRes(codes.BAD_USERNAME, { username });
+      return sRes(this.codes.BAD_USERNAME, { username });
 
     if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
 
@@ -101,7 +121,7 @@ class ProfileService {
 
       if (updateResult !== 1) {
         await t.rollback();
-        return sRes(codes.BAD_UPDATE, { values, profileId });
+        return sRes(serviceCodes.DB_ERR, { values, profileId });
       }
 
       let profile = await Profile.findByPk(profileId);
@@ -117,7 +137,7 @@ class ProfileService {
 
   static usernameAvailable = async (username) => {
     if (!Validate.username(username))
-      return sRes(codes.BAD_USERNAME, { username });
+      return sRes(this.codes.BAD_USERNAME, { username });
 
     try {
       const user = await Profile.findOne({ where: { username } });
@@ -170,8 +190,6 @@ class ProfileService {
     )
       return sRes(serviceCodes.BAD_ID, { requesterProfileId });
 
-    if (!isNumber(offset)) offset = 0;
-
     try {
       let forums = await Forum.findAll({
         where: { profileId },
@@ -215,16 +233,5 @@ class ProfileService {
     }
   };
 }
-
-// Profile service response codes
-export const codes = {
-  BAD_FULLNAME: "Bad Fullname",
-  BAD_ABOUT: "Bad About",
-  BAD_GENDER: "Bad Gender",
-  BAD_USERNAME: "Bad Username",
-  BAD_PFP: "Bad ProfileImageUrl",
-  BAD_DOB: "Bad Date of Birth",
-  BAD_UPDATE: "Bad Update",
-};
 
 export const Profile_ = ProfileService;

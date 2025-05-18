@@ -1,22 +1,37 @@
 import { includeWriter } from "../constants/include.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
-import Feedback from "../models/Feedback.js";
+import Feedback, { status } from "../models/Feedback.js";
 import { isNumber } from "../utils/checks.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 
-const feedbacksLimit = 30;
-
 class FeedbackService {
+  // Feedback service response codes
+  static codes = {
+    BAD_MESSAGE: [
+      "Bad Message",
+      "Invalid message for a feedback, should contain atleast one letter",
+    ],
+    BAD_STATUS: [
+      "Bad Status",
+      `Status can only be from these values: ${Object.values(status).join(
+        ", "
+      )}`,
+    ],
+  };
+
+  static feedbacksLimit = 30;
+
   static create = async (message, status, profileId) => {
-    if (!Validate.message(message)) return sRes(codes.BAD_MESSAGE, { message });
+    if (!Validate.message(message))
+      return sRes(this.codes.BAD_MESSAGE, { message });
 
     if (!Validate.id(profileId) && ![null, undefined].includes(profileId))
       return sRes(serviceCodes.BAD_ID, { profileId });
 
     if (!Validate.feedbackStatus(status))
-      return sRes(codes.BAD_STATUS, { status });
+      return sRes(this.codes.BAD_STATUS, { status });
 
     try {
       let feedback = await Feedback.create({
@@ -103,7 +118,6 @@ class FeedbackService {
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
-    if (!isNumber(offset)) offset = 0;
 
     const whereObj = {};
     for (const key in values) {
@@ -127,7 +141,7 @@ class FeedbackService {
       let feedbacks = await Feedback.findAll({
         where: { ...whereObj },
         offset,
-        limit: feedbacksLimit,
+        limit: this.feedbacksLimit,
         order: orderFields,
         include: [includeWriter],
       });
@@ -142,18 +156,12 @@ class FeedbackService {
   static getPages = async () => {
     try {
       const totalCount = await Feedback.count();
-      const totalPages = Math.ceil(totalCount / feedbacksLimit);
+      const totalPages = Math.ceil(totalCount / this.feedbacksLimit);
       return sRes(serviceCodes.OK, { totalPages });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, null, err);
     }
   };
 }
-
-// Feedback service response codes
-export const codes = {
-  BAD_MESSAGE: "Bad Message",
-  BAD_STATUS: "Bad Status",
-};
 
 export const Feedback_ = FeedbackService;

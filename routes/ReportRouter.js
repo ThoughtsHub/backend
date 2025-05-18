@@ -4,6 +4,6 @@ import ReportController from "../controllers/ReportController.js";
 
 const router = Router();
 
-router.post("/", loggedIn, haveProfile, ReportController.create)
+router.post("/forum", loggedIn, haveProfile, ReportController.create)
 
 export const ReportRouter = router;

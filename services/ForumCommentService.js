@@ -8,14 +8,21 @@ import { timestampsKeys } from "../constants/timestamps.js";
 import { includeWriter } from "../constants/include.js";
 import { Op } from "sequelize";
 
-const commentsLimit = 30;
-
 class ForumCommentService {
-  static create = async (localId, body, forumId, profileId) => {
-    localId = localId ?? null;
-    if (!Validate.body(body)) return sRes(codes.BAD_BODY, { body });
+  // Forum comment service response codes
+  static codes = {
+    BAD_BODY: ["Bad Body", "Comment cannot be empty"],
+    BAD_ASSOCIATION: ["Bad Association", "Comment doesn't belong to you"],
+    BAD_LOCALID: ["Bad LocalId", "Invalid localId, should be a string"],
+  };
 
-    if (!Validate.localId(localId)) return sRes(codes.BAD_LOCALID, { localId });
+  static commentsLimit = 30;
+
+  static create = async (localId, body, forumId, profileId) => {
+    if (!Validate.body(body)) return sRes(this.codes.BAD_BODY, { body });
+
+    if (!Validate.localId(localId))
+      return sRes(this.codes.BAD_LOCALID, { localId });
 
     if (!Validate.id(forumId)) return sRes(serviceCodes.BAD_ID, { forumId });
     if (!Validate.id(profileId))
@@ -88,7 +95,7 @@ class ForumCommentService {
 
       if (updateResult !== 1) {
         await t.rollback();
-        return sRes(codes.BAD_ASSOCIATION, {
+        return sRes(this.codes.BAD_ASSOCIATION, {
           body,
           forumId,
           profileId,
@@ -134,7 +141,11 @@ class ForumCommentService {
 
       if (destroyResult !== 1) {
         await t.rollback();
-        return sRes(codes.BAD_ASSOCIATION, { commentId, profileId, forumId });
+        return sRes(this.codes.BAD_ASSOCIATION, {
+          commentId,
+          profileId,
+          forumId,
+        });
       }
 
       const [[_, updateResult]] = await Forum.decrement(
@@ -176,7 +187,11 @@ class ForumCommentService {
 
       if (destroyResult !== 1) {
         await t.rollback();
-        return sRes(codes.BAD_ASSOCIATION, { commentIds, profileId, forumId });
+        return sRes(this.codes.BAD_ASSOCIATION, {
+          commentIds,
+          profileId,
+          forumId,
+        });
       }
 
       const [_, updateResult] = await Forum.decrement(
@@ -202,8 +217,6 @@ class ForumCommentService {
   };
 
   static getByTimestamp = async (timestamp, forumId) => {
-    if (!isNumber(timestamp)) timestamp = 0;
-
     if (!Validate.id(forumId)) return sRes(serviceCodes.BAD_ID, { forumId });
 
     const whereObjTimestamp = {
@@ -215,7 +228,7 @@ class ForumCommentService {
         where: { forumId, ...whereObjTimestamp },
         order: [[timestampsKeys.createdAt, "desc"]],
         include: [includeWriter],
-        limit: commentsLimit,
+        limit: this.commentsLimit,
       });
 
       comments = comments.map((c) => c.get({ plain: true }));
@@ -231,8 +244,6 @@ class ForumCommentService {
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
-    if (!isNumber(offset)) offset = 0;
-
     const whereObj = {};
     for (const key in values) {
       const val = values[key];
@@ -259,7 +270,7 @@ class ForumCommentService {
       let comments = await ForumComment.findAll({
         where: { ...whereObj },
         offset,
-        limit: commentsLimit,
+        limit: this.commentsLimit,
         order: orderFields,
         include: [
           includeWriter,
@@ -284,19 +295,12 @@ class ForumCommentService {
   static getPages = async () => {
     try {
       const totalCount = await ForumComment.count();
-      const totalPages = Math.ceil(totalCount / commentsLimit);
+      const totalPages = Math.ceil(totalCount / this.commentsLimit);
       return sRes(serviceCodes.OK, { totalPages });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, null, err);
     }
   };
 }
-
-// Forum comment service response codes
-export const codes = {
-  BAD_BODY: "Bad Body",
-  BAD_ASSOCIATION: "Bad Association",
-  BAD_LOCALID: "Bad LocalId",
-};
 
 export const ForumComment_ = ForumCommentService;

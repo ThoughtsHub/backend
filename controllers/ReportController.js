@@ -1,8 +1,8 @@
 import { priority, status } from "../models/Report_Forum.js";
 import { Report } from "../services/ReportService.js";
-import { serviceCodes } from "../utils/services.js";
 import { logBad, logServerErr } from "../services/LogService.js";
 import activity from "../services/ActivityService.js";
+import { serviceResultBadHandler } from "../utils/services.js";
 
 class ReportController {
   static create = async (req, res) => {
@@ -17,14 +17,9 @@ class ReportController {
         forumId,
         profileId
       );
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Report forum failed",
-          `A user failed to report on a forum; \nReason: ${result.code}`,
-          { info: result.info, forumId, profileId, reason }
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Report on forum failed"))
+        return;
 
       const report = result.info.report;
 

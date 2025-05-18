@@ -1,30 +1,37 @@
 import activity from "../services/ActivityService.js";
-import log, { logBad, logOk, logServerErr } from "../services/LogService.js";
+import { logOk, logServerErr } from "../services/LogService.js";
 import { Profile_ } from "../services/ProfileService.js";
+import { User_ } from "../services/UserService.js";
 import { toNumber } from "../utils/number.js";
-import { serviceCodes } from "../utils/services.js";
+import { serviceResultBadHandler } from "../utils/services.js";
 
 class ProfileController {
   static checkUsername = async (req, res) => {
     const { username } = req.query;
+    const requesterUsername = req?.user?.profile?.username;
 
     try {
-      let result = await Profile_.usernameAvailable(username);
-      if (result.code !== serviceCodes.OK) {
-        logBad("Check failed", "Username availability check failed");
-        return res.failure(result.code, { isAvailable: false });
+      let available = false;
+      if (username === requesterUsername) available = true;
+      else {
+        let result = await Profile_.usernameAvailable(username);
+
+        if (serviceResultBadHandler(result, res, "Username check failed"))
+          return;
+
+        available = result.info;
       }
 
-      const available = result.info;
-
-      res.ok(`Username ${available ? "A" : "Una"}vailable`, {
-        isAvailable: available,
-      });
+      if (available)
+        res.ok("Username Available", {
+          isAvailable: available,
+        });
+      else res.failure("Username Unavailable", 409, { isAvailable: available });
 
       logOk(
         "Username check",
         "Someone checked if a certain username is available or not",
-        { username }
+        { username, isAvailable: available }
       );
     } catch (err) {
       logServerErr(err);
@@ -46,14 +53,9 @@ class ProfileController {
         body.username,
         userId
       );
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Profile Creation failed",
-          `Reason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Profile creation failed"))
+        return;
 
       const user = result.info.profile;
 
@@ -72,14 +74,9 @@ class ProfileController {
 
     try {
       let result = await Profile_.update(req.body, profileId);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Profile Updation failed",
-          `Reason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Profile updation failed"))
+        return;
 
       const user = result.info.profile;
 
@@ -98,13 +95,9 @@ class ProfileController {
     if (profileId === req?.user?.profile?.id) {
       try {
         let result = await Profile_.getById(profileId);
-        if (result.code !== serviceCodes.OK) {
-          logBad(
-            `Profile request failed", "A user could not be able to see thier profile; \nReason : ${result.code}`,
-            { profileId }
-          );
-          return res.failure(result.code);
-        }
+
+        if (serviceResultBadHandler(result, res, "Profile request failed"))
+          return;
 
         const profile = result.info.profile;
 
@@ -123,14 +116,9 @@ class ProfileController {
 
     try {
       let result = await Profile_.getById(profileId);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Profile request failed",
-          `A user requested profile of someone other; \nReason: ${result.code}`,
-          { profileId }
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Profile request failed"))
+        return;
 
       const profile = result.info.profile;
 
@@ -152,14 +140,9 @@ class ProfileController {
 
     try {
       let result = await Profile_.getById(profileId);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Profile request failed",
-          `A user could not be able to see thier profile; \nReason : ${result.code}`,
-          { profileId }
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Profile request failed"))
+        return;
 
       const profile = result.info.profile;
 
@@ -183,14 +166,9 @@ class ProfileController {
 
     try {
       let result = await Profile_.getForums(profileId, reqProfileId, offset);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Profile Forum Request failed",
-          `A user requested for forums of a profile; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Profile forums request failed"))
+        return;
 
       const forums = result.info.forums;
 
@@ -216,10 +194,8 @@ class ProfileController {
 
     try {
       let result = await Profile_.getAll(offset);
-      if (result.code !== serviceCodes.OK) {
-        logBad("Users fetch failed", `Reason: ${result.code}`, { offset });
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Users fetch failed")) return;
 
       const users = result.info.users;
 
@@ -230,6 +206,24 @@ class ProfileController {
       });
 
       logOk("User delivered", "A user requested users");
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static delete = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+      let result = await User_.delete(userId);
+
+      if (serviceResultBadHandler(result, res, "User deletion failed")) return;
+
+      res.ok("Deleted");
+
+      logOk("User deleted", "A user deleted thier account", { userId });
+      activity("User delete", "A user deleted thier account");
     } catch (err) {
       logServerErr(err);
       res.serverError();

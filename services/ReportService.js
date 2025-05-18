@@ -1,24 +1,46 @@
 import { Validate } from "./ValidationService.js";
 import { serviceCodes, sRes } from "../utils/services.js";
-import ReportForum from "../models/Report_Forum.js";
+import ReportForum, { priority, status } from "../models/Report_Forum.js";
 import db from "../db/pg.js";
 import { isNumber } from "../utils/checks.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import Forum from "../models/Forum.js";
 import { includeWriter } from "../constants/include.js";
 
-const reportsLimit = 30;
-
 class ForumReportService {
+  // Report service response codes
+  static codes = {
+    BAD_REASON: [
+      "Bad Reason",
+      "Invalid reason for a report, should be a string",
+    ],
+    BAD_PRIORITY: [
+      "Bad Priority",
+      `Priority for a report can only be from these: ${Object.values(
+        priority
+      ).join(", ")}`,
+    ],
+    BAD_STATUS: [
+      "Bad Status",
+      `Status for a report can only be from these: ${Object.values(status).join(
+        ", "
+      )}`,
+    ],
+    BAD_ASSOCIATION: ["Bad association", "This report was not filled by you"],
+  };
+
+  static reportsLimit = 30;
+
   static create = async (reason, priority, status, forumId, profileId) => {
     reason = reason ?? "No reason";
-    if (!Validate.reason(reason)) return sRes(codes.BAD_REASON, { reason });
+    if (!Validate.reason(reason))
+      return sRes(this.codes.BAD_REASON, { reason });
 
     if (!Validate.priority(priority))
-      return sRes(codes.BAD_PRIORITY, { priority });
+      return sRes(this.codes.BAD_PRIORITY, { priority });
 
     if (!Validate.forumReportStatus(status))
-      return sRes(codes.BAD_STATUS, { status });
+      return sRes(this.codes.BAD_STATUS, { status });
 
     if (!Validate.id(forumId)) return sRes(serviceCodes.BAD_ID, { forumId });
     if (!Validate.id(profileId))
@@ -76,7 +98,7 @@ class ForumReportService {
 
       if (updateResult !== 1) {
         await t.rollback();
-        return sRes(codes.BAD_ASSOCIATION, { values, reportId });
+        return sRes(this.codes.BAD_ASSOCIATION, { values, reportId });
       }
 
       let report = await ReportForum.findByPk(reportId, { transaction: t });
@@ -122,8 +144,6 @@ class ForumReportService {
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
-    if (!isNumber(offset)) offset = 0;
-
     const whereObj = {};
     for (const key in values) {
       const val = values[key];
@@ -154,7 +174,7 @@ class ForumReportService {
       let reports = await ReportForum.findAll({
         where: { ...whereObj },
         offset,
-        limit: reportsLimit,
+        limit: this.reportsLimit,
         order: orderFields,
         include: [
           {
@@ -179,21 +199,13 @@ class ForumReportService {
   static getPages = async () => {
     try {
       const totalCount = await ReportForum.count();
-      const totalPages = Math.ceil(totalCount / reportsLimit);
+      const totalPages = Math.ceil(totalCount / this.reportsLimit);
       return sRes(serviceCodes.OK, { totalPages });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, null, err);
     }
   };
 }
-
-// Report service response codes
-export const codes = {
-  BAD_REASON: "Bad Reason",
-  BAD_PRIORITY: "Bad Priority",
-  BAD_STATUS: "Bad Status",
-  BAD_ASSOCIATION: "Bad association",
-};
 
 export const Report = {
   Forum_: ForumReportService,

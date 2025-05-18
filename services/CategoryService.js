@@ -4,8 +4,17 @@ import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 
 class CategoryService {
+  // Category service response codes
+  static codes = {
+    BAD_CATEGORY: [
+      "Bad Category",
+      "Category does not meet its qualifications, should be a string and at least have a letter",
+    ],
+  };
+
   static create = async (name) => {
-    if (!Validate.category(name)) return sRes(codes.BAD_CATEGORY, { name });
+    if (!Validate.category(name))
+      return sRes(this.codes.BAD_CATEGORY, { name });
 
     try {
       let category = await Category.create({ name });
@@ -18,7 +27,8 @@ class CategoryService {
   };
 
   static update = async (name, categoryId) => {
-    if (!Validate.category(name)) return sRes(codes.BAD_CATEGORY, { name });
+    if (!Validate.category(name))
+      return sRes(this.codes.BAD_CATEGORY, { name });
 
     if (!Validate.id(categoryId))
       return sRes(serviceCodes.BAD_ID, { categoryId });
@@ -95,10 +105,5 @@ class CategoryService {
     }
   };
 }
-
-// Category service response codes
-export const codes = {
-  BAD_CATEGORY: "Bad Category",
-};
 
 export const Category_ = CategoryService;

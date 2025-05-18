@@ -6,12 +6,35 @@ import { hash, compare } from "../utils/hash.js";
 import db from "../db/pg.js";
 
 class UserService {
+  // User service response codes
+  static codes = {
+    BAD_USERNAME: [
+      "Bad Username",
+      "User doesn't exist with this username/email",
+    ],
+    BAD_EMAIL: ["Bad Email", "User doesn't exist with this email/username"],
+    BAD_PASS: [
+      "Bad Password",
+      "Invalid password, should at least be of 8 letters",
+    ],
+    INVALID_EMAIL: [
+      "Invalid Email",
+      "User doesn't exist with this email/username",
+    ],
+    INVALID_USERNAME: [
+      "Invalid Username",
+      "User doesn't exist with this username/email",
+    ],
+    INCORRECT_PASS: ["Incorrect Password", "Incorrect password"],
+  };
+
   static create = async (email, password) => {
     // validate email
-    if (!Validate.email(email)) return sRes(codes.BAD_EMAIL, { email });
+    if (!Validate.email(email)) return sRes(this.codes.BAD_EMAIL, { email });
 
     // validate password
-    if (!Validate.password(password)) return sRes(codes.BAD_PASS, { password });
+    if (!Validate.password(password))
+      return sRes(this.codes.BAD_PASS, { password });
 
     password = hash(password);
 
@@ -28,7 +51,8 @@ class UserService {
   };
 
   static updatePassword = async (password, userId) => {
-    if (!Validate.password(password)) return sRes(codes.BAD_PASS, { password });
+    if (!Validate.password(password))
+      return sRes(this.codes.BAD_PASS, { password });
 
     if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
 
@@ -58,16 +82,17 @@ class UserService {
   };
 
   static getByEmailAndPassword = async (email, password) => {
-    if (!Validate.email(email)) return sRes(codes.BAD_EMAIL, { email });
+    if (!Validate.email(email)) return sRes(this.codes.BAD_EMAIL, { email });
 
-    if (!Validate.password(password)) return sRes(codes.BAD_PASS, { password });
+    if (!Validate.password(password))
+      return sRes(this.codes.BAD_PASS, { password });
 
     try {
       let user = await User.findOne({ where: { email } });
-      if (user === null) return sRes(codes.INVALID_EMAIL, { email });
+      if (user === null) return sRes(this.codes.INVALID_EMAIL, { email });
 
       if (!compare(password, user.password))
-        return sRes(codes.INCORRECT_PASS, { password });
+        return sRes(this.codes.INCORRECT_PASS, { password });
 
       user = user.get({ plain: true });
 
@@ -79,18 +104,20 @@ class UserService {
 
   static getByUsernameAndPassword = async (username, password) => {
     if (!Validate.username(username))
-      return sRes(codes.BAD_USERNAME, { username });
+      return sRes(this.codes.BAD_USERNAME, { username });
 
-    if (!Validate.password(password)) return sRes(codes.BAD_PASS, { password });
+    if (!Validate.password(password))
+      return sRes(this.codes.BAD_PASS, { password });
 
     try {
       let profile = await Profile.findOne({ where: { username } });
-      if (profile === null) return sRes(codes.INVALID_USERNAME, { username });
+      if (profile === null)
+        return sRes(this.codes.INVALID_USERNAME, { username });
 
       let user = await User.findByPk(profile.userId);
 
       if (!compare(password, user.password))
-        return sRes(codes.INCORRECT_PASS, { password });
+        return sRes(this.codes.INCORRECT_PASS, { password });
 
       user = user.get({ plain: true });
 
@@ -124,15 +151,5 @@ class UserService {
     }
   };
 }
-
-// User service response codes
-export const codes = {
-  BAD_USERNAME: "Bad Username",
-  BAD_EMAIL: "Bad Email",
-  BAD_PASS: "Bad Password",
-  INVALID_EMAIL: "Invalid Email",
-  INVALID_USERNAME: "Invalid Username",
-  INCORRECT_PASS: "Incorrect Password",
-};
 
 export const User_ = UserService;

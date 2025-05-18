@@ -1,8 +1,8 @@
 import { Feedback_ } from "../services/FeedbackService.js";
-import { serviceCodes } from "../utils/services.js";
 import { logBad, logServerErr } from "../services/LogService.js";
 import activity from "../services/ActivityService.js";
 import { status } from "../models/Feedback.js";
+import { serviceResultBadHandler } from "../utils/services.js";
 
 class FeedbackController {
   static create = async (req, res) => {
@@ -11,18 +11,12 @@ class FeedbackController {
 
     try {
       let result = await Feedback_.create(message, status.PENDING, profileId);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Feedback failed",
-          `A user failed to give feedback; \nReason: ${result.code}`,
-          { info: result.info, message }
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Feedback failed")) return;
 
       const feedback = result.info.feedback;
 
-      res.ok("Reported", { feedback });
+      res.ok("Feedback given", { feedback });
 
       logBad("Feedback given", "A user gave a feedback", { feedback });
       activity("Feedback", "A user gave a feedback");

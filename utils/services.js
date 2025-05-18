@@ -1,3 +1,5 @@
+import { logBad, logDbErr } from "../services/LogService.js";
+
 // service result
 export const sRes = (
   code = serviceCodes.DATABASE_ERR,
@@ -5,12 +7,40 @@ export const sRes = (
   err = null
 ) => {
   console.log({ code, info, err });
-  return { code, info, err };
+  return { code: code[0], message: code[1], info, err };
 };
 
 export const serviceCodes = {
-  OK: "Success",
-  DB_ERR: "Database Error",
-  BAD_ID: "Bad Id",
-  INVALID_ID: "Invalid Id",
+  OK: ["Success", "OK"],
+  DB_ERR: ["Database Error", "Database Error"],
+  BAD_ID: ["Bad Id", "Invalid Id given"],
+  INVALID_ID: ["Invalid Id", "Invalid Id given"],
+};
+
+export const serviceResultBadHandler = (
+  result,
+  res,
+  title = "Request failed",
+  desc = "",
+  writeCode = false
+) => {
+  if (result.code === serviceCodes.DB_ERR[0]) {
+    logDbErr(result.info, result.err);
+    res.serverError();
+  } else if (result.code === serviceCodes.BAD_ID[0]) {
+    logBad(
+      title,
+      `${desc}${writeCode ? `\nError Message : ${result.code}` : ""}`,
+      result.info
+    );
+    res.failure(`${result.message} : ${Object.keys(result.info).join(", ")}`);
+  } else if (result.code !== serviceCodes.OK[0]) {
+    logBad(
+      title,
+      `${desc}${writeCode ? `\nError Message : ${result.code}` : ""}`,
+      result.info
+    );
+    res.failure(result.message);
+  } else return false;
+  return true;
 };

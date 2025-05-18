@@ -7,9 +7,34 @@ import { isNumber } from "../utils/checks.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { Op } from "sequelize";
 
-const newsLimit = 30;
-
 class NewsService {
+  // News service response codes
+  static codes = {
+    BAD_TITLE: [
+      "Bad Title",
+      "Invalid title for a news, at least contain a letter",
+    ],
+    BAD_BODY: [
+      "Bad Body",
+      "Invalid body for a news, at least contain a letter",
+    ],
+    BAD_IURL: ["Bad Image Url", "Invalid url"],
+    BAD_NURL: ["Bad News Url", "Invalid url"],
+    BAD_STATUS: [
+      "Bad Status",
+      `Status can only be from these values: ${Object.values(status).join(
+        ", "
+      )}`,
+    ],
+    BAD_CATEGORY: [
+      "Bad Category",
+      "Category should at least contain a letter in it",
+    ],
+    INVALID_CATEGORY: ["Invalid Category", "This category doesn't exist"],
+  };
+
+  static newsLimit = 30;
+
   static create = async (
     title,
     body,
@@ -167,8 +192,6 @@ class NewsService {
   };
 
   static getByTimestamp = async (timestamp, categories = []) => {
-    if (!isNumber(timestamp)) timestamp = 0;
-
     const categoryIds = [];
     for (const val of categories) {
       const category = await Category.findOne({
@@ -191,14 +214,14 @@ class NewsService {
         offset =
           newsAfterTimestamp > 100
             ? 100
-            : newsAfterTimestamp - newsLimit >= 0
-            ? newsAfterTimestamp - newsLimit
+            : newsAfterTimestamp - this.newsLimit >= 0
+            ? newsAfterTimestamp - this.newsLimit
             : 0;
       }
 
       let news = await News.findAll({
         where: { ...whereObjTimestamp, status: status.Published },
-        limit: newsLimit,
+        limit: this.newsLimit,
         offset,
         order: [[timestampsKeys.createdAt, "desc"]],
         include: [{ model: Category, as: "category" }],
@@ -207,7 +230,7 @@ class NewsService {
         news = await News.findAll({
           where: { status: status.Published },
           order: randomOrder,
-          limit: newsLimit,
+          limit: this.newsLimit,
           include: [{ model: Category, as: "category" }],
         });
 
@@ -229,8 +252,6 @@ class NewsService {
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
-    if (!isNumber(offset)) offset = 0;
-
     try {
       const whereObj = {};
       for (const key in values) {
@@ -288,7 +309,7 @@ class NewsService {
       let news = await News.findAll({
         where: { ...whereObj },
         offset,
-        limit: newsLimit,
+        limit: this.newsLimit,
         order: orderFields,
         include: [{ model: Category, as: "category" }],
       });
@@ -307,23 +328,12 @@ class NewsService {
   static getPages = async () => {
     try {
       const totalCount = await News.count();
-      const totalPages = Math.ceil(totalCount / newsLimit);
+      const totalPages = Math.ceil(totalCount / this.newsLimit);
       return sRes(serviceCodes.OK, { totalPages });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, null, err);
     }
   };
 }
-
-// News service response codes
-export const codes = {
-  BAD_TITLE: "Bad Title",
-  BAD_BODY: "Bad Body",
-  BAD_IURL: "Bad Image Url",
-  BAD_NURL: "Bad News Url",
-  BAD_STATUS: "Bad Status",
-  BAD_CATEGORY: "Bad Category",
-  INVALID_CATEGORY: "Invalid Category",
-};
 
 export const News_ = NewsService;

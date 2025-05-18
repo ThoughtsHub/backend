@@ -7,9 +7,9 @@ import {
 } from "../models/Report_Forum.js";
 import { isNull, isNumber, isString } from "../utils/checks.js";
 
-const usernameRegex = /^[a-zA-Z][a-zA-Z0-9]{3,}$/;
+const usernameRegex = /^[a-zA-Z0-9]{3,}$/;
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
 class ValidateService {
   static email = (val) => isString(val) && emailRegex.test(val);
@@ -19,18 +19,19 @@ class ValidateService {
 
   static password = (val) => isString(val) && val.length >= 8;
 
-  static id = (val) => isString(val);
+  static id = (val) => isString(val) && val.length >= 1;
 
   static username = (val) => isString(val) && usernameRegex.test(val);
 
   static fullName = (val) => isString(val) && val.length >= 3;
 
-  static about = (val) => isString(val) || isNull(val);
+  static about = (val) => isString(val);
 
-  static gender = (val) => ["male", "female", "other"].includes(val);
+  static gender = (val) =>
+    ["Male", "Female", "Other"].includes(val) || isNull(val);
 
   static dob = (val) => {
-    if (val === null) return true;
+    if (isNull(val)) return true;
     if (!isNumber(val)) return false;
 
     const ageInMs = Date.now() - val;
@@ -39,30 +40,30 @@ class ValidateService {
     return ageInYears >= 3 && ageInYears <= 80;
   };
 
-  static profileImageUrl = (val) => isString(val);
+  static profileImageUrl = (val) => isString(val) || isNull(val);
 
-  static imageUrl = (val) => isString(val);
+  static imageUrl = (val) => isString(val) || isNull(val);
 
   static newsUrl = (val) => isString(val);
 
   static localId = (val) => isString(val) || isNull(val);
 
-  static title = (val) => isString(val);
+  static title = (val) => isString(val) && val.length >= 1;
 
-  static body = (val) => isString(val);
+  static body = (val) => isString(val) && val.length >= 1;
 
   static newsStatus = (val) => Object.values(NewsStatus).includes(val);
 
-  static category = (val) => isString(val);
+  static category = (val) => isString(val) && val.length >= 1;
 
   static forumReportStatus = (val) =>
     Object.values(ForumReportStatus).includes(val);
 
   static priority = (val) => Object.values(priority).includes(val);
 
-  static reason = (val) => isString(val);
+  static reason = (val) => isString(val) || isNull(val);
 
-  static message = (val) => isString(val);
+  static message = (val) => isString(val) && val.length >= 1;
 
   static feedbackStatus = (val) => Object.values(FeedbackStatus).includes(val);
 

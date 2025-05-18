@@ -9,18 +9,28 @@ import { timestampsKeys } from "../constants/timestamps.js";
 import { Op } from "sequelize";
 import { includeAppreciation, includeWriter } from "../constants/include.js";
 
-const forumsLimit = 30;
-
 class ForumService {
+  // Forum service response codes
+  static codes = {
+    BAD_LOCALID: ["Bad LocalId", "Invalid localId, should be a string"],
+    BAD_TITLE: ["Bad Title", "Forum title should at least contain one letter"],
+    BAD_BODY: ["Bad Body", "Forum body should at least contain one letter"],
+    BAD_IURL: ["Bad Image Url", "Invalid url for an image"],
+    BAD_ASSOCIATION: ["Bad Association", "Forum doesn't belong to you"],
+  };
+
+  static forumsLimit = 30;
+
   static create = async (localId, title, body, imageUrl = "", profileId) => {
-    localId = localId ?? null;
-    if (!Validate.localId(localId)) return sRes(codes.BAD_LOCALID, { localId });
+    if (!Validate.localId(localId))
+      return sRes(this.codes.BAD_LOCALID, { localId });
 
-    if (!Validate.title(title)) return sRes(codes.BAD_TITLE, { title });
+    if (!Validate.title(title)) return sRes(this.codes.BAD_TITLE, { title });
 
-    if (!Validate.body(body)) return sRes(codes.BAD_BODY, { body });
+    if (!Validate.body(body)) return sRes(this.codes.BAD_BODY, { body });
 
-    if (!Validate.imageUrl(imageUrl)) return sRes(codes.BAD_IURL, { imageUrl });
+    if (!Validate.imageUrl(imageUrl))
+      return sRes(this.codes.BAD_IURL, { imageUrl });
 
     if (!Validate.id(profileId))
       return sRes(serviceCodes.BAD_ID, { profileId });
@@ -104,7 +114,7 @@ class ForumService {
 
       if (updateResult !== 1) {
         await t.rollback();
-        return sRes(codes.BAD_ASSOCIATION, { values, profileId, forumId });
+        return sRes(this.codes.BAD_ASSOCIATION, { values, profileId, forumId });
       }
 
       let forum = await Forum.findByPk(forumId, { transaction: t });
@@ -135,7 +145,7 @@ class ForumService {
 
       if (destroyResult !== forumIds.length) {
         await t.rollback();
-        return sRes(codes.BAD_ASSOCIATION, { forumIds, profileId });
+        return sRes(this.codes.BAD_ASSOCIATION, { forumIds, profileId });
       }
 
       const [[_, updateResult]] = await Profile.decrement(
@@ -267,7 +277,6 @@ class ForumService {
   static getByTimestamp = async (timestamp, profileId) => {
     if (!Validate.id(profileId) && ![null, undefined].includes(profileId))
       return sRes(serviceCodes.OK, { profileId });
-    if (!isNumber(timestamp)) timestamp = 0;
 
     const whereObjTimestamp = {
       [timestampsKeys.createdAt]: { [Op.gt]: timestamp },
@@ -282,14 +291,14 @@ class ForumService {
         offset =
           forumsAfterTimestamp > 100
             ? 100
-            : forumsAfterTimestamp - forumsLimit >= 0
-            ? forumsAfterTimestamp - forumsLimit
+            : forumsAfterTimestamp - this.forumsLimit >= 0
+            ? forumsAfterTimestamp - this.forumsLimit
             : 0;
       }
 
       let forums = await Forum.findAll({
         where: { ...whereObjTimestamp },
-        limit: forumsLimit,
+        limit: this.forumsLimit,
         offset,
         order: [[timestampsKeys.createdAt, "desc"]],
         include: [null, undefined].includes(profileId)
@@ -299,7 +308,7 @@ class ForumService {
       if (forums.length === 0) {
         forums = await Forum.findAll({
           order: randomOrder,
-          limit: forumsLimit,
+          limit: this.forumsLimit,
           include: [null, undefined].includes(profileId)
             ? [includeWriter]
             : [includeWriter, includeAppreciation(profileId)],
@@ -325,8 +334,6 @@ class ForumService {
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
-    if (!isNumber(offset)) offset = 0;
-
     const whereObj = {};
     for (const key in values) {
       const val = values[key];
@@ -356,7 +363,7 @@ class ForumService {
       let forums = await Forum.findAll({
         where: { ...whereObj },
         offset,
-        limit: forumsLimit,
+        limit: this.forumsLimit,
         order: orderFields,
         include: [includeWriter],
       });
@@ -371,21 +378,12 @@ class ForumService {
   static getPages = async () => {
     try {
       const totalCount = await Forum.count();
-      const totalPages = Math.ceil(totalCount / forumsLimit);
+      const totalPages = Math.ceil(totalCount / this.forumsLimit);
       return sRes(serviceCodes.OK, { totalPages });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, null, err);
     }
   };
 }
-
-// Forum service response codes
-export const codes = {
-  BAD_LOCALID: "Bad Local Id",
-  BAD_TITLE: "Bad Title",
-  BAD_BODY: "Bad Body",
-  BAD_IURL: "Bad Image Url",
-  BAD_ASSOCIATION: "Bad Association",
-};
 
 export const Forum_ = ForumService;

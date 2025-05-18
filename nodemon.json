@@ -1,0 +1,26 @@
+{
+    "watch": [
+        "utils",
+        "package.json",
+        "services",
+        "routes",
+        "server",
+        "controllers",
+        "associations",
+        "models",
+        "constants",
+        "db",
+        "env",
+        "middlewares",
+        "scrips/admin.js"
+    ],
+    "ext": "js,json",
+    "ignore": [
+        "node_modules",
+        "dist",
+        "logs",
+        "test"
+    ],
+    "exec": "node app.js",
+    "delay": "1000"
+}

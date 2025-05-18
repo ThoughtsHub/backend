@@ -10,7 +10,7 @@ const createAdmin = () => {
       result = await Profile_.create(
         "admin",
         "admin",
-        "other",
+        "Other",
         "",
         null,
         "admin",

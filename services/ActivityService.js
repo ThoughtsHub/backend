@@ -4,16 +4,29 @@ import Activity from "../models/Activity.js";
 import { isNumber } from "../utils/checks.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 
-const activitiesLimit = 45;
-
 class ActivityService {
-  static create = async (type, title, description = "") => {
-    if (!Validate.title(type)) return sRes(codes.BAD_TYPE, { type });
+  //  Activity service response codes
+  static codes = {
+    BAD_TYPE: ["Bad Type", "Activity status type does not meet qualifications"],
+    BAD_TITLE: [
+      "Bad Title",
+      "Invalid title for an activity, should be a string and at least a letter",
+    ],
+    BAD_DESC: [
+      "Bad Description",
+      "Invalid description for an activity, should be a string or null",
+    ],
+  };
 
-    if (!Validate.title(title)) return sRes(codes.BAD_TITLE, { title });
+  static activitiesLimit = 45;
+
+  static create = async (type, title, description = "") => {
+    if (!Validate.title(type)) return sRes(this.codes.BAD_TYPE, { type });
+
+    if (!Validate.title(title)) return sRes(this.codes.BAD_TITLE, { title });
 
     if (!Validate.responseDesc(description))
-      return sRes(codes.BAD_DESC, { description });
+      return sRes(this.codes.BAD_DESC, { description });
 
     try {
       await Activity.create({ type, title, description });
@@ -25,12 +38,10 @@ class ActivityService {
   };
 
   static getByOffset = async (offset) => {
-    if (!isNumber(offset)) offset = 0;
-
     try {
       let activities = await Activity.findAll({
         offset,
-        limit: activitiesLimit,
+        limit: this.activitiesLimit,
         order: [[timestampsKeys.createdAt, "desc"]],
       });
       activities = activities.map((a) => a.get({ plain: true }));
@@ -41,13 +52,6 @@ class ActivityService {
     }
   };
 }
-
-//  Activity service response codes
-export const codes = {
-  BAD_TYPE: "Bad Type",
-  BAD_TITLE: "Bad Title",
-  BAD_DESC: "Bad Description",
-};
 
 export const Activity_ = ActivityService;
 

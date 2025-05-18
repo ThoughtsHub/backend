@@ -14,4 +14,6 @@ const shutdown = async (server) => {
   console.log("Shutdown complete!");
 };
 
+export const exit = () => process.exit();
+
 export default shutdown;

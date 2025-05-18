@@ -1,8 +1,8 @@
 import { toNumber } from "../utils/number.js";
 import { News_ } from "../services/NewsService.js";
 import { Category_ } from "../services/CategoryService.js";
-import { serviceCodes } from "../utils/services.js";
 import { logBad, logOk, logServerErr } from "../services/LogService.js";
+import { serviceResultBadHandler } from "../utils/services.js";
 
 class NewsController {
   static get = async (req, res) => {
@@ -13,14 +13,8 @@ class NewsController {
 
     try {
       let result = await News_.getByTimestamp(timestamp, categories);
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "News fetch failed",
-          `A user requested to view news; \nReason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "News fetch failed")) return;
 
       const news = result.info.news;
 
@@ -36,14 +30,9 @@ class NewsController {
   static getCategories = async (req, res) => {
     try {
       let result = await Category_.get();
-      if (result.code !== serviceCodes.OK) {
-        logBad(
-          "Categories fetch failed",
-          `Reason: ${result.code}`,
-          result.info
-        );
-        return res.failure(result.code);
-      }
+
+      if (serviceResultBadHandler(result, res, "Categories fetch failed"))
+        return;
 
       const categories = result.info.categories;
 
