@@ -7,6 +7,8 @@ import { ReportRouter } from "./ReportRouter.js";
 import { FeedbackRouter } from "./FeedbackRouter.js";
 import { OtherRouter } from "./OtherRouter.js";
 import { NewsRouter } from "./NewsRouter.js";
+import { loggedAsAdmin } from "../middlewares/auth.js";
+import { AdminRouter } from "./AdminRouter.js";
 
 const router = Router();
 
@@ -18,5 +20,7 @@ router.use("/news", NewsRouter);
 router.use("/forums", ForumRouter);
 router.use("/report", ReportRouter);
 router.use("/feedback", FeedbackRouter);
+
+router.use("/admin", loggedAsAdmin, AdminRouter);
 
 export const AppRouter = router;

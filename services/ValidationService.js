@@ -44,17 +44,21 @@ class ValidateService {
 
   static imageUrl = (val) => isString(val) || isNull(val);
 
-  static newsUrl = (val) => isString(val);
+  static appreciationValue = (val) => val === 1 || val === 0;
+
+  static newsUrl = (val) => isString(val) || isNull(val);
 
   static localId = (val) => isString(val) || isNull(val);
 
   static title = (val) => isString(val) && val.length >= 1;
+  static newsTitle = (val) => isString(val) || isNull(val);
 
   static body = (val) => isString(val) && val.length >= 1;
+  static newsBody = (val) => isString(val) || isNull(val);
 
   static newsStatus = (val) => Object.values(NewsStatus).includes(val);
 
-  static category = (val) => isString(val) && val.length >= 1;
+  static category = (val) => (isString(val) && val.length >= 1) || isNull(val);
 
   static forumReportStatus = (val) =>
     Object.values(ForumReportStatus).includes(val);

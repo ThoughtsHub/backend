@@ -30,6 +30,11 @@ const valuesInBody = [
   "message",
   "status",
   "priority",
+  "hindiTitle",
+  "hindiBody",
+  "category",
+  "feedbackId",
+  "reportId",
 ];
 const valuesInQuery = [
   "timestamp",
@@ -38,6 +43,8 @@ const valuesInQuery = [
   "userId",
   "commentId",
   "profileId",
+  "feedbackId",
+  "reportId",
   "category",
   "newsId",
   "status",
@@ -47,6 +54,18 @@ const valuesInQuery = [
   "title",
   "body",
   "username",
+  "all",
+  "matchCaseTitle",
+  "matchCaseBody",
+  "title",
+  "body",
+  "hindiTitle",
+  "hindiBody",
+  "status",
+  "imageUrl",
+  "newsUrl",
+  "categories",
+  "order",
 ];
 
 export const handleBody = (req, res, next) => {
@@ -59,6 +78,9 @@ export const handleBody = (req, res, next) => {
     body[key] = isBadValue(reqBody[key]) ? null : reqBody[key];
   for (let key of valuesInQuery)
     query[key] = isBadValue(reqQuery[key]) ? null : reqQuery[key];
+
+  res.originalBody = reqBody;
+  res.originalQuery = reqQuery;
 
   req.body = body;
   req.query = query;

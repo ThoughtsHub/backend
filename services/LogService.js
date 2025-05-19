@@ -110,7 +110,7 @@ export const logServerErr = (err) => {
 
 export const logDbErr = (info, err) => {
   log({
-    databaseOpsCode: toNumber(err.parent.code),
+    databaseOpsCode: toNumber(err?.parent?.code),
     databaseOpsType: RT.ERROR,
     databaseOpsTitle: "Database error",
     databaseOpsDescription: "Error",
@@ -118,7 +118,7 @@ export const logDbErr = (info, err) => {
   });
 };
 
-export const logOk = (title, desc, values) => {
+export const logOk = (title, desc, values = null) => {
   log({
     responseCode: RC.OK,
     responseType: RT.OK,

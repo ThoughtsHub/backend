@@ -25,20 +25,23 @@ export const serviceResultBadHandler = (
   writeCode = false
 ) => {
   if (result.code === serviceCodes.DB_ERR[0]) {
-    logDbErr(result.info, result.err);
+    logDbErr(
+      { info: result.info, body: res.originalBody, query: res.originalQuery },
+      result.err
+    );
     res.serverError();
   } else if (result.code === serviceCodes.BAD_ID[0]) {
     logBad(
       title,
       `${desc}${writeCode ? `\nError Message : ${result.code}` : ""}`,
-      result.info
+      { info: result.info, body: res.originalBody, query: res.originalQuery }
     );
     res.failure(`${result.message} : ${Object.keys(result.info).join(", ")}`);
   } else if (result.code !== serviceCodes.OK[0]) {
     logBad(
       title,
       `${desc}${writeCode ? `\nError Message : ${result.code}` : ""}`,
-      result.info
+      { info: result.info, body: res.originalBody, query: res.originalQuery }
     );
     res.failure(result.message);
   } else return false;

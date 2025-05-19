@@ -10,6 +10,20 @@ const transportEmail = {
   },
 };
 
+export const sendEmail = async (recipient, subject, html) => {
+  const mailOptions = { from: google.email, to: recipient, subject, html };
+
+  const transporter = nodemailer.createTransport(transportEmail);
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
 /**
  * Sends an OTP with predefined values to the recipient mail
  * @param {string} recipient Recipient's E-Mail address
@@ -17,11 +31,10 @@ const transportEmail = {
  * @returns {Promise<boolean>}
  */
 const sendOtpEmail = async (recipient, otp) => {
-  const mailOptions = {
-    from: google.email,
-    to: recipient,
-    subject: "Verification OTP | ThoughtsHub",
-    html: `
+  const sent = await sendEmail(
+    recipient,
+    "Verification OTP | ThoughtsHub",
+    `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
       <h2 style="color: #4CAF50; text-align: center;">ThoughtsHub Verification</h2>
       <p style="font-size: 16px;">Hello,</p>
@@ -34,20 +47,10 @@ const sendOtpEmail = async (recipient, otp) => {
       <hr style="border: 1px solid #ddd;">
       <p style="font-size: 14px; color: #777; text-align: center;">&copy; ${new Date().getFullYear()} CampusVibe. All rights reserved.</p>
     </div>
-  `,
-  };
+  `
+  );
 
-  const transporter = nodemailer.createTransport(transportEmail);
-
-  try {
-    await transporter.sendMail(mailOptions);
-
-    return true;
-  } catch (err) {
-    console.log(err);
-  }
-
-  return false;
+  return sent;
 };
 
 /**

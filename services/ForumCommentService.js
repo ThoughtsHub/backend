@@ -194,7 +194,7 @@ class ForumCommentService {
         });
       }
 
-      const [_, updateResult] = await Forum.decrement(
+      const [[_, updateResult]] = await Forum.decrement(
         { comments: commentIds.length },
         { where: { id: forumId }, transaction: t }
       );

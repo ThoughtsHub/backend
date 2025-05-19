@@ -1,12 +1,13 @@
 import { toNumber } from "../utils/number.js";
 import { News_ } from "../services/NewsService.js";
 import { Category_ } from "../services/CategoryService.js";
-import { logBad, logOk, logServerErr } from "../services/LogService.js";
+import { logOk, logServerErr } from "../services/LogService.js";
 import { serviceResultBadHandler } from "../utils/services.js";
 
 class NewsController {
   static get = async (req, res) => {
-    let { categories = "", timestamp } = req.query;
+    let { category: categories, timestamp } = req.query;
+    categories ??= "";
 
     categories = categories.split("|");
     timestamp = toNumber(timestamp);
@@ -20,7 +21,7 @@ class NewsController {
 
       res.ok("News fetched", { news });
 
-      logBad("News fetched", "A user requested to view news", null);
+      logOk("News fetched", "A user requested to view news", null);
     } catch (err) {
       logServerErr(err);
       res.serverError();

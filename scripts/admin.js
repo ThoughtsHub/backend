@@ -5,7 +5,7 @@ import { serviceCodes } from "../utils/services.js";
 const createAdmin = () => {
   setTimeout(async () => {
     const available = await Profile_.usernameAvailable("admin");
-    if (available.code === serviceCodes.OK && available.info) {
+    if (available.code === serviceCodes.OK[0] && available.info) {
       let result = await User_.create("admin@thoughtshub.com", "admin582");
       result = await Profile_.create(
         "admin",

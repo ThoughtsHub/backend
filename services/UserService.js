@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import Profile from "../models/Profile.js";
 import { hash, compare } from "../utils/hash.js";
 import db from "../db/pg.js";
+import { timestampsKeys } from "../constants/timestamps.js";
 
 class UserService {
   // User service response codes
@@ -27,6 +28,8 @@ class UserService {
     ],
     INCORRECT_PASS: ["Incorrect Password", "Incorrect password"],
   };
+
+  static usersLimit = 30;
 
   static create = async (email, password) => {
     // validate email
@@ -148,6 +151,90 @@ class UserService {
     } catch (err) {
       await t.rollback();
       return sRes(serviceCodes.DB_ERR, { userId }, err);
+    }
+  };
+
+  static getByOffset = async (
+    offset,
+    values = {},
+    orderFields = [[timestampsKeys.createdAt, "desc"]]
+  ) => {
+    const whereUserObj = {};
+    const whereProfileObj = {};
+    for (const key in values) {
+      const val = values[key];
+      switch (key) {
+        case "userId":
+          if (Validate.id(val)) whereUserObj.id = val;
+          break;
+
+        case "email":
+          if (Validate.email(val))
+            whereUserObj.email = { [Op.iLike]: `%${val}%` };
+          break;
+
+        case "mobile":
+          if (Validate.mobile(val))
+            whereUserObj.mobile = { [Op.iLike]: `%${val}%` };
+          break;
+
+        case "profileId":
+          if (Validate.id(val)) whereProfileObj.id = val;
+          break;
+
+        case "fullName":
+          if (Validate.fullName(val))
+            whereProfileObj.fullName = { [Op.iLike]: `%${val}%` };
+          break;
+
+        case "about":
+          if (Validate.about(val))
+            whereProfileObj.about = { [Op.iLike]: `%${val}%` };
+          break;
+
+        case "gender":
+          if (Validate.gender(val)) whereProfileObj.gender = val;
+          break;
+
+        case "dob":
+          if (Validate.dob(val)) whereProfileObj.dob = val;
+          break;
+
+        case "profileImageUrl":
+          if (Validate.profileImageUrl(val))
+            whereProfileObj.profileImageUrl = val;
+          break;
+      }
+    }
+
+    try {
+      let users = await Profile.findAll({
+        where: { ...whereProfileObj },
+        offset,
+        limit: this.usersLimit,
+        order: orderFields,
+        attributes: { include: [["id", "profileId"]], exclude: ["id"] },
+        include: {
+          model: User,
+          as: "user",
+          where: { ...whereUserObj },
+          attributes: {
+            include: [["id", "userId"]],
+            exclude: ["id", "password"],
+          },
+        },
+      });
+
+      users = users.map((u) => {
+        u = u.get({ plain: true });
+        u = Object.assign(u, u.user);
+        delete u.user;
+        return u;
+      });
+
+      return sRes(serviceCodes.OK, { users });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { offset, values, orderFields }, err);
     }
   };
 }

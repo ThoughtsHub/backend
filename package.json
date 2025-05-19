@@ -17,7 +17,8 @@
     "scripts": {
         "start": "node app.js",
         "dev": "nodemon --signal SIGINT app.js",
-        "test": "node ./tests/routesTest.js"
+        "test": "node ./tests/routesTest.js",
+        "test-admin": "node ./tests/adminRoutesTest.js"
     },
     "dependencies": {
         "bcryptjs": "^3.0.2",

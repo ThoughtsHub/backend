@@ -20,6 +20,7 @@ class ForumService {
   };
 
   static forumsLimit = 30;
+  static forumAppreciationsLimit = 30;
 
   static create = async (localId, title, body, imageUrl = "", profileId) => {
     if (!Validate.localId(localId))
@@ -163,6 +164,51 @@ class ForumService {
     } catch (err) {
       await t.rollback();
       return sRes(serviceCodes.DB_ERR, { forumIds, profileId }, err);
+    }
+  };
+
+  static appreciations = async (
+    offset,
+    values = {},
+    orderFields = [[timestampsKeys.createdAt, "desc"]]
+  ) => {
+    const whereObj = {};
+    for (const key in values) {
+      const val = values[key];
+      switch (key) {
+        case "forumId":
+          if (Validate.id(val)) whereObj.forumId = val;
+          break;
+
+        case "profileId":
+          if (Validate.id(val)) whereObj.profileId = val;
+          break;
+
+        case "value":
+          if (Validate.appreciationValue(val)) whereObj.value = val;
+          break;
+      }
+    }
+
+    try {
+      let appreciations = await ForumAppreciation.findAll({
+        where: { ...whereObj },
+        offset,
+        limit: this.forumAppreciationsLimit,
+        order: orderFields,
+        include: [
+          { ...includeWriter, as: "profile" },
+          {
+            model: Forum,
+            as: "forum",
+            attributes: { include: [["id", "forumId"]], exclude: ["id"] },
+          },
+        ],
+      });
+
+      return sRes(serviceCodes.OK, { appreciations });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { offset, values, orderFields }, err);
     }
   };
 

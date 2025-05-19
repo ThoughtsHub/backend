@@ -3,9 +3,9 @@ import { Validate } from "./ValidationService.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import Category from "../models/Category.js";
 import db, { randomOrder } from "../db/pg.js";
-import { isNumber } from "../utils/checks.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { Op } from "sequelize";
+import { isNull } from "../utils/checks.js";
 
 class NewsService {
   // News service response codes
@@ -45,27 +45,29 @@ class NewsService {
     category,
     status
   ) => {
-    if (!Validate.title(title)) return sRes(codes.BAD_TITLE, { title });
-    if (!Validate.title(hindiTitle))
-      return sRes(codes.BAD_TITLE, { hindiTitle });
+    if (!Validate.newsTitle(title))
+      return sRes(this.codes.BAD_TITLE, { title });
+    if (!Validate.newsTitle(hindiTitle))
+      return sRes(this.codes.BAD_TITLE, { hindiTitle });
 
-    if (!Validate.body(body)) return sRes(codes.BAD_BODY, { body });
-    if (!Validate.body(hindiBody)) return sRes(codes.BAD_BODY, { hindiBody });
+    if (!Validate.newsBody(body)) return sRes(this.codes.BAD_BODY, { body });
+    if (!Validate.newsBody(hindiBody))
+      return sRes(this.codes.BAD_BODY, { hindiBody });
 
-    if (!Validate.imageUrl(imageUrl)) return sRes(codes.BAD_IURL, { imageUrl });
+    if (!Validate.imageUrl(imageUrl))
+      return sRes(this.codes.BAD_IURL, { imageUrl });
 
-    if (!Validate.newsUrl(newsUrl)) return sRes(codes.BAD_NURL, { newsUrl });
+    if (!Validate.newsUrl(newsUrl))
+      return sRes(this.codes.BAD_NURL, { newsUrl });
 
     if (!Validate.category(category))
-      return sRes(codes.BAD_CATEGORY, { category });
+      return sRes(this.codes.BAD_CATEGORY, { category });
 
-    if (!Validate.newsStatus(status)) return sRes(codes.BAD_STATUS, { status });
+    if (!Validate.newsStatus(status))
+      return sRes(this.codes.BAD_STATUS, { status });
 
     try {
-      const category = await Category.findOne({ where: { name: category } });
-      if (category === null) {
-        return sRes(codes.INVALID_CATEGORY, { category });
-      }
+      const category_ = await Category.findOne({ where: { name: category } });
 
       let news = await News.create({
         title,
@@ -74,23 +76,27 @@ class NewsService {
         hindiBody,
         imageUrl,
         newsUrl,
-        categoryId: category.id,
+        categoryId: category_?.id,
         status,
       });
       news = news.get({ plain: true });
 
       return sRes(serviceCodes.OK, { news });
     } catch (err) {
-      return sRes(serviceCodes.DB_ERR, {
-        title,
-        body,
-        hindiTitle,
-        hindiBody,
-        imageUrl,
-        newsUrl,
-        status,
-        categoryId,
-      });
+      return sRes(
+        serviceCodes.DB_ERR,
+        {
+          title,
+          body,
+          hindiTitle,
+          hindiBody,
+          imageUrl,
+          newsUrl,
+          status,
+          category,
+        },
+        err
+      );
     }
   };
 
@@ -105,34 +111,42 @@ class NewsService {
         const val = values[key];
         switch (key) {
           case "title":
-            if (Validate.title(val)) valuesToBeUpdated.title = val;
+            if (Validate.newsTitle(val) && !isNull(val))
+              valuesToBeUpdated.title = val;
             break;
 
           case "body":
-            if (Validate.body(val)) valuesToBeUpdated.body = val;
+            if (Validate.newsBody(val) && !isNull(val))
+              valuesToBeUpdated.body = val;
             break;
 
           case "hindiTitle":
-            if (Validate.title(val)) valuesToBeUpdated.hindiTitle = val;
+            if (Validate.newsTitle(val) && !isNull(val))
+              valuesToBeUpdated.hindiTitle = val;
             break;
 
           case "hindiBody":
-            if (Validate.body(val)) valuesToBeUpdated.hindiBody = val;
+            if (Validate.newsBody(val) && !isNull(val))
+              valuesToBeUpdated.hindiBody = val;
             break;
 
           case "imageUrl":
-            if (Validate.imageUrl(val)) valuesToBeUpdated.imageUrl = val;
+            if (Validate.imageUrl(val) && !isNull(val))
+              valuesToBeUpdated.imageUrl = val;
             break;
 
           case "newsUrl":
-            if (Validate.newsUrl(val)) valuesToBeUpdated.newsUrl = val;
+            if (Validate.newsUrl(val) && !isNull(val))
+              valuesToBeUpdated.newsUrl = val;
             break;
 
           case "category":
-            if (Validate.category(val)) {
+            if (Validate.category(val) && !isNull(val)) {
               const category = await Category.findOne({ where: { name: val } });
-              if (category === null)
-                return sRes(codes.INVALID_CATEGORY, { values, newsId });
+              if (category === null) {
+                await t.rollback();
+                return sRes(this.codes.INVALID_CATEGORY, { values, newsId });
+              }
               valuesToBeUpdated.categoryId = category.id;
               break;
             }
@@ -158,7 +172,7 @@ class NewsService {
       news = news.get({ plain: true });
 
       await t.commit();
-      return sRes(serviceCodes.OK, { values, newsId });
+      return sRes(serviceCodes.OK, { values, newsId, news });
     } catch (err) {
       await t.rollback();
       return sRes(serviceCodes.DB_ERR, { values, newsId }, err);
@@ -170,6 +184,8 @@ class NewsService {
       if (!Validate.id(newsId)) return sRes(serviceCodes.BAD_ID, { newsId });
 
     const t = await db.transaction();
+
+    console.log(newsIds)
 
     try {
       const destroyResult = await News.destroy({
@@ -233,15 +249,15 @@ class NewsService {
           limit: this.newsLimit,
           include: [{ model: Category, as: "category" }],
         });
-
-        news = news.map((f) => {
-          f.get({ plain: true });
-          f.category = f.category?.name ?? null;
-          return f;
-        });
-
-        return sRes(serviceCodes.OK, { news });
       }
+
+      news = news.map((f) => {
+        f.get({ plain: true });
+        f.category = f.category?.name ?? null;
+        return f;
+      });
+
+      return sRes(serviceCodes.OK, { news });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, { timestamp, categories }, err);
     }
@@ -252,59 +268,76 @@ class NewsService {
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
+    const matchCaseTitle = values.matchCaseTitle === true;
+    const matchCaseBody = values.matchCaseBody === true;
     try {
-      const whereObj = {};
-      for (const key in values) {
-        const val = values[key];
-        switch (key) {
-          case "title":
-            if (Validate.title(val)) whereObj.title = val;
-            break;
+      let whereObj = {};
+      if (values.all === 'false')
+        for (const key in values) {
+          const val = values[key];
+          switch (key) {
+            case "title":
+              if (Validate.newsTitle(val))
+                whereObj.title = {
+                  [matchCaseTitle ? Op.like : Op.iLike]: `%${val}%`,
+                };
+              break;
 
-          case "body":
-            if (Validate.body(val)) whereObj.body = val;
-            break;
+            case "body":
+              if (Validate.newsBody(val))
+                whereObj.body = {
+                  [matchCaseBody ? Op.like : Op.iLike]: `%${val}%`,
+                };
+              break;
 
-          case "hindiTitle":
-            if (Validate.title(val)) whereObj.hindiTitle = val;
-            break;
+            case "hindiTitle":
+              if (Validate.newsTitle(val))
+                whereObj.hindiTitle = {
+                  [matchCaseTitle ? Op.like : Op.iLike]: `%${val}%`,
+                };
+              break;
 
-          case "hindiBody":
-            if (Validate.body(val)) whereObj.hindiBody = val;
-            break;
+            case "hindiBody":
+              if (Validate.newsBody(val))
+                whereObj.hindiBody = {
+                  [matchCaseBody ? Op.like : Op.iLike]: `%${val}%`,
+                };
+              break;
 
-          case "imageUrl":
-            if (Validate.imageUrl(val)) whereObj.imageUrl = val;
-            break;
+            case "imageUrl":
+              if (Validate.imageUrl(val)) whereObj.imageUrl = val;
+              break;
 
-          case "newsUrl":
-            if (Validate.newsUrl(val)) whereObj.newsUrl = val;
-            break;
+            case "newsUrl":
+              if (Validate.newsUrl(val)) whereObj.newsUrl = val;
+              break;
 
-          case "categories":
-            const categoriesIds = [];
-            for (let val_ of val) {
-              if (Validate.category(val_)) {
-                const category = await Category.findOne({
-                  where: { name: val_ },
-                });
-                if (category === null)
-                  return sRes(codes.INVALID_CATEGORY, {
-                    values,
-                    orderFields,
-                    offset,
+            case "categories":
+              const categoriesIds = [];
+              for (let val_ of val) {
+                if (Validate.category(val_)) {
+                  const category = await Category.findOne({
+                    where: { name: val_ },
                   });
-                categoriesIds.push(category.id);
+                  if (category === null)
+                    return sRes(this.codes.INVALID_CATEGORY, {
+                      values,
+                      orderFields,
+                      offset,
+                    });
+                  categoriesIds.push(category.id);
+                }
               }
-            }
-            whereObj.categoriesId = categoriesIds;
-            break;
+              whereObj.categoryId = categoriesIds;
+              break;
 
-          case "status":
-            if (Validate.newsStatus(val)) whereObj.status = val;
-            break;
+            case "status":
+              if (Validate.newsStatus(val)) whereObj.status = val;
+              break;
+          }
         }
-      }
+
+      console.log(whereObj);
 
       let news = await News.findAll({
         where: { ...whereObj },
