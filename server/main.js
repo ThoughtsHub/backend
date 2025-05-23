@@ -3,7 +3,7 @@ import express from "express";
 import helmet from "helmet";
 import { AppRouter } from "../routes/router.js";
 import "../utils/response.js";
-// import cors from "cors";
+import cors from "cors";
 import auth from "../middlewares/auth.js";
 import { handleBody } from "../middlewares/body.js";
 
@@ -15,7 +15,7 @@ const app = express();
 //   next();
 // });
 
-// app.use(cors()); // development purposes
+app.use(cors()); // development purposes
 
 app.use(express.json());
 app.use(cookieParser());

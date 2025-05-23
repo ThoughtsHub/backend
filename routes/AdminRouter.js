@@ -6,6 +6,7 @@ import AdminReportController from "../controllers/admin/ReportController.js";
 import AdminFeedbackController from "../controllers/admin/FeedbackController.js";
 import AdminLogController from "../controllers/admin/LogController.js";
 import AdminActivityController from "../controllers/admin/ActivityController.js";
+import UploadController from "../controllers/UploadController.js";
 
 const router = Router();
 
@@ -40,5 +41,7 @@ router.patch("/feedback", AdminFeedbackController.updateStatus);
 
 router.get("/logs", AdminLogController.get);
 router.get("/activity", AdminActivityController.get);
+
+router.post("/upload-max-size-image-change", UploadController.changeMaxSizeKb)
 
 export const AdminRouter = router;

@@ -9,6 +9,7 @@ import { OtherRouter } from "./OtherRouter.js";
 import { NewsRouter } from "./NewsRouter.js";
 import { loggedAsAdmin } from "../middlewares/auth.js";
 import { AdminRouter } from "./AdminRouter.js";
+import { UploadRouter } from "./UploadRouter.js";
 
 const router = Router();
 
@@ -20,6 +21,7 @@ router.use("/news", NewsRouter);
 router.use("/forums", ForumRouter);
 router.use("/report", ReportRouter);
 router.use("/feedback", FeedbackRouter);
+router.use("/upload", UploadRouter);
 
 router.use("/admin", loggedAsAdmin, AdminRouter);
 
