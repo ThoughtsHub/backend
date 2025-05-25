@@ -253,7 +253,7 @@ class NewsService {
 
       news = news.map((f) => {
         f.get({ plain: true });
-        f.category = f.category?.name ?? null;
+        f.category = f.category?.name ?? "no category";
         return f;
       });
 
