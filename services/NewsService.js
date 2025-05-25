@@ -185,7 +185,7 @@ class NewsService {
 
     const t = await db.transaction();
 
-    console.log(newsIds)
+    console.log(newsIds);
 
     try {
       const destroyResult = await News.destroy({
@@ -254,6 +254,7 @@ class NewsService {
       news = news.map((f) => {
         f.get({ plain: true });
         f.category = f.category?.name ?? "no category";
+        if (f.category === null) f.category = "no category";
         return f;
       });
 
@@ -272,7 +273,7 @@ class NewsService {
     const matchCaseBody = values.matchCaseBody === true;
     try {
       let whereObj = {};
-      if (values.all === 'false')
+      if (values.all === "false")
         for (const key in values) {
           const val = values[key];
           switch (key) {
