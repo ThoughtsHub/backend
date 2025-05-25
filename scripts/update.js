@@ -15,8 +15,16 @@ const countAllLikes = async () => {
     const likes = await ForumAppreciation.count({
       where: { forumId: forum.id },
     });
-    const comments = await ForumComment.count({where : {forumId: forum.id}} );
-    const result = await Forum.update({appreciations: likes, comments}, {where: {forumId: forum.id}})
+    const comments = await ForumComment.count({ where: { forumId: forum.id } });
+    try {
+      const result = await Forum.update(
+        { appreciations: likes, comments },
+        { where: { forumId: forum.id } }
+      );
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
   }
 };
 
