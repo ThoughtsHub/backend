@@ -10,4 +10,6 @@ router.get("/categories", NewsController.getCategories);
 
 router.get("/users", ProfileController.getUsers);
 
+router.delete("/delete-user", ProfileController.delete);
+
 export const OtherRouter = router;

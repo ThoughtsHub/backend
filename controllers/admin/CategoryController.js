@@ -15,7 +15,7 @@ class CategoryController {
 
       res.ok("Category created", { category });
 
-      logOk("Category created", "Admin created a category with name", {
+      logOk("Category created", "Admin created a category", {
         category,
       });
     } catch (err) {
