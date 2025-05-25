@@ -254,7 +254,7 @@ class NewsService {
       news = news.map((n) => {
         n = n.get({ plain: true });
         n.category = n.category?.name ?? "no category";
-        return f;
+        return n;
       });
 
       return sRes(serviceCodes.OK, { news });
