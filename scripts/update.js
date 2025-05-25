@@ -5,7 +5,7 @@ import ForumAppreciation from "../models/Forum_Appreciation.js";
 import ForumComment from "../models/Forum_Comment.js";
 import User from "../models/User.js";
 import { Forum_ } from "../services/ForumService.js";
-import { User_ } from "../services/UserService";
+import { User_ } from "../services/UserService.js";
 
 await connectToPg();
 await initLink();
