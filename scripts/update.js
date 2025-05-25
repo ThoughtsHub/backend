@@ -10,13 +10,6 @@ import { User_ } from "../services/UserService.js";
 await connectToPg();
 await initLink();
 
-const updateUserPasswords = async () => {
-  const users = await User.findAll();
-  for (const user of users) {
-    const result = await User_.updatePassword(user.password, user.id);
-  }
-};
-
 const countAllLikes = async () => {
   const forums = await Forum.findAll();
   for (const forum of forums) {
