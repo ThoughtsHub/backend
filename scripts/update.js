@@ -25,5 +25,4 @@ const countAllLikes = async () => {
   }
 };
 
-await updateUserPasswords();
 await countAllLikes();
