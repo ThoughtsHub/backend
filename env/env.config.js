@@ -24,7 +24,7 @@ export const google = {
 };
 
 export const nodeEnv = {
-  production: process.env.node_env_production ?? true,
+  production: process.env.node_env_production === "true",
 };
 
 export const puppeteer = {
