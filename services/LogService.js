@@ -5,6 +5,7 @@ import { Validate } from "./ValidationService.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { RC } from "../utils/codes.js";
 import { toNumber } from "../utils/number.js";
+import { nodeEnv } from "../env/env.config.js";
 
 const logsLimit = 30;
 
@@ -59,7 +60,7 @@ class LogService {
    * @param {{line: string, lines: string, text: string, description: string, responseCode: number,  responseTitle: string, responseDescription: string | null, responseType: "OK" | "WARNING" | "ERROR", responseValues: object,databaseOpsCode: number, databaseOpsType: "OK" | "WARNING" |"ERROR", databaseOpsTitle: string, databaseOpsDescription: string | null, databaseOpsValues: object }} values
    */
   static create = async (values) => {
-    console.log(values);
+    if (nodeEnv.production) console.log(values);
     let type = null;
     if (LogService.satisfyBasic(values)) type = logTypes.Basic;
     else if (LogService.satisfyLine(values)) type = logTypes.SingleLine;
