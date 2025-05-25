@@ -7,9 +7,10 @@ import { serviceResultBadHandler } from "../../utils/services.js";
 class AdminFeedbackController {
   static get = async (req, res) => {
     const offset = toNumber(req.query.offset);
-    const order = req.query.order ?? [[timestampsKeys.createdAt, "desc"]];
+    let order = req.query.order ?? `[["${timestampsKeys.createdAt}", "desc"]]`;
 
     try {
+      order = JSON.parse(order);
       let result = await Feedback_.getByOffset(
         offset,
         res.originalQuery,

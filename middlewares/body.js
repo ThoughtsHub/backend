@@ -36,6 +36,7 @@ const valuesInBody = [
   "feedbackId",
   "reportId",
   "maxSize",
+  "name"
 ];
 const valuesInQuery = [
   "timestamp",

@@ -87,9 +87,6 @@ class UserService {
   static getByEmailAndPassword = async (email, password) => {
     if (!Validate.email(email)) return sRes(this.codes.BAD_EMAIL, { email });
 
-    if (!Validate.password(password))
-      return sRes(this.codes.BAD_PASS, { password });
-
     try {
       let user = await User.findOne({ where: { email } });
       if (user === null) return sRes(this.codes.INVALID_EMAIL, { email });
@@ -108,9 +105,6 @@ class UserService {
   static getByUsernameAndPassword = async (username, password) => {
     if (!Validate.username(username))
       return sRes(this.codes.BAD_USERNAME, { username });
-
-    if (!Validate.password(password))
-      return sRes(this.codes.BAD_PASS, { password });
 
     try {
       let profile = await Profile.findOne({ where: { username } });

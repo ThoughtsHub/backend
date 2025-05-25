@@ -7,6 +7,7 @@ import AdminFeedbackController from "../controllers/admin/FeedbackController.js"
 import AdminLogController from "../controllers/admin/LogController.js";
 import AdminActivityController from "../controllers/admin/ActivityController.js";
 import UploadController from "../controllers/UploadController.js";
+import CategoryController from "../controllers/admin/CategoryController.js";
 
 const router = Router();
 
@@ -15,6 +16,8 @@ router.post("/news", AdminNewsController.create);
 router.put("/news", AdminNewsController.update);
 router.patch("/news", AdminNewsController.update);
 router.delete("/news", AdminNewsController.delete);
+
+router.post("/category", CategoryController.create);
 
 router.get("/forums", AdminForumController.get);
 router.get("/forums/appreciation", AdminForumController.getAppreciations);
@@ -42,6 +45,6 @@ router.patch("/feedback", AdminFeedbackController.updateStatus);
 router.get("/logs", AdminLogController.get);
 router.get("/activity", AdminActivityController.get);
 
-router.post("/upload-max-size-image-change", UploadController.changeMaxSizeKb)
+router.post("/upload-max-size-image-change", UploadController.changeMaxSizeKb);
 
 export const AdminRouter = router;

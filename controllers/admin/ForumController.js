@@ -9,9 +9,10 @@ import { toString } from "../../utils/string.js";
 class AdminForumController {
   static get = async (req, res) => {
     const offset = toNumber(req.query.offset);
-    const order = req.query.order ?? [[timestampsKeys.createdAt, "desc"]];
+    let order = req.query.order ?? `[["${timestampsKeys.createdAt}", "desc"]]`;
 
     try {
+      order = JSON.parse(order);
       let result = await Forum_.getByOffset(offset, res.originalQuery, order);
       if (serviceResultBadHandler(result, res, "Forums fetch failed (admin)"))
         return;
