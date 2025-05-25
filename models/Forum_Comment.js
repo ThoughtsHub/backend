@@ -13,7 +13,7 @@ const ForumComment = db.define(
       references: { model: Profile, key: "id" },
     },
     forumId: {
-      ...types.FOREIGN_ID_REQ,
+      ...types.FOREIGN_ID,
       references: { model: Forum, key: "id" },
     },
     localId: { ...types.STRING },
