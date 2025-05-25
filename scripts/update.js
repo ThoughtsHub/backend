@@ -19,7 +19,7 @@ const countAllLikes = async () => {
     try {
       const result = await Forum.update(
         { appreciations: likes, comments },
-        { where: { forumId: forum.id } }
+        { where: { id: forum.id } }
       );
       console.log(result);
     } catch (err) {
