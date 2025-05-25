@@ -8,10 +8,12 @@ const ForumComment = db.define(
   "ForumComment",
   {
     id: { ...types.ID },
+    // TODO : make profileId required
     profileId: {
-      ...types.FOREIGN_ID_REQ,
+      ...types.FOREIGN_ID,
       references: { model: Profile, key: "id" },
     },
+    // TODO : make forumId required
     forumId: {
       ...types.FOREIGN_ID,
       references: { model: Forum, key: "id" },
