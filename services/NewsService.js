@@ -251,10 +251,9 @@ class NewsService {
         });
       }
 
-      news = news.map((f) => {
-        f.get({ plain: true });
-        f.category = f.category?.name ?? "no category";
-        if (f.category === null) f.category = "no category";
+      news = news.map((n) => {
+        n = n.get({ plain: true });
+        n.category = n.category?.name ?? "no category";
         return f;
       });
 
