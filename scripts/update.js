@@ -3,9 +3,8 @@ import { connectToPg } from "../db/pg.js";
 import Forum from "../models/Forum.js";
 import ForumAppreciation from "../models/Forum_Appreciation.js";
 import ForumComment from "../models/Forum_Comment.js";
-import User from "../models/User.js";
+import { ForumComment_ } from "../services/ForumCommentService.js";
 import { Forum_ } from "../services/ForumService.js";
-import { User_ } from "../services/UserService.js";
 
 await connectToPg();
 await initLink();
@@ -16,9 +15,9 @@ const countAllLikes = async () => {
     const likes = await ForumAppreciation.count({
       where: { forumId: forum.id },
     });
-    const comments = await ForumComment.count({ where: { forumId: forum.id } });
+    const comments = await ForumComment_.getByOffset(0, {forumId: forum.id});
     const result = await Forum_.update(
-      { appreciations: likes, comments: comments },
+      { appreciations: likes, comments: comments.info.comments.length },
       forum.profileId,
       forum.id
     );
