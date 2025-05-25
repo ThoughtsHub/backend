@@ -7,7 +7,7 @@ export const sRes = (
   info = null,
   err = null
 ) => {
-  if (nodeEnv.production) console.log({ code, info, err });
+  if (!nodeEnv.production) console.log({ code, info, err });
   return { code: code[0], message: code[1], info, err };
 };
 
