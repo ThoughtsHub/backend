@@ -1,5 +1,5 @@
 import { Router } from "express";
-import LoginController from "../controllers/loginController.js";
+import LoginController from "../controllers/LoginController.js";
 import { loggedIn } from "../middlewares/auth.js";
 import ProfileController from "../controllers/ProfileController.js";
 
