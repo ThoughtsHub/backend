@@ -30,7 +30,6 @@ export const validateAuth = async (userToken) => {
 };
 
 export const auth = async (req, _, next) => {
-    console.log(req.cookies)
   const userToken =
     req.headers["authorization"]?.split(" ")?.[1] ??
     req.headers["auth_token"] ??
