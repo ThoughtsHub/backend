@@ -15,12 +15,8 @@ const countAllLikes = async () => {
     const likes = await ForumAppreciation.count({
       where: { forumId: forum.id },
     });
-    const comments = await ForumComment_.getByOffset(0, {forumId: forum.id});
-    const result = await Forum_.update(
-      { appreciations: likes, comments: comments.info.comments.length },
-      forum.profileId,
-      forum.id
-    );
+    const comments = await ForumComment.count({where : {forumId: forum.id}} );
+    const result = await Forum.update({appreciations: likes, comments}, {where: {forumId: forum.id}})
   }
 };
 
