@@ -97,7 +97,11 @@ class CategoryService {
   static get = async () => {
     try {
       let categories = await Category.findAll();
-      categories = categories.map((c) => c.get({ plain: true }));
+      categories = categories.map((c) => {
+        c = c.get({ plain: true });
+        c.value = c.name;
+        return c;
+      });
 
       return sRes(serviceCodes.OK, { categories });
     } catch (err) {
