@@ -42,5 +42,5 @@ export const profileAssociation = () => {
     onDelete: "CASCADE",
     as: "forumReports",
   });
-  ReportForum.belongsTo(Profile, { foreignKey: "profileId", as: "writer" });
+  ReportForum.belongsTo(Profile, { foreignKey: "profileId", as: "reporter" });
 };

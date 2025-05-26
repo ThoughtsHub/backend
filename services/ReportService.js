@@ -2,10 +2,9 @@ import { Validate } from "./ValidationService.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import ReportForum, { priority, status } from "../models/Report_Forum.js";
 import db from "../db/pg.js";
-import { isNumber } from "../utils/checks.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import Forum from "../models/Forum.js";
-import { includeWriter } from "../constants/include.js";
+import { includeReporter, includeWriter } from "../constants/include.js";
 
 class ForumReportService {
   // Report service response codes
@@ -186,7 +185,7 @@ class ForumReportService {
             },
             include: [includeWriter],
           },
-          includeWriter,
+          includeReporter,
         ],
       });
       reports = reports.map((r) => r.get({ plain: true }));

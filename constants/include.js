@@ -10,6 +10,15 @@ export const includeWriter = {
   },
 };
 
+export const includeReporter = {
+  model: Profile,
+  as: "reporter",
+  attributes: {
+    include: [["id", "profileId"]],
+    exclude: ["id"],
+  },
+};
+
 export const includeAppreciation = (profileId) => ({
   model: ForumAppreciation,
   as: "appreciations_",
