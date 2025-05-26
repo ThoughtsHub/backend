@@ -13,8 +13,11 @@ await initLink();
 const updateUserPasswords = async () => {
   const users = await User.findAll();
   for (const user of users) {
-    if (user.password.length !== 60) {
+    if (user.password === 'admin') {
       const result = await User_.updatePassword(user.password, user.id);
+      console.log(result)
     }
   }
 };
+
+await updateUserPasswords()
