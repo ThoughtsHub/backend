@@ -185,8 +185,6 @@ class NewsService {
 
     const t = await db.transaction();
 
-    console.log(newsIds);
-
     try {
       const destroyResult = await News.destroy({
         where: { id: newsIds },
@@ -337,8 +335,6 @@ class NewsService {
               break;
           }
         }
-
-      console.log(whereObj);
 
       let news = await News.findAll({
         where: { ...whereObj },
