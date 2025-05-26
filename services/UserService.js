@@ -54,8 +54,8 @@ class UserService {
   };
 
   static updatePassword = async (password, userId) => {
-    // if (!Validate.password(password))
-    //   return sRes(this.codes.BAD_PASS, { password });
+    if (!Validate.password(password))
+      return sRes(this.codes.BAD_PASS, { password });
 
     if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
 
