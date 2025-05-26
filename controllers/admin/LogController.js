@@ -13,8 +13,6 @@ class AdminLogController {
       const logs = result.info.logs;
 
       res.ok("Logs", { logs });
-
-      logOk("Logs fetched", "Admin requested logs");
     } catch (err) {
       logServerErr(err);
       res.serverError();
