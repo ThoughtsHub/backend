@@ -3,19 +3,18 @@ import { connectToPg } from "../db/pg.js";
 import Forum from "../models/Forum.js";
 import ForumAppreciation from "../models/Forum_Appreciation.js";
 import ForumComment from "../models/Forum_Comment.js";
-import News from "../models/News.js";
-import { ForumComment_ } from "../services/ForumCommentService.js";
+import User from "../models/User.js";
 import { Forum_ } from "../services/ForumService.js";
-import { News_ } from "../services/NewsService.js";
+import { User_ } from "../services/UserService";
 
 await connectToPg();
 await initLink();
 
-const updateNewsStatus = async () => {
-  const news = await News.findAll();
-  for (const n of news) {
-    let result = News_.update({ status: "Published" }, n.id);
+const updateUserPasswords = async () => {
+  const users = await User.findAll();
+  for (const user of users) {
+    if (user.password.length !== 60) {
+      const result = await User_.updatePassword(user.password, user.id);
+    }
   }
 };
-
-await updateNewsStatus()

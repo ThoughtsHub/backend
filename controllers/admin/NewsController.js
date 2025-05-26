@@ -86,7 +86,10 @@ class AdminNewsController {
 
       const news = result.info.news;
 
-      res.ok("News fetched", { news });
+      res.ok("News fetched", {
+        news,
+        newOffset: news.length < News_.newsLimit ? null : offset + news.length,
+      });
 
       logOk("News fetched successfully", "Admin requested news");
     } catch (err) {

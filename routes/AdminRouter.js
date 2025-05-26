@@ -18,6 +18,7 @@ router.patch("/news", AdminNewsController.update);
 router.delete("/news", AdminNewsController.delete);
 
 router.post("/category", CategoryController.create);
+router.delete("/category", CategoryController.delete);
 
 router.get("/forums", AdminForumController.get);
 router.get("/forums/appreciation", AdminForumController.getAppreciations);

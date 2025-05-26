@@ -36,7 +36,7 @@ const valuesInBody = [
   "feedbackId",
   "reportId",
   "maxSize",
-  "name"
+  "name",
 ];
 const valuesInQuery = [
   "timestamp",
@@ -46,6 +46,7 @@ const valuesInQuery = [
   "commentId",
   "profileId",
   "feedbackId",
+  "categoryId",
   "reportId",
   "category",
   "newsId",

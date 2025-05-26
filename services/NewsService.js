@@ -254,6 +254,7 @@ class NewsService {
       news = news.map((n) => {
         n = n.get({ plain: true });
         n.category = n.category?.name ?? "no category";
+        delete n.categoryId;
         return n;
       });
 
