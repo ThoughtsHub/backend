@@ -28,7 +28,7 @@ router.use("/admin", loggedAsAdmin, AdminRouter);
 router.get(
   ["/admin-panel/", "/admin-panel/:other", "/admin-panel/*"],
   async (req, res) => {
-    res.sendFile("/dist/index.html", { root: "./public" });
+    res.redirect("https://admin.thoughtshub.agency/");
   }
 );
 
