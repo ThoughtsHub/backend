@@ -184,6 +184,7 @@ class ForumReportService {
               include: [["id", "forumId"]],
               exclude: ["id"],
             },
+            include: [includeWriter],
           },
           includeWriter,
         ],
