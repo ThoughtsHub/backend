@@ -118,7 +118,6 @@ class FeedbackService {
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
-
     const whereObj = {};
     for (const key in values) {
       const val = values[key];
@@ -136,8 +135,6 @@ class FeedbackService {
           break;
       }
     }
-
-    console.log(whereObj)
 
     try {
       let feedbacks = await Feedback.findAll({
