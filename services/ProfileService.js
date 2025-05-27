@@ -220,11 +220,18 @@ class ProfileService {
 
   static getAll = async (offset) => {
     try {
-      const users = await Profile.findAll({
+      let users = await Profile.findAll({
         where: { [Op.not]: { username: "admin" } }, // should not list admins in the users list
         offset,
         limit: this.usersLimit,
         order: [[timestampsKeys.createdAt, "desc"]],
+      });
+
+      users = users.map((u) => {
+        u = u.get({ plain: true });
+        u.profileId = u.id;
+        delete u.id;
+        return u;
       });
 
       return sRes(serviceCodes.OK, { users });

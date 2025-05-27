@@ -137,6 +137,8 @@ class FeedbackService {
       }
     }
 
+    console.log(whereObj)
+
     try {
       let feedbacks = await Feedback.findAll({
         where: { ...whereObj },
