@@ -11,6 +11,8 @@ import CategoryController from "../controllers/admin/CategoryController.js";
 
 const router = Router();
 
+router.get("/categories", AdminNewsController.getCategories);
+
 router.get("/news", AdminNewsController.get);
 router.post("/news", AdminNewsController.create);
 router.put("/news", AdminNewsController.update);

@@ -1,4 +1,5 @@
 import { timestampsKeys } from "../../constants/timestamps.js";
+import { Category_ } from "../../services/CategoryService.js";
 import { logOk, logServerErr } from "../../services/LogService.js";
 import { News_ } from "../../services/NewsService.js";
 import { toNumber } from "../../utils/number.js";
@@ -92,6 +93,26 @@ class AdminNewsController {
       });
 
       logOk("News fetched successfully", "Admin requested news");
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static getCategories = async (req, res) => {
+    try {
+      let result = await Category_.get();
+
+      if (
+        serviceResultBadHandler(result, res, "Categories fetch failed (admin)")
+      )
+        return;
+
+      const categories = result.info.categories;
+
+      res.ok("Categories found", { categories });
+
+      logOk("Categories fetched", "Admin requested for categories list", null);
     } catch (err) {
       logServerErr(err);
       res.serverError();

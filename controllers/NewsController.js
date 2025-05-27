@@ -30,7 +30,7 @@ class NewsController {
 
   static getCategories = async (req, res) => {
     try {
-      let result = await Category_.get();
+      let result = await Category_.getNames();
 
       if (serviceResultBadHandler(result, res, "Categories fetch failed"))
         return;
