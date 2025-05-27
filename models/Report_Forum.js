@@ -10,7 +10,7 @@ export const priority = {
   High: "High",
 };
 export const status = {
-  Ignored: "Ignore",
+  Ignored: "Ignored",
   Pending: "Pending",
   Resolved: "Resolved",
 };
