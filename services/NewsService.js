@@ -131,8 +131,7 @@ class NewsService {
             break;
 
           case "imageUrl":
-            if (Validate.imageUrl(val) && !isNull(val))
-              valuesToBeUpdated.imageUrl = val;
+            if (Validate.imageUrl(val)) valuesToBeUpdated.imageUrl = val;
             break;
 
           case "newsUrl":
