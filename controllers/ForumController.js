@@ -90,6 +90,7 @@ class ForumController {
 
       logOk("Forums fetched", "A user requested forums", {
         profileId: req?.user?.profile?.id,
+        timestamp,
       });
     } catch (err) {
       logServerErr(err);

@@ -21,7 +21,10 @@ class NewsController {
 
       res.ok("News fetched", { news });
 
-      logOk("News fetched", "A user requested to view news", null);
+      logOk("News fetched", "A user requested to view news", {
+        timestamp,
+        categories,
+      });
     } catch (err) {
       logServerErr(err);
       res.serverError();
