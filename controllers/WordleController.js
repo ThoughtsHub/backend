@@ -90,7 +90,7 @@ class WordleController {
   };
 
   static getResult = async (req, res) => {
-    const profileId = req.user.profile.id;
+    const profileId = req.user.profile?.id ?? null;
     let { day, offset = 0 } = req.query;
     offset = toNumber(offset);
     day ??= getTodayDate();
