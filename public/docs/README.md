@@ -1195,3 +1195,103 @@ Gets suggested users
 - `500` : Some error occured at server, contact admin.
 
 ---
+
+### Wordle
+
+The day format will be : **dd-mm-yyyy** \
+
+If date is 1 January 2025 -> 01-01-2025 \
+If date is 23 March 2026 -> 23-03-2026 \
+and else with same formatting
+
+#### GET /wordle/today
+
+Get today's word
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  word: string;
+}
+```
+
+#### GET /wordle
+
+Get word of a specific day
+
+**Query :**
+
+```js
+{
+    day: string [format : dd-mm-yyyy]
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  word: string;
+}
+```
+
+#### POST /wordle
+
+Sets the wordle's result for a specific day
+
+**Body :**
+
+```js
+{
+    day: string [format : dd-mm-yyyy]
+}
+```
+
+If sent this request, will understand that the user solved the word of this specific day
+
+#### GET /wordle/result
+
+Gets the result for a specific day
+
+**Query :**
+
+```js
+{
+    day: string [format : dd-mm-yyyy]
+    offset: number
+}
+```
+
+**Result :**
+
+```js
+{
+    message: string
+    success: boolean
+    userResult: {
+        attempted: boolean [true | false]
+        guessedCorrectly: boolean
+        rank: number | null [null meaning either user didnt participate or is not logged in]
+    }
+    rankings: [
+        {
+            rank: number
+            profile: {
+                userId: string
+                profileId: string
+                username: string
+                fullName: string
+                about: string
+                profileImageUrl: string
+                gender: string
+                dob: string
+            }
+        }
+    ]
+}
+```

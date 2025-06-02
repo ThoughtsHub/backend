@@ -3,6 +3,7 @@ import { forumAssociation } from "./forumAssociations.js";
 import { NewsAssociation } from "./newsAssociations.js";
 import { profileAssociation } from "./profileAssociations.js";
 import { userAssociation } from "./userAssociations.js";
+import { wordleAssociations } from "./wordleAssociations.js";
 import Activity from "../models/Activity.js";
 import Log from "../models/Log.js";
 
@@ -11,6 +12,7 @@ export const initLink = async () => {
   profileAssociation();
   forumAssociation();
   NewsAssociation();
+  wordleAssociations();
 
   await db.sync({ alter: true });
 };

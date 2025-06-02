@@ -5,6 +5,7 @@ import {
   status as ForumReportStatus,
   priority,
 } from "../models/Report_Forum.js";
+import { status as WordleWordStatus } from "../models/Wordle_Word.js";
 import { isNull, isNumber, isString } from "../utils/checks.js";
 
 const usernameRegex = /^[a-zA-Z0-9]{3,}$/;
@@ -78,6 +79,12 @@ class ValidateService {
   static responseDesc = (val) => isString(val) || isNull(val);
 
   static responseValues = (val) => typeof val == "object";
+
+  static wordleWord = (val) => isString(val) && val.length === 5;
+
+  static wordleFields = (val) => isString(val) || isNull(val);
+
+  static wordleStatus = (val) => Object.values(WordleWordStatus).includes(val);
 }
 
 export const Validate = ValidateService;

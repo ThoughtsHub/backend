@@ -10,6 +10,7 @@ import { NewsRouter } from "./NewsRouter.js";
 import { loggedAsAdmin } from "../middlewares/auth.js";
 import { AdminRouter } from "./AdminRouter.js";
 import { UploadRouter } from "./UploadRouter.js";
+import { WordleRouter } from "./WordleRouter.js";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.use("/forums", ForumRouter);
 router.use("/report", ReportRouter);
 router.use("/feedback", FeedbackRouter);
 router.use("/upload", UploadRouter);
+router.use("/wordle", WordleRouter);
 
 router.use("/admin", loggedAsAdmin, AdminRouter);
 

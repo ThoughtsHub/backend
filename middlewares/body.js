@@ -37,6 +37,8 @@ const valuesInBody = [
   "reportId",
   "maxSize",
   "name",
+  "guessedCorrectly",
+  "day",
 ];
 const valuesInQuery = [
   "timestamp",
@@ -69,6 +71,7 @@ const valuesInQuery = [
   "newsUrl",
   "categories",
   "order",
+  "day",
 ];
 
 export const handleBody = (req, res, next) => {

@@ -19,6 +19,15 @@ export const includeReporter = {
   },
 };
 
+export const includeProfile = {
+  model: Profile,
+  as: "profile",
+  attributes: {
+    include: [["id", "profileId"]],
+    exclude: ["id"],
+  },
+};
+
 export const includeAppreciation = (profileId) => ({
   model: ForumAppreciation,
   as: "appreciations_",
