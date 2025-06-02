@@ -1,5 +1,6 @@
 import { logOk, logServerErr } from "../services/LogService.js";
 import { Wordle_ } from "../services/WordleService.js";
+import { isString } from "../utils/checks.js";
 import { getTodayDate } from "../utils/date.js";
 import { toNumber } from "../utils/number.js";
 import { serviceResultBadHandler } from "../utils/services.js";
@@ -90,10 +91,11 @@ class WordleController {
   };
 
   static getResult = async (req, res) => {
-    const profileId = req.user.profile?.id ?? null;
+    let profileId = req?.user?.profile?.id;
     let { day, offset = 0 } = req.query;
     offset = toNumber(offset);
     day ??= getTodayDate();
+    if (!isString(profileId)) profileId = null;
 
     try {
       const result1 = await Wordle_.getResultOfUser(day, profileId);
