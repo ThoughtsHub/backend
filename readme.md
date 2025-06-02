@@ -1293,5 +1293,6 @@ Gets the result for a specific day
             }
         }
     ]
+    newOffset: number | null
 }
 ```
