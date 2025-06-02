@@ -5,9 +5,18 @@ import WordleWord from "../models/Wordle_Word.js";
 await connectToPg();
 await initLink();
 
-const todaysWord = async (word) => {
-  const result = await WordleWord.create({ day: "02-06-2025", word });
+const todaysWord = async (word, values) => {
+  const result = await WordleWord.create({
+    day: "02-06-2025",
+    word,
+    ...values,
+  });
   console.log(result);
 };
 
-await todaysWord("racer");
+await todaysWord("blaze", {
+  hindiTranslation: "धधकना",
+  englishMeaning:
+    "To burn brightly or intensely; to shine with a strong light.",
+  hindiMeaning: "तेज़ी से जलना या चमकना।",
+});
