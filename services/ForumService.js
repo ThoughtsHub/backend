@@ -351,14 +351,19 @@ class ForumService {
           ? [includeWriter]
           : [includeWriter, includeAppreciation(profileId)],
       });
-      if (forums.length === 0) {
-        forums = await Forum.findAll({
+      if (forums.length < this.forumsLimit) {
+        let forumIds = forums.map((f) => f.id);
+        let forums_ = await Forum.findAll({
+          where: { [Op.not]: { id: forumIds } },
           order: randomOrder,
           limit: this.forumsLimit,
           include: [null, undefined].includes(profileId)
             ? [includeWriter]
             : [includeWriter, includeAppreciation(profileId)],
         });
+
+        forums_ = forums_.slice(0, this.forumsLimit - forums.length - 1);
+        forums = [...forums, ...forums_];
       }
 
       forums = forums.map((f) => {

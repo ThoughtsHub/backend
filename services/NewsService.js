@@ -239,13 +239,17 @@ class NewsService {
         order: [[timestampsKeys.createdAt, "desc"]],
         include: [{ model: Category, as: "category" }],
       });
-      if (news.length === 0) {
-        news = await News.findAll({
-          where: { status: status.Published },
+      if (news.length < this.newsLimit) {
+        let newsIds = news.map((n) => n.id);
+        let news_ = await News.findAll({
+          where: { status: status.Published, [Op.not]: { id: newsIds } },
           order: randomOrder,
           limit: this.newsLimit,
           include: [{ model: Category, as: "category" }],
         });
+
+        news_ = news_.slice(0, this.newsLimit - news.length - 1);
+        news = [...news, ...news_];
       }
 
       news = news.map((n) => {
