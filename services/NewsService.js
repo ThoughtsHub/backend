@@ -242,7 +242,7 @@ class NewsService {
       if (news.length < this.newsLimit) {
         let newsIds = news.map((n) => n.id);
         let news_ = await News.findAll({
-          where: { status: status.Published, [Op.not]: { id: newsIds } },
+          where: { status: status.Published, id: { [Op.notIn]: newsIds } },
           order: randomOrder,
           limit: this.newsLimit,
           include: [{ model: Category, as: "category" }],

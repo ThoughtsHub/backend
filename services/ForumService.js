@@ -354,7 +354,7 @@ class ForumService {
       if (forums.length < this.forumsLimit) {
         let forumIds = forums.map((f) => f.id);
         let forums_ = await Forum.findAll({
-          where: { [Op.not]: { id: forumIds } },
+          where: { id: { [Op.notIn]: forumIds } },
           order: randomOrder,
           limit: this.forumsLimit,
           include: [null, undefined].includes(profileId)
