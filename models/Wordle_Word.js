@@ -16,6 +16,8 @@ const WordleWord = db.define(
     hindiTranslation: { ...types.STRING },
     englishMeaning: { ...types.TEXT },
     hindiMeaning: { ...types.TEXT },
+    englishSentenceUse: { ...types.TEXT },
+    hindiSentenceUse: { ...types.TEXT },
     solvedBy: { ...types.INT_REQ_0 },
     status: {
       ...types.ENUM,
