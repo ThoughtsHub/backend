@@ -1214,7 +1214,15 @@ Get today's word
 {
   message: string;
   success: boolean;
-  word: string;
+  word: {
+    day: string [format: dd-mm-yyyy]
+    word: string
+    hindiTranslation: string
+    englishMeaning: string
+    hindiMeaning: string
+    englishSentenceUse: string
+    hindiSentenceUse: string
+  }
 }
 ```
 
@@ -1236,7 +1244,15 @@ Get word of a specific day
 {
   message: string;
   success: boolean;
-  word: string;
+  word: {
+    day: string [format: dd-mm-yyyy]
+    word: string
+    hindiTranslation: string
+    englishMeaning: string
+    hindiMeaning: string
+    englishSentenceUse: string
+    hindiSentenceUse: string
+  }
 }
 ```
 

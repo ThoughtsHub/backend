@@ -8,6 +8,7 @@ import AdminLogController from "../controllers/admin/LogController.js";
 import AdminActivityController from "../controllers/admin/ActivityController.js";
 import UploadController from "../controllers/UploadController.js";
 import CategoryController from "../controllers/admin/CategoryController.js";
+import AdminWordleController from "../controllers/admin/WordleController.js";
 
 const router = Router();
 
@@ -49,5 +50,11 @@ router.get("/logs", AdminLogController.get);
 router.get("/activity", AdminActivityController.get);
 
 router.post("/upload-max-size-image-change", UploadController.changeMaxSizeKb);
+
+router.get("/wordle/words", AdminWordleController.getWords);
+router.post("/wordle", AdminWordleController.create);
+router.put("/wordle", AdminWordleController.update);
+router.patch("/wordle", AdminWordleController.update);
+router.delete("/wordle", AdminWordleController.delete);
 
 export const AdminRouter = router;

@@ -16,7 +16,7 @@ class WordleController {
 
       const word = result.info.word;
 
-      res.ok("Today's wordle word", { word: word.word });
+      res.ok("Today's wordle word", { word });
 
       logOk(
         "Wordle word fetched",
@@ -39,13 +39,35 @@ class WordleController {
 
       const word = result.info.word;
 
-      res.ok("Wordle word", { word: word.word });
+      res.ok("Wordle word", { word });
 
       logOk(
         "Wordle word fetched",
         "A user requested for daily wordle word for a specific day",
         { word, day }
       );
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static getWords = async (req, res) => {
+    let { offset } = req.query;
+    offset = toNumber(offset);
+
+    try {
+      const result = await Wordle_.getWords(offset);
+      if (serviceResultBadHandler(result, res, "Fetching for words failed"))
+        return;
+
+      const words = result.info.words;
+
+      res.ok("Wordle words", { words });
+
+      logOk("Wordle words fetched", "A user requested for wordle words", {
+        offset,
+      });
     } catch (err) {
       logServerErr(err);
       res.serverError();

@@ -1,5 +1,3 @@
-import { isString } from "../utils/checks.js";
-
 const valuesInBody = [
   "username",
   "contact",
@@ -25,6 +23,7 @@ const valuesInBody = [
   "value",
   "newsId",
   "localId",
+  "wordId",
   "id",
   "reason",
   "message",
@@ -39,6 +38,12 @@ const valuesInBody = [
   "name",
   "guessedCorrectly",
   "day",
+  "word",
+  "hindiTranslation",
+  "englishMeaning",
+  "hindiMeaning",
+  "englishSentenceUse",
+  "hindiSentenceUser",
 ];
 const valuesInQuery = [
   "timestamp",
@@ -52,6 +57,7 @@ const valuesInQuery = [
   "reportId",
   "category",
   "newsId",
+  "wordId",
   "status",
   "priority",
   "message",

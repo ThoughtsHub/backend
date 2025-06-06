@@ -8,6 +8,8 @@ router.get("/today", WordleController.getTodayWord);
 
 router.get("/", WordleController.getByDate);
 
+router.get("/words", WordleController.getWords);
+
 router.post("/", loggedIn, haveProfile, WordleController.setResult);
 
 router.get("/result", WordleController.getResult);

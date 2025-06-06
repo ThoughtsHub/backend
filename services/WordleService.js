@@ -1,7 +1,9 @@
 import { includeProfile } from "../constants/include.js";
+import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
 import WordleRank from "../models/Wordle_Rank.js";
 import WordleWord, {
+  status,
   status as WordleWordStatus,
 } from "../models/Wordle_Word.js";
 import { getTodayDate, getTomorrowDate } from "../utils/date.js";
@@ -18,16 +20,16 @@ class WordleService {
   };
 
   static rankingsLimit = 30;
+  static wordsLimit = 30;
 
   static create = async (
+    day,
     word,
     hindiTranslation,
     englishMeaning,
     hindiMeaning,
     status = WordleWordStatus.Draft
   ) => {
-    const day = getTomorrowDate();
-
     try {
       let wordleWord = await WordleWord.create({
         word,
@@ -108,9 +110,34 @@ class WordleService {
     }
   };
 
+  static delete = async (wordId) => {
+    const t = await db.transaction();
+
+    try {
+      const deleteResult = await WordleWord.destroy({
+        where: { id: wordId },
+        transaction: t,
+        individualHooks: true,
+      });
+
+      if (deleteResult !== 1) {
+        await t.rollback();
+        return sRes(serviceCodes.DB_ERR, { wordId });
+      }
+
+      await t.commit();
+      return sRes(serviceCodes.OK);
+    } catch (err) {
+      await t.rollback();
+      return sRes(serviceCodes.DB_ERR, { wordId }, err);
+    }
+  };
+
   static getWordByDay = async (day = getTodayDate()) => {
     try {
-      let word = await WordleWord.findOne({ where: { day } });
+      let word = await WordleWord.findOne({
+        where: { day, status: status.Published },
+      });
       if (word === null) return sRes(this.codes.NO_WORD_ON_DAY, { day });
       word = word.get({ plain: true });
 
@@ -129,7 +156,10 @@ class WordleService {
     guessedCorrectly = guessedCorrectly === true;
 
     try {
-      const word = await WordleWord.findOne({ where: { day }, transaction: t });
+      const word = await WordleWord.findOne({
+        where: { day, status: status.Published },
+        transaction: t,
+      });
       if (word === null) {
         await t.rollback();
         return sRes(this.codes.NO_WORD_ON_DAY, {
@@ -152,6 +182,20 @@ class WordleService {
         let [updateResult] = await WordleRank.update(
           { rank: totalWordleUsersForDay },
           { where: { wordId: word.id, profileId }, transaction: t }
+        );
+
+        if (updateResult !== 1) {
+          await t.rollback();
+          return sRes(serviceCodes.DB_ERR, {
+            guessedCorrectly,
+            day,
+            profileId,
+          });
+        }
+
+        [updateResult] = await WordleWord.increment(
+          { solvedBy: 1 },
+          { where: { id: word.id }, transaction: t }
         );
 
         if (updateResult !== 1) {
@@ -222,6 +266,22 @@ class WordleService {
       return sRes(serviceCodes.OK, { userResult });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, { day, profileId }, err);
+    }
+  };
+
+  static getWords = async (offset, admin = false) => {
+    try {
+      let words = await WordleWord.findAll({
+        where: admin ? {} : { status: status.Published },
+        offset,
+        limit: this.wordsLimit,
+        order: [[timestampsKeys.createdAt, "desc"]],
+      });
+      words = words.map((w) => w.get({ plain: true }));
+
+      return sRes(serviceCodes.OK, { words });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { offset }, err);
     }
   };
 }
