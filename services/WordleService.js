@@ -213,15 +213,6 @@ class WordleService {
           { solvedBy: 1 },
           { where: { id: word.id }, transaction: t }
         );
-
-        if (updateResult !== 1) {
-          await t.rollback();
-          return sRes(serviceCodes.DB_ERR, {
-            guessedCorrectly,
-            day,
-            profileId,
-          });
-        }
       }
 
       let wordleUserRank = await WordleRank.findOne({
