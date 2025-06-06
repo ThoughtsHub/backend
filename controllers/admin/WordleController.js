@@ -41,7 +41,7 @@ class AdminWordleController {
       englishMeaning,
       hindiMeaning,
       englishSentenceUse,
-      hindiSentenceUser,
+      hindiSentenceUse,
       status = WStatus.Draft,
     } = req.body;
 
@@ -52,6 +52,8 @@ class AdminWordleController {
         hindiTranslation,
         englishMeaning,
         hindiMeaning,
+        englishSentenceUse,
+        hindiSentenceUse,
         status
       );
       if (serviceResultBadHandler(result, res, "Wordle word creation failed"))
@@ -68,7 +70,7 @@ class AdminWordleController {
         englishMeaning,
         hindiMeaning,
         englishSentenceUse,
-        hindiSentenceUser,
+        hindiSentenceUse,
         status,
       });
     } catch (err) {

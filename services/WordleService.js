@@ -6,7 +6,7 @@ import WordleWord, {
   status,
   status as WordleWordStatus,
 } from "../models/Wordle_Word.js";
-import { getTodayDate, getTomorrowDate } from "../utils/date.js";
+import { getTodayDate } from "../utils/date.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 
@@ -28,6 +28,8 @@ class WordleService {
     hindiTranslation,
     englishMeaning,
     hindiMeaning,
+    englishSentenceUse,
+    hindiSentenceUse,
     status = WordleWordStatus.Draft
   ) => {
     try {
@@ -36,6 +38,8 @@ class WordleService {
         hindiTranslation,
         englishMeaning,
         hindiMeaning,
+        englishSentenceUse,
+        hindiSentenceUse,
         day,
         status,
       });
@@ -51,6 +55,8 @@ class WordleService {
           hindiTranslation,
           englishMeaning,
           hindiMeaning,
+          englishSentenceUse,
+          hindiSentenceUse,
           day,
         },
         err
@@ -79,6 +85,16 @@ class WordleService {
         case "englishMeaning":
           if (Validate.wordleFields(val))
             valuesToBeUpdated.englishMeaning = val;
+          break;
+
+        case "englishSentenceUse":
+          if (Validate.wordleFields(val))
+            valuesToBeUpdated.englishSentenceUse = val;
+          break;
+
+        case "hindiSentenceUse":
+          if (Validate.wordleFields(val))
+            valuesToBeUpdated.hindiSentenceUse = val;
           break;
 
         case "status":
