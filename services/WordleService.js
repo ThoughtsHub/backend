@@ -153,7 +153,11 @@ class WordleService {
   static getWordByDay = async (day = getTodayDate()) => {
     try {
       let word = await WordleWord.findOne({
-        where: { day, status: status.Published },
+        where: {
+          day,
+          status: status.Published,
+          [timestampsKeys.createdAt]: { [Op.lte]: getTodayIstTime() },
+        },
       });
       if (word === null) return sRes(this.codes.NO_WORD_ON_DAY, { day });
       word = word.get({ plain: true });
