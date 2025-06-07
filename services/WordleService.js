@@ -59,6 +59,7 @@ class WordleService {
           englishSentenceUse,
           hindiSentenceUse,
           day,
+          status,
         },
         err
       );
