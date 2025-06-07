@@ -3,6 +3,7 @@ import { connectToPg } from "../db/pg.js";
 import Forum from "../models/Forum.js";
 import ForumAppreciation from "../models/Forum_Appreciation.js";
 import ForumComment from "../models/Forum_Comment.js";
+import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 import { Forum_ } from "../services/ForumService.js";
 import { User_ } from "../services/UserService.js";
@@ -10,14 +11,14 @@ import { User_ } from "../services/UserService.js";
 await connectToPg();
 await initLink();
 
-const updateUserPasswords = async () => {
-  const users = await User.findAll();
-  for (const user of users) {
-    if (user.password === 'admin') {
-      const result = await User_.updatePassword(user.password, user.id);
-      console.log(result)
-    }
+const updateForumCounts = async () => {
+  const profiles = await Profile.findAll();
+  for (const profile of profiles) {
+    const pid = profile.id;
+
+    const forumCount = await Forum.count({ where: { profileId: pid } });
+    await Profile.update({ forums: forumCount }, { where: { id: pid } });
   }
 };
 
-await updateUserPasswords()
+await updateForumCounts();
