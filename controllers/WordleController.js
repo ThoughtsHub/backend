@@ -63,7 +63,11 @@ class WordleController {
 
       const words = result.info.words;
 
-      res.ok("Wordle words", { words });
+      res.ok("Wordle words", {
+        words,
+        newOffset:
+          words.length < Wordle_.wordsLimit ? null : offset + words.length,
+      });
 
       logOk("Wordle words fetched", "A user requested for wordle words", {
         offset,

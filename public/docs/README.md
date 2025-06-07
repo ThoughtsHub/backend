@@ -1256,6 +1256,42 @@ Get word of a specific day
 }
 ```
 
+#### GET /wordle/words
+
+Get words by offset
+
+**Query :**
+
+```js
+{
+    offset: number [default: 0]
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  word: [
+    {
+    day: string [format: dd-mm-yyyy]
+    word: string
+    hindiTranslation: string
+    englishMeaning: string
+    hindiMeaning: string
+    englishSentenceUse: string
+    hindiSentenceUse: string
+  }
+  ],
+  newOffset: number | null
+}
+```
+
+> If `newOffset` is `null` then no words are available.
+
+
 #### POST /wordle
 
 Sets the wordle's result for a specific day
