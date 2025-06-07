@@ -1348,3 +1348,5 @@ Gets the result for a specific day
     newOffset: number | null
 }
 ```
+
+> If `newOffset` is `null` then all candidates have been sent.
