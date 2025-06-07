@@ -8,9 +8,9 @@ import WordleWord, {
   status as WordleWordStatus,
 } from "../models/Wordle_Word.js";
 import {
+  checkDateLessEqualThanToday,
   getTodayDate,
   getTodayIstTime,
-  getTommorowIstTime,
 } from "../utils/date.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
@@ -21,6 +21,10 @@ class WordleService {
     NO_WORD_ON_DAY: [
       "NO WORD ON THIS DAY",
       "No word was specified on this day",
+    ],
+    BAD_DAY: [
+      "BAD DAY",
+      "You are requesting for future which isn't available now...",
     ],
   };
 
@@ -156,12 +160,14 @@ class WordleService {
   };
 
   static getWordByDay = async (day = getTodayDate()) => {
+    if (!checkDateLessEqualThanToday(day))
+      return sRes(this.codes.BAD_DAY, { day });
+
     try {
       let word = await WordleWord.findOne({
         where: {
           day,
           status: status.Published,
-          [timestampsKeys.createdAt]: { [Op.lt]: getTommorowIstTime() },
         },
       });
       if (word === null) return sRes(this.codes.NO_WORD_ON_DAY, { day });
