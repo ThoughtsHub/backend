@@ -50,3 +50,18 @@ export const checkDateLessEqualThanToday = (dateStr) => {
 
   return inputDate.getTime() <= todayISTDate.getTime();
 };
+
+export const getTodayIstTime = () => {
+  // Get today's IST date (ignoring time)
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
+  const istNow = new Date(utcNow + istOffset);
+
+  // Create IST date object with time set to 00:00:00 for comparison
+  const todayISTDate = new Date(
+    Date.UTC(istNow.getFullYear(), istNow.getMonth(), istNow.getDate())
+  );
+
+  return todayISTDate.getTime();
+};

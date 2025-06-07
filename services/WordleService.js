@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { includeProfile } from "../constants/include.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
@@ -6,7 +7,7 @@ import WordleWord, {
   status,
   status as WordleWordStatus,
 } from "../models/Wordle_Word.js";
-import { getTodayDate } from "../utils/date.js";
+import { getTodayDate, getTodayIstTime } from "../utils/date.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 
@@ -288,7 +289,12 @@ class WordleService {
   static getWords = async (offset, admin = false) => {
     try {
       let words = await WordleWord.findAll({
-        where: admin ? {} : { status: status.Published },
+        where: admin
+          ? {}
+          : {
+              status: WordleWordStatus.Published,
+              [timestampsKeys.createdAt]: { [Op.lt]: getTodayIstTime() },
+            },
         offset,
         limit: this.wordsLimit,
         order: [[timestampsKeys.createdAt, "desc"]],
