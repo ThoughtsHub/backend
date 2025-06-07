@@ -65,3 +65,20 @@ export const getTodayIstTime = () => {
 
   return todayISTDate.getTime();
 };
+
+export const getTommorowIstTime = () => {
+  // Get today's IST date (ignoring time)
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
+  const istNow = new Date(utcNow + istOffset);
+
+  istNow.setDate(istNow.getDate() + 1);
+
+  // Create IST date object with time set to 00:00:00 for comparison
+  const tommorowISTDate = new Date(
+    Date.UTC(istNow.getFullYear(), istNow.getMonth(), istNow.getDate())
+  );
+
+  return tommorowISTDate.getTime();
+};

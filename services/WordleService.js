@@ -7,7 +7,11 @@ import WordleWord, {
   status,
   status as WordleWordStatus,
 } from "../models/Wordle_Word.js";
-import { getTodayDate, getTodayIstTime } from "../utils/date.js";
+import {
+  getTodayDate,
+  getTodayIstTime,
+  getTommorowIstTime,
+} from "../utils/date.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 
@@ -157,7 +161,7 @@ class WordleService {
         where: {
           day,
           status: status.Published,
-          [timestampsKeys.createdAt]: { [Op.lte]: getTodayIstTime() },
+          [timestampsKeys.createdAt]: { [Op.lt]: getTommorowIstTime() },
         },
       });
       if (word === null) return sRes(this.codes.NO_WORD_ON_DAY, { day });
