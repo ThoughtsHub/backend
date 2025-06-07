@@ -209,10 +209,19 @@ class WordleService {
           });
         }
 
-        [updateResult] = await WordleWord.increment(
+        let [[_, updateResult2]] = await WordleWord.increment(
           { solvedBy: 1 },
           { where: { id: word.id }, transaction: t }
         );
+
+        if (updateResult2 !== 1) {
+          await t.rollback();
+          return sRes(serviceCodes.DB_ERR, {
+            guessedCorrectly,
+            day,
+            profileId,
+          });
+        }
       }
 
       let wordleUserRank = await WordleRank.findOne({
