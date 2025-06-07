@@ -1,7 +1,6 @@
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 import Activity from "../models/Activity.js";
-import { isNumber } from "../utils/checks.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 
 class ActivityService {

@@ -3,7 +3,6 @@ import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 import ForumComment from "../models/Forum_Comment.js";
 import Forum from "../models/Forum.js";
-import { isNumber } from "../utils/checks.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { includeWriter } from "../constants/include.js";
 import { Op } from "sequelize";

@@ -1,6 +1,5 @@
 import { timestampsKeys } from "../constants/timestamps.js";
 import Log, { logTypes, RT } from "../models/Log.js";
-import { isNumber } from "../utils/checks.js";
 import { Validate } from "./ValidationService.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { RC } from "../utils/codes.js";
