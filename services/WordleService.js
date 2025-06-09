@@ -304,7 +304,7 @@ class WordleService {
   static getWords = async (offset, admin = false) => {
     try {
       let todayWord = await WordleWord.findOne({
-        where: { day: getTodayDate },
+        where: { day: getTodayDate() },
       });
       const topTime = todayWord[timestampsKeys.createdAt];
 
