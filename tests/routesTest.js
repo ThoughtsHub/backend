@@ -340,3 +340,9 @@ let commentId = null;
   });
   isPassed("Feedback", result, true);
 }
+
+// Test - Notifications
+{
+  let result = await _fetch("GET", "/notification");
+  isPassed("Notification", result, true);
+}

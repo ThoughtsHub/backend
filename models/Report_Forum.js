@@ -31,7 +31,7 @@ const ReportForum = db.define(
     priority: {
       ...types.ENUM,
       values: Object.values(priority),
-      defaultValue: priority.medium,
+      defaultValue: priority.Medium,
     },
     status: {
       ...types.ENUM,
