@@ -15,19 +15,20 @@ class NotificationService {
         transaction: t,
       });
       const fromProfile = await Profile.findByPk(fromId, { transaction: t });
+      if (profile.id !== fromProfile.id) {
+        const message = `${fromProfile.username} liked on "${forum.title}"`;
 
-      const message = `${fromProfile.username} liked on "${forum.title}"`;
-
-      const notification = await Notification.create(
-        {
-          type: variants.LIKE,
-          profileId: profile.id,
-          forumId: forum.id,
-          fromProfileId: fromProfile.id,
-          notificationMessage: message,
-        },
-        { transaction: t }
-      );
+        const notification = await Notification.create(
+          {
+            type: variants.LIKE,
+            profileId: profile.id,
+            forumId: forum.id,
+            fromProfileId: fromProfile.id,
+            notificationMessage: message,
+          },
+          { transaction: t }
+        );
+      }
 
       return sRes(serviceCodes.OK, { forumId, fromId });
     } catch (err) {
@@ -43,18 +44,21 @@ class NotificationService {
       });
       const fromProfile = await Profile.findByPk(fromId, { transaction: t });
 
-      const message = `${fromProfile.username} unliked on "${forum.title}"`;
+      if (profile.id !== fromProfile.id) {
+        const message = `${fromProfile.username} unliked on "${forum.title}"`;
 
-      const notification = await Notification.create(
-        {
-          type: variants.UNLIKE,
-          profileId: profile.id,
-          forumId: forum.id,
-          fromProfileId: fromProfile.id,
-          notificationMessage: message,
-        },
-        { transaction: t }
-      );
+        const notification = await Notification.create(
+          {
+            type: variants.UNLIKE,
+            profileId: profile.id,
+            forumId: forum.id,
+            fromProfileId: fromProfile.id,
+            notificationMessage: message,
+          },
+          { transaction: t }
+        );
+      }
+
       return sRes(serviceCodes.OK, { forumId, fromId });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, { forumId, fromId }, err);
@@ -72,19 +76,21 @@ class NotificationService {
       });
       const fromProfile = await Profile.findByPk(fromId, { transaction: t });
 
-      const message = `${fromProfile.username} commented on "${forum.title}"`;
+      if (profile.id !== fromProfile.id) {
+        const message = `${fromProfile.username} commented on "${forum.title}"`;
 
-      const notification = await Notification.create(
-        {
-          type: variants.UNLIKE,
-          profileId: profile.id,
-          forumId: forum.id,
-          commentId: comment.id,
-          fromProfileId: fromProfile.id,
-          notificationMessage: message,
-        },
-        { transaction: t }
-      );
+        const notification = await Notification.create(
+          {
+            type: variants.UNLIKE,
+            profileId: profile.id,
+            forumId: forum.id,
+            commentId: comment.id,
+            fromProfileId: fromProfile.id,
+            notificationMessage: message,
+          },
+          { transaction: t }
+        );
+      }
 
       return sRes(serviceCodes.OK, { commentId, fromId });
     } catch (err) {
