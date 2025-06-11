@@ -1350,3 +1350,39 @@ Gets the result for a specific day
 ```
 
 > If `newOffset` is `null` then all candidates have been sent.
+
+### Notification
+
+#### GET /notification
+
+Gives a list of notifications from the latest to oldest \
+**Must be logged in** \
+
+**Query :**
+```js
+{
+    offset: number [default: 0]
+}
+```
+
+**Result :**
+```js
+{
+    success: boolean
+    message: string
+    notifications: [
+        {
+            id: string,
+            type: string [LIKE, UNLIKE, COMMENT] [action taken],
+            profileId: string [on whose forum/comment, action taken],
+            forumId: string [on which forum, action taken],
+            commentId: string | null [on which comment, action taken],
+            fromProfileId: string [who took action],
+            notificationMessage: string [general message what action happened],
+        }
+    ],
+    newOffset: number | null
+}
+```
+
+> If `newOffset` is `null`, notifications have been exhausted
