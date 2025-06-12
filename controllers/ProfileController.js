@@ -92,9 +92,10 @@ class ProfileController {
 
   static get = async (req, res) => {
     const profileId = req.query.profileId;
-    if (profileId === req?.user?.profile?.id) {
+    const reqProfileId = req?.user?.profile?.id;
+    if (profileId === reqProfileId) {
       try {
-        let result = await Profile_.getById(profileId);
+        let result = await Profile_.getById(profileId, reqProfileId);
 
         if (serviceResultBadHandler(result, res, "Profile request failed"))
           return;
@@ -115,7 +116,7 @@ class ProfileController {
     }
 
     try {
-      let result = await Profile_.getById(profileId);
+      let result = await Profile_.getById(profileId, reqProfileId);
 
       if (serviceResultBadHandler(result, res, "Profile request failed"))
         return;
@@ -139,7 +140,7 @@ class ProfileController {
     const profileId = req?.user?.profile?.id;
 
     try {
-      let result = await Profile_.getById(profileId);
+      let result = await Profile_.getById(profileId, profileId);
 
       if (serviceResultBadHandler(result, res, "Profile request failed"))
         return;
@@ -190,10 +191,11 @@ class ProfileController {
   };
 
   static getUsers = async (req, res) => {
+    const profileId = req?.user?.profile?.id;
     let offset = toNumber(req.query.offset);
 
     try {
-      let result = await Profile_.getAll(offset);
+      let result = await Profile_.getAll(offset, profileId);
 
       if (serviceResultBadHandler(result, res, "Users fetch failed")) return;
 

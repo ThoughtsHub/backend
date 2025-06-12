@@ -44,12 +44,17 @@ class FollowerController {
     }
   };
 
-  static get = async (req, res) => {
+  static getFollowers = async (req, res) => {
+    const reqProfileId = req?.user?.profile?.id;
     let { profileId, offset } = req.query;
     offset = toNumber(offset);
 
     try {
-      const result = await Follower_.get(profileId, offset);
+      const result = await Follower_.getFollowers(
+        profileId,
+        offset,
+        reqProfileId
+      );
       if (serviceResultBadHandler(result, res, "Followers list fetch failed"))
         return;
 
@@ -64,6 +69,39 @@ class FollowerController {
       });
 
       logOk("Followers fetched", "A user requested for followers list", {
+        profileId,
+      });
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static getFollowing = async (req, res) => {
+    const reqProfileId = req?.user?.profile?.id;
+    let { profileId, offset } = req.query;
+    offset = toNumber(offset);
+
+    try {
+      const result = await Follower_.getFollowing(
+        profileId,
+        offset,
+        reqProfileId
+      );
+      if (serviceResultBadHandler(result, res, "Followings list fetch failed"))
+        return;
+
+      const followings = result.info.followings;
+
+      res.ok("Following", {
+        followings,
+        newOffset:
+          followings.length < Follower_.followersLimit
+            ? null
+            : followings.length + offset,
+      });
+
+      logOk("Followings fetched", "A user requested for followings list", {
         profileId,
       });
     } catch (err) {

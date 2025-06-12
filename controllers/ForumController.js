@@ -201,17 +201,28 @@ class ForumController {
   };
 
   static getComments = async (req, res) => {
+    const profileId = req?.user?.profile?.id;
     let { timestamp, forumId } = req.query;
     timestamp = toNumber(timestamp);
 
     try {
-      let result = await ForumComment_.getByTimestamp(timestamp, forumId);
+      let result = await ForumComment_.getByTimestamp(
+        timestamp,
+        forumId,
+        profileId
+      );
 
       if (serviceResultBadHandler(result, res, "Comments fetch failed")) return;
 
       const comments = result.info.comments;
 
-      res.ok("Comments fetched", { comments });
+      res.ok("Comments fetched", {
+        comments,
+        newOffset:
+          comments.length < ForumComment_.commentsLimit
+            ? null
+            : comments.length + offset,
+      });
 
       logOk("Comments fetched", "A user fetched comments", null);
     } catch (err) {

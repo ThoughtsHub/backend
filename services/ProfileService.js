@@ -4,7 +4,12 @@ import Forum from "../models/Forum.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 import { timestampsKeys } from "../constants/timestamps.js";
-import { includeAppreciation, includeWriter } from "../constants/include.js";
+import {
+  includeAppreciation,
+  includeFollower,
+  includeWriter,
+  includeWriterWith,
+} from "../constants/include.js";
 import { Op } from "sequelize";
 
 class ProfileService {
@@ -148,16 +153,23 @@ class ProfileService {
     }
   };
 
-  static getById = async (profileId) => {
+  static getById = async (profileId, requesterProfileId = null) => {
     if (!Validate.id(profileId))
       return sRes(serviceCodes.BAD_ID, { profileId });
 
     try {
-      let profile = await Profile.findByPk(profileId);
+      let profile = await Profile.findByPk(profileId, {
+        include: [null, undefined].includes(requesterProfileId)
+          ? []
+          : [includeFollower(requesterProfileId)],
+      });
 
       if (profile !== null) {
         profile = profile.get({ plain: true });
         profile.profileId = profile.id;
+        profile.isFollowing =
+          Array.isArray(profile.Followers) && profile.Followers.length === 1;
+        delete profile.Followers;
         delete profile.id;
       }
 
@@ -197,12 +209,18 @@ class ProfileService {
         order: [[timestampsKeys.createdAt, "desc"]],
         include: [null, undefined].includes(requesterProfileId)
           ? [includeWriter]
-          : [includeWriter, includeAppreciation(requesterProfileId)],
+          : [
+              includeAppreciation(requesterProfileId),
+              includeWriterWith(requesterProfileId, false, "writer"),
+            ],
       });
       forums = forums.map((f) => {
         f = f.get({ plain: true });
         f.isVoted =
           Array.isArray(f.appreciations_) && f.appreciations_.length === 1;
+        f.writer.isFollowing =
+          Array.isArray(f.writer.Followers) && f.writer.Followers.length === 1;
+        delete f.writer.Followers;
         delete f.appreciations_;
         return f;
       });
@@ -217,18 +235,21 @@ class ProfileService {
     }
   };
 
-  static getAll = async (offset) => {
+  static getAll = async (offset, profileId = null) => {
     try {
       let users = await Profile.findAll({
-        where: { [Op.not]: { username: "admin" } }, // should not list admins in the users list
+        // where: { [Op.not]: { username: "admin" } }, // should not list admins in the users list
         offset,
         limit: this.usersLimit,
         order: [[timestampsKeys.createdAt, "desc"]],
+        include: [includeFollower(profileId)],
       });
 
       users = users.map((u) => {
         u = u.get({ plain: true });
         u.profileId = u.id;
+        u.isFollowing = Array.isArray(u.follow) && u.follow.length === 1;
+        delete u.follow;
         delete u.id;
         return u;
       });

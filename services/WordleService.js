@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { includeProfile } from "../constants/include.js";
+import { includeProfile, includeWriterWith } from "../constants/include.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import db from "../db/pg.js";
 import WordleRank from "../models/Wordle_Rank.js";
@@ -258,7 +258,7 @@ class WordleService {
     }
   };
 
-  static getRankingsByOffset = async (day, offset = 0) => {
+  static getRankingsByOffset = async (day, offset = 0, profileId = null) => {
     try {
       const word = await WordleWord.findOne({ where: { day } });
       if (word === null)
@@ -269,9 +269,15 @@ class WordleService {
         offset,
         limit: this.rankingsLimit,
         order: [["rank", "asc"]],
-        include: [includeProfile],
+        include: [includeWriterWith(profileId, false, "profile")],
       });
-      rankings = rankings.map((r) => r.get({ plain: true }));
+      rankings = rankings.map((r) => {
+        r = r.get({ plain: true });
+        r.profile.isFollowing =
+          Array.isArray(r.profile.follow) && r.profile.follow.length === 1;
+        delete r.profile.follow;
+        return r;
+      });
 
       return sRes(serviceCodes.OK, { rankings });
     } catch (err) {
@@ -306,7 +312,7 @@ class WordleService {
       let todayWord = await WordleWord.findOne({
         where: { day: getTodayDate() },
       });
-      const topTime = todayWord[timestampsKeys.createdAt];
+      const topTime = todayWord?.[timestampsKeys.createdAt] ?? Date.now();
 
       let words = await WordleWord.findAll({
         where: admin

@@ -6,7 +6,11 @@ import Profile from "../models/Profile.js";
 import ForumAppreciation from "../models/Forum_Appreciation.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { Op } from "sequelize";
-import { includeAppreciation, includeWriter } from "../constants/include.js";
+import {
+  includeAppreciation,
+  includeWriter,
+  includeWriterWith,
+} from "../constants/include.js";
 
 class ForumService {
   // Forum service response codes
@@ -348,7 +352,10 @@ class ForumService {
         order: [[timestampsKeys.createdAt, "desc"]],
         include: [null, undefined].includes(profileId)
           ? [includeWriter]
-          : [includeWriter, includeAppreciation(profileId)],
+          : [
+              includeAppreciation(profileId),
+              includeWriterWith(profileId, false, "writer"),
+            ],
       });
       if (forums.length < this.forumsLimit) {
         let forumIds = forums.map((f) => f.id);
@@ -358,7 +365,10 @@ class ForumService {
           limit: this.forumsLimit,
           include: [null, undefined].includes(profileId)
             ? [includeWriter]
-            : [includeWriter, includeAppreciation(profileId)],
+            : [
+                includeAppreciation(profileId),
+                includeWriterWith(profileId, false, "writer"),
+              ],
         });
 
         forums_ = forums_.slice(0, this.forumsLimit - forums.length - 1);
@@ -369,6 +379,9 @@ class ForumService {
         f = f.get({ plain: true });
         f.isVoted =
           Array.isArray(f.appreciations_) && f.appreciations_.length === 1;
+        f.writer.isFollowing =
+          Array.isArray(f.writer.follow) && f.writer.follow.length === 1;
+        delete f.writer.follow;
         delete f.appreciations_;
         return f;
       });

@@ -130,7 +130,7 @@ class WordleController {
       )
         return;
 
-      const result2 = await Wordle_.getRankingsByOffset(day, offset);
+      const result2 = await Wordle_.getRankingsByOffset(day, offset, profileId);
       if (
         serviceResultBadHandler(
           result2,

@@ -45,8 +45,15 @@ export const profileAssociation = () => {
   });
   ReportForum.belongsTo(Profile, { foreignKey: "profileId", as: "reporter" });
 
-  Profile.hasMany(Follower, { foreignKey: "profileId", onDelete: "CASCADE" });
-  Follower.belongsTo(Profile, { foreignKey: "profileId" });
+  Profile.hasMany(Follower, {
+    foreignKey: "profileId",
+    onDelete: "CASCADE",
+    as: "follow",
+  });
+  Follower.belongsTo(Profile, {
+    foreignKey: "profileId",
+    as: "followedProfile",
+  });
 
   Profile.hasMany(Follower, { foreignKey: "followerId", onDelete: "CASCADE" });
   Follower.belongsTo(Profile, { foreignKey: "followerId" });

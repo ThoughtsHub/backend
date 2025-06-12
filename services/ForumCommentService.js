@@ -4,7 +4,7 @@ import { Validate } from "./ValidationService.js";
 import ForumComment from "../models/Forum_Comment.js";
 import Forum from "../models/Forum.js";
 import { timestampsKeys } from "../constants/timestamps.js";
-import { includeWriter } from "../constants/include.js";
+import { includeWriter, includeWriterWith } from "../constants/include.js";
 import { Op } from "sequelize";
 
 class ForumCommentService {
@@ -215,7 +215,7 @@ class ForumCommentService {
     }
   };
 
-  static getByTimestamp = async (timestamp, forumId) => {
+  static getByTimestamp = async (timestamp, forumId, profileId = null) => {
     if (!Validate.id(forumId)) return sRes(serviceCodes.BAD_ID, { forumId });
 
     const whereObjTimestamp = {
@@ -226,11 +226,19 @@ class ForumCommentService {
       let comments = await ForumComment.findAll({
         where: { forumId, ...whereObjTimestamp },
         order: [[timestampsKeys.createdAt, "desc"]],
-        include: [includeWriter],
+        include: [null, undefined].includes(profileId)
+          ? [includeWriter]
+          : [includeWriterWith(profileId, false, "writer")],
         limit: this.commentsLimit,
       });
 
-      comments = comments.map((c) => c.get({ plain: true }));
+      comments = comments.map((c) => {
+        c = c.get({ plain: true });
+        c.writer.isFollowing =
+          Array.isArray(c.writer.follow) && c.writer.follow.length === 1;
+        delete c.writer.follow;
+        return c;
+      });
 
       return sRes(serviceCodes.OK, { comments });
     } catch (err) {

@@ -21,6 +21,8 @@ router.post("/follow", loggedIn, haveProfile, FollowerController.follow);
 
 router.post("/unfollow", loggedIn, haveProfile, FollowerController.unfollow);
 
-router.get("/followers", FollowerController.get);
+router.get("/followers", FollowerController.getFollowers);
+
+router.get("/following", FollowerController.getFollowing);
 
 export const ProfileRouter = router;
