@@ -7,7 +7,6 @@ import ForumAppreciation from "../models/Forum_Appreciation.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { Op } from "sequelize";
 import { includeAppreciation, includeWriter } from "../constants/include.js";
-import notify from "./NotificationService.js";
 
 class ForumService {
   // Forum service response codes
@@ -258,8 +257,6 @@ class ForumService {
         }
       }
 
-      await notify.like(forumId, profileId, t);
-
       await t.commit();
       return sRes(serviceCodes.OK, { forumId, profileId });
     } catch (err) {
@@ -313,8 +310,6 @@ class ForumService {
           return sRes(serviceCodes.DB_ERR, { forumId, profileId });
         }
       }
-
-      await notify.unlike(forumId, profileId, t);
 
       await t.commit();
       return sRes(serviceCodes.OK, { forumId, profileId });

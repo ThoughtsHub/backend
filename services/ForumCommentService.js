@@ -6,7 +6,6 @@ import Forum from "../models/Forum.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { includeWriter } from "../constants/include.js";
 import { Op } from "sequelize";
-import notify from "./NotificationService.js";
 
 class ForumCommentService {
   // Forum comment service response codes
@@ -54,8 +53,6 @@ class ForumCommentService {
           err
         );
       }
-
-      await notify.comment(comment.id, profileId, t);
 
       await t.commit();
       return sRes(serviceCodes.OK, { comment });
