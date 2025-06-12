@@ -1,4 +1,5 @@
 import Feedback from "../models/Feedback.js";
+import Follower from "../models/Follower.js";
 import Forum from "../models/Forum.js";
 import ForumAppreciation from "../models/Forum_Appreciation.js";
 import ForumComment from "../models/Forum_Comment.js";
@@ -43,4 +44,10 @@ export const profileAssociation = () => {
     as: "forumReports",
   });
   ReportForum.belongsTo(Profile, { foreignKey: "profileId", as: "reporter" });
+
+  Profile.hasMany(Follower, { foreignKey: "profileId", onDelete: "CASCADE" });
+  Follower.belongsTo(Profile, { foreignKey: "profileId" });
+
+  Profile.hasMany(Follower, { foreignKey: "followerId", onDelete: "CASCADE" });
+  Follower.belongsTo(Profile, { foreignKey: "followerId" });
 };

@@ -28,6 +28,14 @@ export const includeProfile = {
   },
 };
 
+export const includeProfileNOTAs = {
+  model: Profile,
+  attributes: {
+    include: [["id", "profileId"]],
+    exclude: ["id"],
+  },
+};
+
 export const includeAppreciation = (profileId) => ({
   model: ForumAppreciation,
   as: "appreciations_",

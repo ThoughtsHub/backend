@@ -44,6 +44,7 @@ const valuesInBody = [
   "hindiMeaning",
   "englishSentenceUse",
   "hindiSentenceUser",
+  "following",
 ];
 const valuesInQuery = [
   "timestamp",
