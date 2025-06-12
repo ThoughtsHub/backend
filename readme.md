@@ -19,6 +19,20 @@ Headers Token for Authorization (Login): **auth_token**
 
 ---
 
+> Each **Profile** Object will have these fields in them:
+
+```js
+{
+    fullName: string
+    ...
+    followers: number
+    following: number
+    forums: number
+}
+```
+
+---
+
 ## **Routes**
 
 Each section in **Routes** is divided by the action that can be performed on the API.
@@ -396,6 +410,7 @@ Gets the profile of a certain user.
             profileImageUrl: string | null
             gender: string
             dob: number | null
+            isFollowing: boolean
             forumsCount: number
             createDate: number
             updateDate: number
@@ -429,6 +444,7 @@ Gets the profile of currently logged in user.
             profileImageUrl: string | null
             gender: string
             dob: number | null
+            isFollowing: boolean
             forumsCount: number
             createDate: number
             updateDate: number
@@ -483,6 +499,7 @@ Gets the forums of requested user, or currently logged in user.
                         profileImageUrl: string
                         gender: string
                         dob: string
+                        isFollowing: boolean
                     }
             ...
         }
@@ -562,7 +579,7 @@ Get the followers list of the requested user
             profileId: string
             followerId: string
             profile : {
-                 userId: string
+                userId: string
                 profileId: string
                 username: string
                 fullName: string
@@ -570,6 +587,7 @@ Get the followers list of the requested user
                 profileImageUrl: string
                 gender: string
                 dob: string
+                isFollowing: boolean
             }
         }
     ]
@@ -578,6 +596,48 @@ Get the followers list of the requested user
 ```
 
 > If `newOffset` is `null`, followers have been exhausted
+
+#### GET /profile/following
+
+Get the followings list of the requested user
+
+**Query :**
+
+```js
+{
+    offset: number [default : 0]
+    profileId: string [whose followings list you want]
+}
+```
+
+**Result :**
+
+```js
+{
+    success: boolean
+    message: string
+    followings: [
+        {
+            profileId: string
+            followerId: string
+            profile : {
+                userId: string
+                profileId: string
+                username: string
+                fullName: string
+                about: string
+                profileImageUrl: string
+                gender: string
+                dob: string
+                isFollowing: boolean
+            }
+        }
+    ]
+    newOffset: number | null
+}
+```
+
+> If `newOffset` is `null`, followings have been exhausted
 
 ---
 
@@ -912,6 +972,7 @@ Gets the forums, by using timestamp.
                         profileImageUrl: string
                         gender: string
                         dob: string
+                        isFollowing: boolean
                     }
             ...
         }
@@ -1108,6 +1169,7 @@ Gets the comments on a forum, by using timestamp.
                         profileImageUrl: string
                         gender: string
                         dob: string
+                        isFollowing: boolean
                     }
                 ...
         }
@@ -1266,6 +1328,7 @@ Gets suggested users
                 profileImageUrl: string
                 gender: string
                 dob: string
+                isFollowing: boolean
                 ...
             }
          ]
@@ -1424,6 +1487,7 @@ Gets the result for a specific day
                 profileImageUrl: string
                 gender: string
                 dob: string
+                isFollowing: boolean
             }
         }
     ]
