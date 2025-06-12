@@ -496,6 +496,89 @@ Gets the forums of requested user, or currently logged in user.
 - `400` : Profile Id invalid
 - `500` : Some error occured at server, contact admin.
 
+#### POST /profile/follow
+
+Follow a user
+
+**Body :**
+
+```js
+{
+  following: string [profileId of user you want to follow]
+}
+```
+
+**Result :**
+
+```js
+{
+  success: boolean;
+  message: string;
+}
+```
+
+#### POST /profile/unfollow
+
+Unfollow a user
+
+**Body :**
+
+```js
+{
+  following: string [profileId of user you want to unfollow]
+}
+```
+
+**Result :**
+
+```js
+{
+  success: boolean;
+  message: string;
+}
+```
+
+#### GET /profile/followers
+
+Get the followers list of the requested user
+
+**Query :**
+
+```js
+{
+    offset: number [default : 0]
+    profileId: string [whose followers list you want]
+}
+```
+
+**Result :**
+
+```js
+{
+    success: boolean
+    message: string
+    followers: [
+        {
+            profileId: string
+            followerId: string
+            profile : {
+                 userId: string
+                profileId: string
+                username: string
+                fullName: string
+                about: string
+                profileImageUrl: string
+                gender: string
+                dob: string
+            }
+        }
+    ]
+    newOffset: number | null
+}
+```
+
+> If `newOffset` is `null`, followers have been exhausted
+
 ---
 
 ### Logout
@@ -1291,7 +1374,6 @@ Get words by offset
 
 > If `newOffset` is `null` then no words are available.
 
-
 #### POST /wordle
 
 Sets the wordle's result for a specific day
@@ -1359,6 +1441,7 @@ Gives a list of notifications from the latest to oldest \
 **Must be logged in** \
 
 **Query :**
+
 ```js
 {
     offset: number [default: 0]
@@ -1366,6 +1449,7 @@ Gives a list of notifications from the latest to oldest \
 ```
 
 **Result :**
+
 ```js
 {
     success: boolean
