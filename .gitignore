@@ -27,3 +27,6 @@ tokens
 
 # image file size
 env/max*.txt
+
+# unneccessary data files
+data/csv
