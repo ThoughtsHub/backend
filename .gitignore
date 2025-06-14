@@ -8,7 +8,8 @@ node_modules
 public/uploads/*
 
 # python script files
-*.py
+./*.py
+scripts/*.py
 
 # python output files
 *.pyout
@@ -29,4 +30,4 @@ tokens
 env/max*.txt
 
 # unneccessary data files
-data/csv
+data/loaded_data
