@@ -85,6 +85,8 @@ class ValidateService {
   static wordleFields = (val) => isString(val) || isNull(val);
 
   static wordleStatus = (val) => Object.values(WordleWordStatus).includes(val);
+
+  static instituteField = (val) => isString(val);
 }
 
 export const Validate = ValidateService;

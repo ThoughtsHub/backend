@@ -19,6 +19,7 @@ const Institute = db.define(
       ...types.FOREIGN_ID,
       references: { model: "Institutes", key: "id" },
     },
+    imageUrl: { ...types.STRING, defaultValue: null },
     ...timestamps,
   },
   { hooks }

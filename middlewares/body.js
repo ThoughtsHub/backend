@@ -79,6 +79,7 @@ const valuesInQuery = [
   "categories",
   "order",
   "day",
+  "aisheCode",
 ];
 
 export const handleBody = (req, res, next) => {

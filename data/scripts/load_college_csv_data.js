@@ -97,7 +97,7 @@ const data = {
 }
 
 // Get all the field names
-const fields = [];
+const fields = ["category"]; // should be included here
 for (const key in data)
   data[key].fields.forEach((f) => {
     if (!fields.includes(f)) fields.push(f);
