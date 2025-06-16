@@ -1496,3 +1496,96 @@ Gets the result for a specific day
 ```
 
 > If `newOffset` is `null` then all candidates have been sent.
+
+---
+
+### Institutes
+
+#### GET /institute
+
+Gets the full details of a specific institute
+
+**Query :**
+
+```js
+{
+  aisheCode: string;
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  institute: {
+    category: string;
+    aisheCode: string;
+    name: string;
+    state: string | null;
+    district: string | null;
+    website: string | null;
+    yearOfEstablishment: string | null;
+    location: string | null;
+    type: string | null;
+    management: string | null;
+    universityName: string | null;
+    universityType: string | null;
+    administrativeMinistry: string | null;
+    imageUrl: string | null;
+  }
+}
+```
+
+#### GET /institute/all
+
+Gets the institute in array filtered by values if provided
+
+**Query :**
+
+```js
+{
+  category: string | null;
+  aisheCode: string | null;
+  name: string | null;
+  state: string | null;
+  district: string | null;
+  website: string | null;
+  yearOfEstablishment: string | null;
+  location: string | null;
+  type: string | null;
+  management: string | null;
+  universityName: string | null;
+  universityType: string | null;
+  administrativeMinistry: string | null;
+  imageUrl: string | null;
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: string;
+  institutes: [
+    {
+        category: string;
+        aisheCode: string;
+        name: string;
+        state: string | null;
+        district: string | null;
+        website: string | null;
+        yearOfEstablishment: string | null;
+        location: string | null;
+        type: string | null;
+        management: string | null;
+        universityName: string | null;
+        universityType: string | null;
+        administrativeMinistry: string | null;
+        imageUrl: string | null;
+    }
+  ]
+}
+```
