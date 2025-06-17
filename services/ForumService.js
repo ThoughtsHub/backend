@@ -11,6 +11,7 @@ import {
   includeWriter,
   includeWriterWith,
 } from "../constants/include.js";
+import sendNotification from "./NotificationService.js";
 
 class ForumService {
   // Forum service response codes
@@ -262,6 +263,14 @@ class ForumService {
       }
 
       await t.commit();
+
+      const profile = await Profile.findByPk(profileId);
+      sendNotification({
+        type: "FORUMID",
+        id: forumId,
+        data: { title: `${profile.username} liked your post`, body: "" },
+      });
+
       return sRes(serviceCodes.OK, { forumId, profileId });
     } catch (err) {
       await t.rollback();

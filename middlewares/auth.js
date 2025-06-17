@@ -36,12 +36,26 @@ export const auth = async (req, _, next) => {
     req.cookies.authToken ??
     "null";
 
+  const fcmToken = req.headers["fcm_token"] ?? null;
+
   const { valid, userId } = await validateAuth(userToken);
-  const user = valid
-    ? await User.findByPk(userId, {
-        include: { model: Profile, as: "profile" },
-      })
-    : null;
+
+  let user = null;
+  try {
+    user = valid
+      ? await User.findByPk(userId, {
+          include: { model: Profile, as: "profile" },
+        })
+      : null;
+
+    user = user.get({ plain: true });
+
+    // updating fcm token
+    if (fcmToken && user.fcmToken !== fcmToken)
+      await User.update({ fcmToken }, { where: { id: userId } });
+  } catch (err) {
+    _.serverError();
+  }
 
   if (user !== null) {
     req.user = user;

@@ -33,6 +33,7 @@ export const puppeteer = {
 };
 
 export const maxImageSizeFile = "./env/max_image_size.config.txt";
+export const firebaseConfigFile = "./env/firebase/firebase.config.json";
 
 const env = { server, pg, redis, google, nodeEnv, puppeteer };
 

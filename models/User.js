@@ -9,6 +9,7 @@ const User = db.define(
     password: { ...types.STR_REQ },
     email: { ...types.STRING, unique: true },
     mobile: { ...types.STRING, unique: true },
+    fcmToken: { ...types.STRING, defaultValue: null },
     ...timestamps,
   },
   { hooks }

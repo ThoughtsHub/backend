@@ -28,3 +28,6 @@ tokens
 
 # image file size
 env/max*.txt
+
+# firebase config
+env/firebase/*.config.json

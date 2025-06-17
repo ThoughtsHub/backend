@@ -6,6 +6,8 @@ import Forum from "../models/Forum.js";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { includeWriter, includeWriterWith } from "../constants/include.js";
 import { Op } from "sequelize";
+import sendNotification from "./NotificationService.js";
+import Profile from "../models/Profile.js";
 
 class ForumCommentService {
   // Forum comment service response codes
@@ -55,6 +57,17 @@ class ForumCommentService {
       }
 
       await t.commit();
+
+      const profile = await Profile.findByPk(profileId);
+      sendNotification({
+        type: "FORUMID",
+        id: forumId,
+        data: {
+          title: `${profile.username} commented on your post`,
+          body: "",
+        },
+      });
+
       return sRes(serviceCodes.OK, { comment });
     } catch (err) {
       await t.rollback();
