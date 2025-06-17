@@ -46,13 +46,12 @@ export const auth = async (req, _, next) => {
       })
     : null;
 
-  user = user.get({ plain: true });
-
   // updating fcm token
   if (fcmToken !== null && user.fcmToken !== fcmToken)
     await User.update({ fcmToken }, { where: { id: userId } });
 
   if (user !== null) {
+    user = user.get({ plain: true });
     req.user = user;
     req.loggedIn = true;
     req.userId = userId;
