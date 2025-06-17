@@ -31,3 +31,6 @@ env/max*.txt
 
 # firebase config
 env/firebase/*.config.json
+
+# private
+env/firebase/firebase_private
