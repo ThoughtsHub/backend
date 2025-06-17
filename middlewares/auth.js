@@ -40,22 +40,17 @@ export const auth = async (req, _, next) => {
 
   const { valid, userId } = await validateAuth(userToken);
 
-  let user = null;
-  try {
-    user = valid
-      ? await User.findByPk(userId, {
-          include: { model: Profile, as: "profile" },
-        })
-      : null;
+  let user = valid
+    ? await User.findByPk(userId, {
+        include: { model: Profile, as: "profile" },
+      })
+    : null;
 
-    user = user.get({ plain: true });
+  user = user.get({ plain: true });
 
-    // updating fcm token
-    if (fcmToken && user.fcmToken !== fcmToken)
-      await User.update({ fcmToken }, { where: { id: userId } });
-  } catch (err) {
-    _.serverError();
-  }
+  // updating fcm token
+  if (fcmToken !== null && user.fcmToken !== fcmToken)
+    await User.update({ fcmToken }, { where: { id: userId } });
 
   if (user !== null) {
     req.user = user;
