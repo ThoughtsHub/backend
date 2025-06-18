@@ -1546,6 +1546,7 @@ Gets the institute in array filtered by values if provided
 
 ```js
 {
+  offset: number [default: 0]
   category: string | null;
   aisheCode: string | null;
   name: string | null;
