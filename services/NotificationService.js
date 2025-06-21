@@ -57,6 +57,7 @@ class NotificationService {
 
     const response = await firebase.messaging().send(message);
     console.log(response);
+    console.log({ type, id, data, fcmToken });
   };
 }
 
