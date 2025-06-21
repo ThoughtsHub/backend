@@ -51,7 +51,7 @@ class NotificationService {
       token: fcmToken,
       notification: {
         title: data.title,
-        body: data.title,
+        body: data.body,
       },
     };
 
