@@ -55,7 +55,8 @@ class NotificationService {
       },
     };
 
-    await firebase.messaging().send(message);
+    const response = await firebase.messaging().send(message);
+    console.log(response);
   };
 }
 
