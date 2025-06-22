@@ -53,6 +53,11 @@ class NotificationService {
         title: data.title,
         body: data.body,
       },
+      apns: {
+        headers: {
+          "apns-priority": "1",
+        },
+      },
     };
 
     const response = await firebase.messaging().send(message);
