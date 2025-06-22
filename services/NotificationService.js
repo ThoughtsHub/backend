@@ -56,7 +56,11 @@ class NotificationService {
       android: { priority: "HIGH" },
     };
 
-    const response = await firebase.messaging().send(message);
+    try {
+      const response = await firebase.messaging().send(message);
+    } catch (err) {
+      console.log(err);
+    }
   };
 }
 
