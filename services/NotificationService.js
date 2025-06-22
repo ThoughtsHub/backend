@@ -53,15 +53,11 @@ class NotificationService {
         title: data.title,
         body: data.body,
       },
-      android: {
-        priority: "high",
-      },
+      android: { priority: "high" },
+      webpush: { headers: { Urgency: "high" } },
     };
 
     const response = await firebase.messaging().send(message);
-    console.log(response);
-    console.log({ type, id, data, fcmToken });
-    console.log(message);
   };
 }
 
