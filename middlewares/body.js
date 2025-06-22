@@ -45,6 +45,13 @@ const valuesInBody = [
   "englishSentenceUse",
   "hindiSentenceUser",
   "following",
+  "startYear",
+  "startMonth",
+  "endYear",
+  "endMonth",
+  "isCompleted",
+  "instituteId",
+  "educationId",
 ];
 const valuesInQuery = [
   "timestamp",
@@ -56,6 +63,7 @@ const valuesInQuery = [
   "feedbackId",
   "categoryId",
   "reportId",
+  "educationId",
   "category",
   "newsId",
   "wordId",

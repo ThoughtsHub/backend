@@ -7,6 +7,15 @@ import { Validate } from "./ValidationService.js";
 class InstituteService {
   static institutesLimit = 30;
 
+  static exists = async (instituteId) => {
+    try {
+      const institue = await Institute.findByPk(instituteId);
+      return institue !== null;
+    } catch (err) {
+      return false;
+    }
+  };
+
   static getInstitutes = async (values, offset) => {
     const fields = [...instituteFields];
 

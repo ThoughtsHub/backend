@@ -87,6 +87,12 @@ class ValidateService {
   static wordleStatus = (val) => Object.values(WordleWordStatus).includes(val);
 
   static instituteField = (val) => isString(val);
+
+  static educationYear = (val, strict = false) =>
+    (val > 1998 && val < new Date().getFullYear()) ||
+    (strict === false && isNull(val));
+
+  static educationMonth = (val) => (val > 0 && val <= 12) || isNull(val);
 }
 
 export const Validate = ValidateService;

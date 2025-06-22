@@ -2,6 +2,7 @@ import { Router } from "express";
 import ProfileController from "../controllers/ProfileController.js";
 import { haveProfile, loggedIn } from "../middlewares/auth.js";
 import FollowerController from "../controllers/FollowerController.js";
+import { ProfileEducationRouter } from "./ProfileEducationRouter.js";
 
 const router = Router();
 
@@ -24,5 +25,7 @@ router.post("/unfollow", loggedIn, haveProfile, FollowerController.unfollow);
 router.get("/followers", FollowerController.getFollowers);
 
 router.get("/following", FollowerController.getFollowing);
+
+router.use("/education", ProfileEducationRouter);
 
 export const ProfileRouter = router;
