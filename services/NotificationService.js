@@ -53,10 +53,8 @@ class NotificationService {
         title: data.title,
         body: data.body,
       },
-      apns: {
-        headers: {
-          "apns-priority": "1",
-        },
+      android: {
+        priority: "high",
       },
     };
 
