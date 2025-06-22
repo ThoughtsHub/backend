@@ -53,7 +53,6 @@ class NotificationService {
         title: data.title,
         body: data.body,
       },
-      android: { priority: "high" },
       webpush: { headers: { Urgency: "high" } },
     };
 
