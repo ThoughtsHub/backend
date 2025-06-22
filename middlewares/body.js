@@ -64,6 +64,7 @@ const valuesInQuery = [
   "categoryId",
   "reportId",
   "educationId",
+  "instituteId",
   "category",
   "newsId",
   "wordId",

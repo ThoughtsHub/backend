@@ -31,10 +31,10 @@ class InstituteController {
   };
 
   static get = async (req, res) => {
-    const { aisheCode } = req.query;
+    const { instituteId } = req.query;
 
     try {
-      const result = await Institute_.getInstitute(aisheCode);
+      const result = await Institute_.getInstitute(instituteId);
       if (serviceResultBadHandler(result, res, "Institute fetch failed"))
         return;
 

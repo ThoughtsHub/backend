@@ -46,10 +46,10 @@ class InstituteService {
     }
   };
 
-  static getInstitute = async (instituteAisheCode) => {
+  static getInstitute = async (instituteId) => {
     try {
       let institute = await Institute.findOne({
-        where: { aisheCode: instituteAisheCode },
+        where: { id: instituteId },
         attributes: {
           exclude: ["id", "createDate", "updateDate"],
           include: [["id", "instituteId"]],
