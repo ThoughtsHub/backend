@@ -24,7 +24,10 @@ class InstituteService {
         limit: 30,
         offset,
         order: [[timestampsKeys.updatedAt, "desc"]],
-        attributes: { exclude: ["id", "createDate", "updateDate"] },
+        attributes: {
+          exclude: ["id", "createDate", "updateDate"],
+          include: [["id", "instituteId"]],
+        },
       });
       institutes = institutes.map((i) => i.get({ plain: true }));
 
@@ -38,7 +41,10 @@ class InstituteService {
     try {
       let institute = await Institute.findOne({
         where: { aisheCode: instituteAisheCode },
-        attributes: { exclude: ["id", "createDate", "updateDate"] },
+        attributes: {
+          exclude: ["id", "createDate", "updateDate"],
+          include: [["id", "instituteId"]],
+        },
       });
       institute = institute.get({ plain: true });
 
