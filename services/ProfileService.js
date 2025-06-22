@@ -10,7 +10,6 @@ import {
   includeWriter,
   includeWriterWith,
 } from "../constants/include.js";
-import { Op } from "sequelize";
 
 class ProfileService {
   // Profile service response codes
@@ -168,8 +167,8 @@ class ProfileService {
         profile = profile.get({ plain: true });
         profile.profileId = profile.id;
         profile.isFollowing =
-          Array.isArray(profile.Followers) && profile.Followers.length === 1;
-        delete profile.Followers;
+          Array.isArray(profile.follow) && profile.follow.length === 1;
+        delete profile.follow;
         delete profile.id;
       }
 
@@ -219,8 +218,8 @@ class ProfileService {
         f.isVoted =
           Array.isArray(f.appreciations_) && f.appreciations_.length === 1;
         f.writer.isFollowing =
-          Array.isArray(f.writer.Followers) && f.writer.Followers.length === 1;
-        delete f.writer.Followers;
+          Array.isArray(f.writer.follow) && f.writer.follow.length === 1;
+        delete f.writer.follow;
         delete f.appreciations_;
         return f;
       });
