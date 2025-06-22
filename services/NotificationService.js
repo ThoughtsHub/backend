@@ -53,15 +53,12 @@ class NotificationService {
         title: data.title,
         body: data.body,
       },
-      android: {
-        notification: { icon: "../assets/icon.jpg" },
-      },
     };
 
     const response = await firebase.messaging().send(message);
-    console.log(response)
-    console.log({type, id, data, fcmToken})
-    console.log(message)
+    console.log(response);
+    console.log({ type, id, data, fcmToken });
+    console.log(message);
   };
 }
 
