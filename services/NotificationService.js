@@ -53,7 +53,6 @@ class NotificationService {
         title: data.title,
         body: data.body,
       },
-      webpush: { headers: { Urgency: "high" } },
     };
 
     const response = await firebase.messaging().send(message);
