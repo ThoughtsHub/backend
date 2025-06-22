@@ -64,7 +64,9 @@ class ForumCommentService {
         id: forumId,
         data: {
           title: `${profile.username} commented on your post`,
-          body: "",
+          body: `${profile.username}: ${
+            body.length > 50 ? body.slice(0, 50) + "..." : body
+          }`,
         },
       });
 

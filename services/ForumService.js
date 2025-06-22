@@ -268,7 +268,10 @@ class ForumService {
       sendNotification({
         type: "FORUMID",
         id: forumId,
-        data: { title: `${profile.username} liked your post`, body: "" },
+        data: {
+          title: `Post Liked`,
+          body: `${profile.username} liked your post`,
+        },
       });
 
       return sRes(serviceCodes.OK, { forumId, profileId });
