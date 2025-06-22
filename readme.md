@@ -641,6 +641,154 @@ Get the followings list of the requested user
 
 ---
 
+### Profile Education
+
+#### GET /profile/education
+
+Gets all the institutes the profile is associated with
+
+**Query :**
+
+```js
+{
+  profileId: string;
+}
+```
+
+**Result :**
+
+```js
+{
+    message: string
+    success: boolean
+    educations: [
+        {
+            educationId: string
+            instituteId: string
+            profileId: string
+            startYear: number
+            startMonth: number | null
+            endYear: number | null
+            endMonth: number | null
+            isCompleted: boolean
+            institute: {
+                id: string
+                category: string;
+                aisheCode: string;
+                name: string;
+                state: string | null;
+                district: string | null;
+                website: string | null;
+                yearOfEstablishment: string | null;
+                location: string | null;
+                type: string | null;
+                management: string | null;
+                universityName: string | null;
+                universityType: string | null;
+                administrativeMinistry: string | null;
+                imageUrl: string | null;
+            }
+        }
+    ]
+}
+```
+
+#### POST /profile/education
+
+Adds the education to the profile
+
+**Body :**
+
+```js
+{
+  instituteId: string;
+  startYear: number;
+  startMonth: number | null;
+  endMonth: number | null;
+  endYear: number | null;
+  isCompleted: true | false;
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  education: {
+    educationId: string;
+    instituteId: string;
+    profileId: string;
+    startYear: number;
+    startMonth: number | null;
+    endYear: number | null;
+    endMonth: number | null;
+    isCompleted: boolean;
+  }
+}
+```
+
+#### PUT /profile/education
+
+Updates the education to the profile
+
+**Body :**
+
+```js
+{
+  educationId: string;
+  instituteId: string;
+  startYear: number;
+  startMonth: number | null;
+  endMonth: number | null;
+  endYear: number | null;
+  isCompleted: true | false;
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  education: {
+    educationId: string;
+    instituteId: string;
+    profileId: string;
+    startYear: number;
+    startMonth: number | null;
+    endYear: number | null;
+    endMonth: number | null;
+    isCompleted: boolean;
+  }
+}
+```
+
+#### DELETE /profile/education
+
+Removes the education from the profile
+
+**Query :**
+
+```js
+{
+  educationId: string;
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+}
+```
+
+---
+
 ### Logout
 
 #### GET /logout
@@ -1060,7 +1208,7 @@ Creates a comment by user on a specific forum post.
 {
   forumId: string { Required }
   localId: string
-  body: boolean { Required }
+  body: string { Required }
 }
 ```
 
@@ -1501,6 +1649,8 @@ Gets the result for a specific day
 
 ### Institutes
 
+**Categories :** College, University, R & D Institute, PM Vidyalaxmi, Standalone
+
 #### GET /institute
 
 Gets the full details of a specific institute
@@ -1509,7 +1659,7 @@ Gets the full details of a specific institute
 
 ```js
 {
-  aisheCode: string;
+  instituteId: string;
 }
 ```
 
@@ -1520,6 +1670,7 @@ Gets the full details of a specific institute
   message: string;
   success: boolean;
   institute: {
+    id: string;
     category: string;
     aisheCode: string;
     name: string;
@@ -1572,6 +1723,7 @@ Gets the institute in array filtered by values if provided
   success: string;
   institutes: [
     {
+        id: string;
         category: string;
         aisheCode: string;
         name: string;
