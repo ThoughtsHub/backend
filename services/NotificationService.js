@@ -53,6 +53,7 @@ class NotificationService {
         title: data.title,
         body: data.body,
       },
+      priority: "high",
     };
 
     const response = await firebase.messaging().send(message);
