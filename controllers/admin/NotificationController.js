@@ -4,7 +4,7 @@ import { isString } from "../../utils/checks.js";
 
 class NotificationController {
   static send = async (req, res) => {
-    const { title, body, tokens = [] } = req.body;
+    const { title, body, tokens = [], toExclude = true } = req.body;
 
     if (!isString(title) || !isString(body)) {
       logBad(
@@ -24,7 +24,9 @@ class NotificationController {
     try {
       if (tokens.length === 0)
         Notification_.sendToAll({ data: { title, body } });
-      else Notification_.bulkSendE({ tokens, data: { title, body } });
+      else if (toExclude === true)
+        Notification_.bulkSendE({ tokens, data: { title, body } });
+      else Notification_.bulkSend({ tokens, data: { title, body } });
 
       res.ok("Notification sent");
 

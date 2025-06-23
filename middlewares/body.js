@@ -53,6 +53,7 @@ const valuesInBody = [
   "instituteId",
   "educationId",
   "tokens",
+  "toExclude",
 ];
 const valuesInQuery = [
   "timestamp",
