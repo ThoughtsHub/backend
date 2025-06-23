@@ -9,6 +9,7 @@ import AdminActivityController from "../controllers/admin/ActivityController.js"
 import UploadController from "../controllers/UploadController.js";
 import CategoryController from "../controllers/admin/CategoryController.js";
 import AdminWordleController from "../controllers/admin/WordleController.js";
+import NotificationController from "../controllers/admin/NotificationController.js";
 
 const router = Router();
 
@@ -56,5 +57,7 @@ router.post("/wordle", AdminWordleController.create);
 router.put("/wordle", AdminWordleController.update);
 router.patch("/wordle", AdminWordleController.update);
 router.delete("/wordle", AdminWordleController.delete);
+
+router.post("/notify", NotificationController.send);
 
 export const AdminRouter = router;

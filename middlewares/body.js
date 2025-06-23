@@ -52,6 +52,7 @@ const valuesInBody = [
   "isCompleted",
   "instituteId",
   "educationId",
+  "tokens",
 ];
 const valuesInQuery = [
   "timestamp",

@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { includeWriter } from "../constants/include.js";
 import firebase from "../env/firebase/firebase.js";
 import Forum from "../models/Forum.js";
@@ -28,6 +29,15 @@ class FCMTokenService {
 
     const userId = profile.userId;
     return this.getByUserId(userId);
+  };
+
+  static getAllAvailableFCMTokens = async () => {
+    let users = await User.findAll({
+      where: { fcmToken: { [Op.not]: null } },
+      attributes: ["fcmToken"],
+    });
+    const fcmTokens = users.map((u) => u.fcmToken);
+    return fcmTokens;
   };
 }
 
@@ -61,6 +71,58 @@ class NotificationService {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  /**
+   *
+   * @param {{tokens: string[], data: {title: string, body: string}}}} param0
+   * @returns {Promise<string[]>}
+   */
+  static bulkSend = async ({ tokens, data }) => {
+    const registrationTokens = tokens;
+    const message = {
+      tokens: registrationTokens,
+      notification: {
+        title: data.title,
+        body: data.body,
+      },
+    };
+
+    try {
+      const response = await firebase.messaging().sendEachForMulticast(message);
+      const failures = response.responses
+        .map((r, i) => [registrationTokens[i], r.success])
+        .filter((r) => !r[1])
+        .map((r) => r[0]);
+
+      return failures;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  };
+
+  /**
+   *
+   * @param {{tokens: string[], data: {title: string, body: string}}} param0
+   * @returns
+   */
+  static bulkSendE = async ({ tokens, data }) => {
+    let tokensA = await FCMTokenService.getAllAvailableFCMTokens();
+    let tokensToSend = [];
+    tokensA.forEach((t) => {
+      if (!tokens.includes(t)) tokensToSend.push(t);
+    });
+    return this.bulkSend({ tokens: tokensToSend, data });
+  };
+
+  /**
+   *
+   * @param {{data: {title: string, body: string}}} param0
+   */
+  static sendToAll = async ({ data }) => {
+    const tokens = await FCMTokenService.getAllAvailableFCMTokens();
+    return this.bulkSend({ tokens, data });
   };
 }
 
