@@ -95,6 +95,8 @@ class NotificationService {
         .filter((r) => !r[1])
         .map((r) => r[0]);
 
+      console.log(response);
+
       return failures;
     } catch (err) {
       console.log(err);
