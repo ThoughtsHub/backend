@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { timestampsKeys } from "../constants/timestamps.js";
 import { fields as instituteFields } from "../data/loaded_data/loaded_data.js";
 import Institute from "../models/Institute.js";
@@ -19,17 +20,79 @@ class InstituteService {
   static getInstitutes = async (values, offset) => {
     const fields = [...instituteFields];
 
-    const valuesToBeFilterOn = {};
+    const whereObj = {};
     for (const key in values) {
       if (fields.includes(key)) {
         const val = values[key];
-        if (Validate.instituteField(val)) valuesToBeFilterOn[key] = val;
+        switch (key) {
+          case "name":
+            if (Validate.instituteField(val))
+              whereObj.name = {
+                [Op.iLike]: `%${val}%`,
+              };
+            break;
+
+          case "aisheCode":
+            if (Validate.instituteField(val)) whereObj.aisheCode = val;
+            break;
+
+          case "state":
+            if (Validate.instituteField(val)) whereObj.state = val;
+            break;
+
+          case "district":
+            if (Validate.instituteField(val)) whereObj.district = val;
+            break;
+
+          case "type":
+            if (Validate.instituteField(val)) whereObj.type = val;
+            break;
+
+          case "management":
+            if (Validate.instituteField(val)) whereObj.management = val;
+            break;
+
+          case "universityName":
+            if (Validate.instituteField(val))
+              if (Validate.instituteField(val))
+                whereObj.universityName = {
+                  [Op.iLike]: `%${val}%`,
+                };
+            break;
+
+          case "universityType":
+            if (Validate.instituteField(val)) whereObj.universityType = val;
+
+          case "administrativeMinistry":
+            if (Validate.instituteField(val))
+              whereObj.administrativeMinistry = val;
+            break;
+
+          case "website":
+            if (Validate.instituteField(val))
+              whereObj.website = {
+                [Op.iLike]: `%${val}%`,
+              };
+            break;
+
+          case "location":
+            if (Validate.instituteField(val))
+              whereObj.location = {
+                [Op.iLike]: `%${val}%`,
+              };
+            break;
+
+          case "yearOfEstablishment":
+            if (Validate.instituteField(val))
+              whereObj.yearOfEstablishment = val;
+            break;
+        }
       }
     }
 
     try {
       let institutes = await Institute.findAll({
-        where: { ...valuesToBeFilterOn },
+        where: { ...whereObj },
         limit: 30,
         offset,
         order: [[timestampsKeys.updatedAt, "desc"]],
