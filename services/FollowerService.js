@@ -132,7 +132,7 @@ class FollowerService {
           Array.isArray(f.profile.follow) && f.profile.follow.length === 1;
         delete f.profile.follow;
         delete f.Profile;
-        return f;
+        return f.profile;
       });
 
       return sRes(serviceCodes.OK, { followers });
@@ -178,7 +178,7 @@ class FollowerService {
           Array.isArray(f.profile.follow) && f.profile.follow.length === 1;
         delete f.profile.follow;
         delete f.followedProfile;
-        return f;
+        return f.profile;
       });
 
       return sRes(serviceCodes.OK, { followings });
