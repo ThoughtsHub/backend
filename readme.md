@@ -1742,3 +1742,41 @@ Gets the institute in array filtered by values if provided
   ]
 }
 ```
+
+#### GET /institute/users/all
+
+Gets all the users, irrelvant of the completion of the institute degree, affiliated with an institute
+
+**Query :**
+
+```js
+{
+  instituteId: string;
+  offset: number;
+}
+```
+
+**Result :**
+
+```js
+{
+    message: string
+    success: boolean
+    users: [
+        {
+            userId: string
+            profileId: string
+            username: string
+            fullName: string
+            about: string
+            profileImageUrl: string
+            gender: string
+            dob: string
+            isFollowing: boolean
+        }
+    ]
+    newOffset: number | null
+}
+```
+
+> If `newOffset` is `null`, users have been exhausted
