@@ -7,4 +7,6 @@ router.get("/all", InstituteController.getAll);
 
 router.get("/", InstituteController.get);
 
+router.get("/users/all", InstituteController.getAllUsersOfInstitute);
+
 export const InstituteRouter = router;

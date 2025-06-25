@@ -4,9 +4,12 @@ import { fields as instituteFields } from "../data/loaded_data/loaded_data.js";
 import Institute from "../models/Institute.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
+import ProfileEducation from "../models/ProfileEducation.js";
+import { includeProfile, includeWriterWith } from "../constants/include.js";
 
 class InstituteService {
   static institutesLimit = 30;
+  static usersLimit = 30;
 
   static exists = async (instituteId) => {
     try {
@@ -123,6 +126,32 @@ class InstituteService {
       return sRes(serviceCodes.OK, { institute });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, { instituteAisheCode }, err);
+    }
+  };
+
+  static getUsers = async (instituteId, offset, profileId = null) => {
+    try {
+      let users = await ProfileEducation.findAll({
+        where: { instituteId },
+        offset,
+        limit: this.usersLimit,
+        include:
+          profileId === null
+            ? [includeProfile]
+            : [includeWriterWith(profileId, false, "profile")],
+      });
+
+      users = users.map((u) => {
+        u = u.get({ plain: true });
+        u.profile.isFollowing =
+          Array.isArray(u.profile.follow) && u.profile.follow.length === 1;
+        delete u.profile.follow;
+        return u.profile;
+      });
+
+      return sRes(serviceCodes.OK, { users });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { instituteId, offset }, err);
     }
   };
 }

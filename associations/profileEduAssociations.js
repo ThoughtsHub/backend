@@ -10,6 +10,7 @@ export const profileEducationAssociations = () => {
   });
   ProfileEducation.belongsTo(Profile, {
     foreignKey: "profileId",
+    as: "profile",
   });
 
   Institute.hasMany(ProfileEducation, {

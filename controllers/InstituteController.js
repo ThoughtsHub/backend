@@ -48,6 +48,30 @@ class InstituteController {
       res.serverError();
     }
   };
+
+  static getAllUsersOfInstitute = async (req, res) => {
+    const profileId = req?.user?.profile?.id ?? null;
+    let { instituteId, offset } = req.query;
+    offset = toNumber(offset);
+
+    try {
+      const result = await Institute_.getUsers(instituteId, offset, profileId);
+      if (serviceResultBadHandler(result, res, "Institute users fetch failed"))
+        return;
+
+      const users = result.info.users;
+
+      res.ok("Institute users", { users });
+
+      logOk(
+        "Institute users fetched",
+        "A user requested a particular institute's users"
+      );
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
 }
 
 export default InstituteController;
