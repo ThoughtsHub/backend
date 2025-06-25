@@ -61,7 +61,10 @@ class InstituteController {
 
       const users = result.info.users;
 
-      res.ok("Institute users", { users });
+      res.ok("Institute users", {
+        users,
+        newOffset: users.length < Institute_.usersLimit ? null : users.length,
+      });
 
       logOk(
         "Institute users fetched",
