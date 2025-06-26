@@ -1,19 +1,9 @@
 import { initLink } from "../../associations/link.js";
 import { connectToPg, closePg } from "../../db/pg.js";
 import fs from "fs";
-import readline from "readline";
 import Institute from "../../models/Institute.js";
 import { Op } from "sequelize";
-
-function updateLoader(current, total) {
-  readline.clearLine(process.stdout, 0);
-  readline.cursorTo(process.stdout, 0);
-  process.stdout.write(
-    `Loading data: ${current}/${total} (${((current / total) * 100).toFixed(
-      1
-    )}%)`
-  );
-}
+import updateLoader from "../../utils/loader.js";
 
 const loadData = async () => {
   // Load the data

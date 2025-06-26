@@ -20,6 +20,8 @@ const Institute = db.define(
       references: { model: "Institutes", key: "id" },
     },
     imageUrl: { ...types.STRING, defaultValue: null },
+    about: { ...types.TEXT },
+    rating: { ...types.INTEGER },
     ...timestamps,
   },
   { hooks }

@@ -30,9 +30,7 @@ class InstituteService {
         switch (key) {
           case "name":
             if (Validate.instituteField(val))
-              whereObj.name = {
-                [Op.iLike]: `%${val}%`,
-              };
+              whereObj.name = { [Op.iLike]: `%${val}%` };
             break;
 
           case "aisheCode":
@@ -43,8 +41,21 @@ class InstituteService {
             if (Validate.instituteField(val)) whereObj.state = val;
             break;
 
+          case "category":
+            if (Validate.instituteField(val)) whereObj.category = val;
+            break;
+
+          case "type":
+            if (Validate.instituteField(val)) whereObj.type = val;
+            break;
+
           case "district":
             if (Validate.instituteField(val)) whereObj.district = val;
+            break;
+
+          case "about":
+            if (Validate.instituteField(val))
+              whereObj.about = { [Op.iLike]: `%${val}%` };
             break;
 
           case "type":
@@ -57,10 +68,7 @@ class InstituteService {
 
           case "universityName":
             if (Validate.instituteField(val))
-              if (Validate.instituteField(val))
-                whereObj.universityName = {
-                  [Op.iLike]: `%${val}%`,
-                };
+              whereObj.universityName = { [Op.iLike]: `%${val}%` };
             break;
 
           case "universityType":
@@ -73,16 +81,12 @@ class InstituteService {
 
           case "website":
             if (Validate.instituteField(val))
-              whereObj.website = {
-                [Op.iLike]: `%${val}%`,
-              };
+              whereObj.website = { [Op.iLike]: `%${val}%` };
             break;
 
           case "location":
             if (Validate.instituteField(val))
-              whereObj.location = {
-                [Op.iLike]: `%${val}%`,
-              };
+              whereObj.location = { [Op.iLike]: `%${val}%` };
             break;
 
           case "yearOfEstablishment":

@@ -8,6 +8,7 @@ import { instituteAssociations } from "./instituteAssociations.js";
 import { profileEducationAssociations } from "./profileEduAssociations.js";
 import Activity from "../models/Activity.js";
 import Log from "../models/Log.js";
+import ProfileEducation from "../models/ProfileEducation.js";
 
 export const initLink = async () => {
   userAssociation();
