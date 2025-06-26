@@ -1674,6 +1674,75 @@ Gets the result for a specific day
 | R & D Institute |                                                    |
 | PM Vidyalaxmi   |                                                    |
 
+| administrativeMinistry                                                     |
+| -------------------------------------------------------------------------- |
+| D/o Health Research, M/o Health and Family Welfare                         |
+| Ministry of Agriculture and Farmers Welfare                                |
+| D/o Health and Family Welfare, M/o Health and Family Welfare               |
+| Office of Comptroller and Auditor General of India (CAG)                   |
+| Ministry of Statistics & Programme Implementation                          |
+| D/o Higher Education, Ministry of Education, GoI                           |
+| Ministry of Science & Technology                                           |
+| Ministry of Consumer Aff., Food, & Public Dist.                            |
+| Ministry of Heavy Industries                                               |
+| D/o Scientific and Industrial Research, M/o Science and Technology         |
+| Ministry of Textiles                                                       |
+| Ministry of Earth Sciences                                                 |
+| Ministry of Commerce & Industry                                            |
+| Ministry of Railways                                                       |
+| D/o Defence Research & Development, Ministry of Defence                    |
+| Ministry of External Affairs                                               |
+| D/o Atomic Energy                                                          |
+| Ministry of Power                                                          |
+| Ministry of Home Affairs                                                   |
+| Ministry of Environment, Forests and Climate Change                        |
+| Ministry of Jal Shakti                                                     |
+| Ministry of Health & Family Welfare                                        |
+| D/o Agricultural Research and Education, M/o Agriculture & Farmers Welfare |
+| Dept of Space                                                              |
+| Ministry of Culture                                                        |
+| D/o Biotechnology, M/o Science and Technology                              |
+| Ministry of Micro, Small and Medium Enterprises                            |
+| Ministry of New & Renewable Energy                                         |
+| Ministry of Chemicals & Fertilizers                                        |
+| Ministry of Education                                                      |
+| Ministry of Finance                                                        |
+| D/o Science & Technology, M/o Science and Technology                       |
+
+| management                       |
+| -------------------------------- |
+| Private                          |
+| University                       |
+| Affiliated College               |
+| Central Government               |
+| Private Aided (Government Aided) |
+| Local Body                       |
+| Constituent / University College |
+| Technical/Polytechnic            |
+| State Government                 |
+| Private Un-Aided                 |
+
+| universityType                                |
+| --------------------------------------------- |
+| Deemed University-Government Aided            |
+| Drs Kiran and Pallavi Patel Global University |
+| State Public University                       |
+| Institute under State Legislature Act         |
+| State Private University                      |
+| Deemed University-Government                  |
+| Central University                            |
+| Deemed University-Private                     |
+| ASSAM SCIENCE AND TECHNOLOGY UNIVERSITY       |
+| Institute of National Importance              |
+| Andhra University, Visakhapatnam              |
+
+| location |
+| -------- |
+| Rural    |
+| Urban    |
+
+> Every field can have null except for name, establishmentYear and state
+
 States are just like as available from net
 
 #### GET /institute
