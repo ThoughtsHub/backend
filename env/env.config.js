@@ -21,6 +21,9 @@ export const redis = {
 export const google = {
   email: process.env.google_email,
   password: process.env.google_password,
+  gemini: {
+    apiKey: process.env.gemini_api_key,
+  },
 };
 
 export const nodeEnv = {

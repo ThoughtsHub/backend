@@ -1651,6 +1651,31 @@ Gets the result for a specific day
 
 **Categories :** College, University, R & D Institute, PM Vidyalaxmi, Standalone
 
+| Category        | Type                                               |
+| --------------- | -------------------------------------------------- |
+| College         | Constituent / University College                   |
+| College         | Recognized Center                                  |
+| College         | Affiliated College                                 |
+| College         | Autonomous College                                 |
+| College         | PG Center / Off-Campus Center                      |
+| College         | Rural                                              |
+| College         | Urban                                              |
+| Standalone      | Technical/Polytechnic                              |
+| Standalone      | Paramedical                                        |
+| Standalone      | Pharmacy Institutions                              |
+| Standalone      | Teacher Training                                   |
+| Standalone      | Rural                                              |
+| Standalone      | Nursing                                            |
+| Standalone      | PGDM Institutes                                    |
+| Standalone      | Hotel Management and Catering                      |
+| Standalone      | Institutions under Rehabilitation Council of India |
+| Standalone      | Institutes under Ministries                        |
+| University      |                                                    |
+| R & D Institute |                                                    |
+| PM Vidyalaxmi   |                                                    |
+
+States are just like as available from net
+
 #### GET /institute
 
 Gets the full details of a specific institute
