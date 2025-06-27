@@ -232,6 +232,86 @@ Checks if username is available or not
 
 ---
 
+### Forgot Password
+
+The flow would remain the same as signup : Get OTP -> Verify OTP -> Update Password
+
+#### POST /forgot-password/otp/get
+
+Sends a unique OTP at the given email/username after checking if associated user exists
+
+**Body :**
+
+```js
+{
+  email: string;
+}
+```
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+}
+```
+
+> `otp` will be sent to the associated email
+
+#### POST /forgot-password/otp/verify
+
+Verifies the otp sent to associated email.
+
+**Body :**
+
+```js
+{
+  contact: string { Required } [email | username]
+  otp: string { Required }
+}
+```
+
+> `contact` is the associated username/email
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  otpToken: string;
+}
+```
+
+> `otpToken` will only be valid for 5 minutes, in that 5 minutes, user will have to set the password for the account, or else, will have to restart from otp generation
+
+#### POST /forgot-password/set-password
+
+Updates the password of the user.
+
+**Body :**
+
+```js
+{
+  otpToken: string { Required }
+  password: string { Required }
+}
+```
+
+> `otpToken` will only be valid for 5 minutes
+
+**Response :**
+
+```js
+{
+  message: string;
+  success: boolean;
+}
+```
+
+---
+
 ### Profile
 
 #### POST /profile
