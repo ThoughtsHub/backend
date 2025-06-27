@@ -91,6 +91,7 @@ const valuesInQuery = [
   "order",
   "day",
   "aisheCode",
+  "page",
 ];
 
 export const handleBody = (req, res, next) => {
