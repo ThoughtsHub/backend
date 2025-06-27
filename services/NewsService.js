@@ -266,7 +266,7 @@ class NewsService {
   };
 
   static getByOffset = async (
-    offset,
+    page,
     values = {},
     orderFields = [[timestampsKeys.createdAt, "desc"]]
   ) => {
@@ -341,7 +341,7 @@ class NewsService {
 
       let news = await News.findAll({
         where: { ...whereObj },
-        offset,
+        offset: page * this.newsLimit,
         limit: this.newsLimit,
         order: orderFields,
         include: [{ model: Category, as: "category" }],
@@ -352,7 +352,11 @@ class NewsService {
         return n;
       });
 
-      return sRes(serviceCodes.OK, { news });
+      return sRes(serviceCodes.OK, {
+        news,
+        newPage: page + 1,
+        isOver: news.length === 0,
+      });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, { offset, values, orderFields }, err);
     }
