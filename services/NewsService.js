@@ -357,7 +357,7 @@ class NewsService {
         isOver: news.length === 0,
       });
     } catch (err) {
-      return sRes(serviceCodes.DB_ERR, { offset, values, orderFields }, err);
+      return sRes(serviceCodes.DB_ERR, { page, values, orderFields }, err);
     }
   };
 
