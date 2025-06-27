@@ -89,7 +89,7 @@ class AdminNewsController {
 
       res.ok("News fetched", {
         news,
-        newpage: result.info.newPage,
+        newPage: result.info.newPage,
         isOver: result.info.isOver,
       });
 
