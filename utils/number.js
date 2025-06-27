@@ -7,6 +7,11 @@ import { isNumber, isString } from "./checks.js";
  */
 export const toNumber = (val) => {
   if (isNumber(val)) return val;
-  if (isString(val) && isNumber(Number(val))) return Number(val);
+  try {
+    let n = Number(val);
+    if (isNumber(n)) return n;
+  } catch (err) {
+    return 0;
+  }
   return 0;
 };
