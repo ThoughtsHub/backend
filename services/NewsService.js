@@ -341,7 +341,7 @@ class NewsService {
 
       let news = await News.findAll({
         where: { ...whereObj },
-        offset: page * this.newsLimit,
+        offset: (page - 1) * this.newsLimit,
         limit: this.newsLimit,
         order: orderFields,
         include: [{ model: Category, as: "category" }],
@@ -354,7 +354,6 @@ class NewsService {
 
       return sRes(serviceCodes.OK, {
         news,
-        newPage: page + 1,
         isOver: news.length === 0,
       });
     } catch (err) {
