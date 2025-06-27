@@ -12,10 +12,12 @@ import { AdminRouter } from "./AdminRouter.js";
 import { UploadRouter } from "./UploadRouter.js";
 import { WordleRouter } from "./WordleRouter.js";
 import { InstituteRouter } from "./InstituteRouter.js";
+import { ForgotPasswordRouter } from "./ForgotPasswordRouter.js";
 
 const router = Router();
 
 router.use("/", LoginRouter);
+router.use("/forgot-password", ForgotPasswordRouter);
 router.use("/", OtherRouter);
 router.use("/otp", OtpRouter);
 router.use("/profile", ProfileRouter);

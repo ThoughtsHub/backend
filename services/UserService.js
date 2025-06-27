@@ -124,6 +124,22 @@ class UserService {
     }
   };
 
+  static exists = async (email) => {
+    if (typeof email !== "string") return sRes(this.codes.BAD_EMAIL, { email });
+
+    try {
+      let user = await User.findOne({ where: { email } });
+      if (user === null)
+        user = await Profile.findOne({ where: { username: email } });
+      if (user === null) return sRes(this.codes.BAD_USERNAME, { email });
+
+      let userId = user.userId ?? user.id;
+      return sRes(serviceCodes.OK, { userId });
+    } catch (err) {
+      return sRes(serviceCodes.DB_ERR, { email }, err);
+    }
+  };
+
   static delete = async (userId) => {
     if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
 
