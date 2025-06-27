@@ -29,7 +29,7 @@ class ForgotPasswordController {
     const send = otp.sendEmail;
 
     try {
-      send(email, generatedOtp);
+      send(result.info.email, generatedOtp);
       await client.setEx(
         `otp-fp:${userId}:${generatedOtp}`,
         5 * 60,

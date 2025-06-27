@@ -134,7 +134,8 @@ class UserService {
       if (user === null) return sRes(this.codes.BAD_USERNAME, { email });
 
       let userId = user.userId ?? user.id;
-      return sRes(serviceCodes.OK, { userId });
+      const u = await User.findByPk(userId);
+      return sRes(serviceCodes.OK, { userId, email: u.email });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, { email }, err);
     }
