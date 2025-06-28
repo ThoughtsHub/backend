@@ -7,6 +7,7 @@ import db from "../db/pg.js";
 import Follower from "../models/Follower.js";
 import Profile from "../models/Profile.js";
 import { serviceCodes, sRes } from "../utils/services.js";
+import sendNotification from "./NotificationService.js";
 
 class FollowerService {
   // Follower service response codes
@@ -58,6 +59,17 @@ class FollowerService {
       }
 
       await t.commit();
+
+      const profile = await Profile.findOne({ where: { id: from } });
+      sendNotification({
+        type: "PROFILEID",
+        id: to,
+        data: {
+          title: `User Followed`,
+          body: `${profile.username} follows you.`,
+        },
+      });
+
       return sRes(serviceCodes.OK);
     } catch (err) {
       await t.rollback();
