@@ -54,6 +54,9 @@ const valuesInBody = [
   "educationId",
   "tokens",
   "toExclude",
+  "review",
+  "rating",
+  "discussionId",
 ];
 const valuesInQuery = [
   "timestamp",
@@ -92,6 +95,7 @@ const valuesInQuery = [
   "day",
   "aisheCode",
   "page",
+  "discussionId",
 ];
 
 export const handleBody = (req, res, next) => {

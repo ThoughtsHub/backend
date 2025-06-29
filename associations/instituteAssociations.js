@@ -14,17 +14,15 @@ export const instituteAssociations = () => {
 
   Institute.hasMany(InstituteReview, {
     foreignKey: "instituteId",
-    as: "reviews",
     onDelete: "CASCADE",
   });
   InstituteReview.belongsTo(Institute, {
     foreignKey: "instituteId",
     as: "institute",
   });
-  
+
   Institute.hasMany(InsituteDiscussion, {
     foreignKey: "instituteId",
-    as: "discussions",
     onDelete: "CASCADE",
   });
   InsituteDiscussion.belongsTo(Institute, {

@@ -5,7 +5,11 @@ import Institute from "../models/Institute.js";
 import { serviceCodes, sRes } from "../utils/services.js";
 import { Validate } from "./ValidationService.js";
 import ProfileEducation from "../models/ProfileEducation.js";
-import { includeProfile, includeWriterWith } from "../constants/include.js";
+import {
+  includeProfile,
+  includeWriter,
+  includeWriterWith,
+} from "../constants/include.js";
 import db from "../db/pg.js";
 import InstituteReview from "../models/InstituteReviews.js";
 import InsituteDiscussion from "../models/InstituteDiscussion.js";
@@ -121,7 +125,11 @@ class InstituteService {
           include: [["id", "instituteId"]],
         },
       });
-      institutes = institutes.map((i) => i.get({ plain: true }));
+      institutes = institutes.map((i) => {
+        i = i.get({ plain: true });
+        i.rating ??= 0;
+        return i;
+      });
 
       return sRes(serviceCodes.OK, { institutes });
     } catch (err) {
@@ -139,6 +147,7 @@ class InstituteService {
         },
       });
       institute = institute.get({ plain: true });
+      institute.rating ??= 0;
 
       return sRes(serviceCodes.OK, { institute });
     } catch (err) {
@@ -185,16 +194,16 @@ class InstituteService {
 
     try {
       let institute = await Institute.findByPk(instituteId, { transaction: t });
-      let review = await InstituteReview.create(
+      let review_ = await InstituteReview.create(
         { instituteId, profileId, review, rating },
         { transaction: t }
       );
+      let ratedBy = institute.ratedBy + 1;
       let newRating =
-        (institute.rating * institute.ratedBy + rating) /
-        (institute.ratedBy + 1);
+        ((institute.rating ?? 0) * institute.ratedBy + rating) / ratedBy;
 
       const [updateResult] = await Institute.update(
-        { rating: newRating, ratedBy: institute.ratedBy + 1 },
+        { rating: newRating, ratedBy, reviews: ratedBy },
         { where: { id: instituteId }, transaction: t }
       );
       if (updateResult !== 1) {
@@ -206,10 +215,10 @@ class InstituteService {
         });
       }
 
-      review = review.get({ plain: true });
+      review_ = review_.get({ plain: true });
 
       await t.commit();
-      return sRes(serviceCodes.OK, { review });
+      return sRes(serviceCodes.OK, { review: review_ });
     } catch (err) {
       await t.rollback();
       return sRes(
@@ -220,15 +229,24 @@ class InstituteService {
     }
   };
 
-  static getReviews = async (instituteId, offset) => {
+  static getReviews = async (instituteId, offset, profileId) => {
     try {
       let reviews = await InstituteReview.findAll({
         where: { instituteId },
         offset,
         limit: this.reviewsLimit,
         order: [[timestampsKeys.createdAt, "desc"]],
+        include: [
+          profileId === null ? includeWriter : includeWriterWith(profileId),
+        ],
       });
-      reviews = reviews.map((r) => r.get({ plain: true }));
+      reviews = reviews.map((r) => {
+        r = r.get({ plain: true });
+        r.writer.isFollowing =
+          Array.isArray(r.writer.follow) && r.writer.follow.length === 1;
+        delete r.writer.follow;
+        return r;
+      });
 
       return sRes(serviceCodes.OK, { reviews });
     } catch (err) {
@@ -259,27 +277,46 @@ class InstituteService {
       await t.commit();
       return sRes(serviceCodes.OK, { discussion: disc });
     } catch (err) {
+      await t.rollback();
       return sRes(
-        serviceCodes.OK,
+        serviceCodes.DB_ERR,
         { instituteId, profileId, discussionId, body },
         err
       );
     }
   };
 
-  static getDiscussions = async (instituteId, discussionId, offset) => {
+  static getDiscussions = async (
+    instituteId,
+    discussionId,
+    offset,
+    profileId
+  ) => {
     try {
       let discs = await InsituteDiscussion.findAll({
         where: { instituteId, discussionId },
         offset,
         limit: this.discsLimit,
         order: [[timestampsKeys.createdAt, "desc"]],
+        include: [
+          profileId === null ? includeWriter : includeWriterWith(profileId),
+        ],
       });
-      discs = discs.map((d) => d.get({ plain: true }));
+      discs = discs.map((d) => {
+        d = d.get({ plain: true });
+        d.writer.isFollowing =
+          Array.isArray(d.writer.follow) && d.writer.follow.length === 1;
+        delete d.writer.follow;
+        return d;
+      });
 
       return sRes(serviceCodes.OK, { discussions: discs });
     } catch (err) {
-      return sRes(serviceCodes.OK, { instituteId, discussionId, offset }, err);
+      return sRes(
+        serviceCodes.DB_ERR,
+        { instituteId, discussionId, offset },
+        err
+      );
     }
   };
 }

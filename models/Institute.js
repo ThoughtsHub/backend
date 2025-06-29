@@ -21,7 +21,7 @@ const Institute = db.define(
     },
     imageUrl: { ...types.STRING, defaultValue: null },
     about: { ...types.TEXT },
-    rating: { ...types.DOUBLE, allowNull: false, defaultValue: 0 },
+    rating: { ...types.DOUBLE, defaultValue: 0 },
     ratedBy: { ...types.INT_REQ_0 },
     reviews: { ...types.INT_REQ_0 },
     discussions: { ...types.INT_REQ_0 },

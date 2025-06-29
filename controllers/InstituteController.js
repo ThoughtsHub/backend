@@ -127,11 +127,16 @@ class InstituteController {
   };
 
   static getReviews = async (req, res) => {
+    const profileId = req?.user?.profile?.id ?? null;
     let { instituteId, offset } = req.query;
     offset = toNumber(offset);
 
     try {
-      const result = await Institute_.getReviews(instituteId, offset);
+      const result = await Institute_.getReviews(
+        instituteId,
+        offset,
+        profileId
+      );
       if (serviceResultBadHandler(result, res, "Reviews fetch failed")) return;
 
       let reviews = result.info.reviews;
@@ -150,11 +155,17 @@ class InstituteController {
   };
 
   static getDiscs = async (req, res) => {
+    const profileId = req?.user?.profile?.id;
     let { instituteId, offset } = req.query;
     offset = toNumber(offset);
 
     try {
-      const result = await Institute_.getDiscussions(instituteId, null, offset);
+      const result = await Institute_.getDiscussions(
+        instituteId,
+        null,
+        offset,
+        profileId
+      );
       if (serviceResultBadHandler(result, res, "Discussions fetch failed"))
         return;
 
@@ -179,6 +190,7 @@ class InstituteController {
   };
 
   static getDiscReplies = async (req, res) => {
+    const profileId = req?.user?.profile?.id;
     let { instituteId, discussionId, offset } = req.query;
     offset = toNumber(offset);
 
@@ -186,7 +198,8 @@ class InstituteController {
       const result = await Institute_.getDiscussions(
         instituteId,
         discussionId,
-        offset
+        offset,
+        profileId
       );
       if (
         serviceResultBadHandler(result, res, "Discussion replies fetch failed")
