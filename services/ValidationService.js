@@ -93,6 +93,8 @@ class ValidateService {
     (strict === false && isNull(val));
 
   static educationMonth = (val) => (val > 0 && val <= 12) || isNull(val);
+
+  static rating = (val) => val >= 0 && val <= 5;
 }
 
 export const Validate = ValidateService;

@@ -3,6 +3,8 @@ import Follower from "../models/Follower.js";
 import Forum from "../models/Forum.js";
 import ForumAppreciation from "../models/Forum_Appreciation.js";
 import ForumComment from "../models/Forum_Comment.js";
+import InsituteDiscussion from "../models/InstituteDiscussion.js";
+import InstituteReview from "../models/InstituteReviews.js";
 import Profile from "../models/Profile.js";
 import ReportForum from "../models/Report_Forum.js";
 
@@ -57,4 +59,24 @@ export const profileAssociation = () => {
 
   Profile.hasMany(Follower, { foreignKey: "followerId", onDelete: "CASCADE" });
   Follower.belongsTo(Profile, { foreignKey: "followerId" });
+
+  Profile.hasMany(InstituteReview, {
+    foreignKey: "profileId",
+    as: "instituteReviews",
+    onDelete: "CASCADE",
+  });
+  InstituteReview.belongsTo(Profile, {
+    foreignKey: "profileId",
+    as: "writer",
+  });
+
+  Profile.hasMany(InsituteDiscussion, {
+    foreignKey: "profileId",
+    as: "instituteDiscussions",
+    onDelete: "CASCADE",
+  });
+  InsituteDiscussion.belongsTo(Profile, {
+    foreignKey: "profileId",
+    as: "writer",
+  });
 };

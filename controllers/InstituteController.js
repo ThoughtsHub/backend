@@ -75,6 +75,143 @@ class InstituteController {
       res.serverError();
     }
   };
+
+  static review = async (req, res) => {
+    const profileId = req?.user?.profile?.id;
+    const { instituteId, rating, review } = req.body;
+
+    try {
+      const result = await Institute_.writeReview(
+        instituteId,
+        profileId,
+        review,
+        rating
+      );
+      if (serviceResultBadHandler(result, res, "Institute review failed"))
+        return;
+
+      res.ok("Reviewed", { review: result.info.review });
+
+      logOk("Insitute reviewed", "A user reviewed an institute", {
+        instituteId,
+      });
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static discuss = async (req, res) => {
+    const profileId = req?.user?.profile?.id;
+    const { instituteId, discussionId, body } = req.body;
+
+    try {
+      const result = await Institute_.discuss(
+        instituteId,
+        profileId,
+        discussionId,
+        body
+      );
+      if (serviceResultBadHandler(result, res, "Institute discussion failed"))
+        return;
+
+      res.ok("Discussion written", { discussion: result.info.discussion });
+
+      logOk("Discussion written", "A user discussed about an institute", {
+        instituteId,
+      });
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static getReviews = async (req, res) => {
+    let { instituteId, offset } = req.query;
+    offset = toNumber(offset);
+
+    try {
+      const result = await Institute_.getReviews(instituteId, offset);
+      if (serviceResultBadHandler(result, res, "Reviews fetch failed")) return;
+
+      let reviews = result.info.reviews;
+
+      res.ok("Reviews", {
+        reviews,
+        newOffset:
+          reviews.length >= Institute_.reviewsLimit ? reviews.length : null,
+      });
+
+      logOk("Reviews fetched", "A user requested reviews about an instiute");
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static getDiscs = async (req, res) => {
+    let { instituteId, offset } = req.query;
+    offset = toNumber(offset);
+
+    try {
+      const result = await Institute_.getDiscussions(instituteId, null, offset);
+      if (serviceResultBadHandler(result, res, "Discussions fetch failed"))
+        return;
+
+      let discussions = result.info.discussions;
+
+      res.ok("Discussions", {
+        discussions,
+        newOffset:
+          discussions.length >= Institute_.discsLimit
+            ? discussions.length
+            : null,
+      });
+
+      logOk(
+        "Discussions fetched",
+        "A user requested discussions about an instiute"
+      );
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
+
+  static getDiscReplies = async (req, res) => {
+    let { instituteId, discussionId, offset } = req.query;
+    offset = toNumber(offset);
+
+    try {
+      const result = await Institute_.getDiscussions(
+        instituteId,
+        discussionId,
+        offset
+      );
+      if (
+        serviceResultBadHandler(result, res, "Discussion replies fetch failed")
+      )
+        return;
+
+      let discussions = result.info.discussions;
+
+      res.ok("Discussion replies", {
+        discussions,
+        newOffset:
+          discussions.length >= Institute_.discsLimit
+            ? discussions.length
+            : null,
+      });
+
+      logOk(
+        "Discussion replies fetched",
+        "A user requested discussion replies about an instiute"
+      );
+    } catch (err) {
+      logServerErr(err);
+      res.serverError();
+    }
+  };
 }
 
 export default InstituteController;
