@@ -265,12 +265,16 @@ class ForumService {
       await t.commit();
 
       const profile = await Profile.findByPk(profileId);
+      const forum = await Forum.findByPk(forumId);
       sendNotification({
         type: "FORUMID",
         id: forumId,
         data: {
-          title: `Post Liked`,
-          body: `${profile.username} liked your post`,
+          title: `@${profile.username} liked your post: ${
+            forum.title.length > 20
+              ? forum.title.slice(0, 20) + "..."
+              : forum.title
+          }`,
         },
       });
 

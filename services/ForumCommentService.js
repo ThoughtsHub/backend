@@ -59,14 +59,17 @@ class ForumCommentService {
       await t.commit();
 
       const profile = await Profile.findByPk(profileId);
+      const forum = await Forum.findByPk(forumId);
       sendNotification({
         type: "FORUMID",
         id: forumId,
         data: {
-          title: `${profile.username} commented on your post`,
-          body: `${profile.username}: ${
-            body.length > 50 ? body.slice(0, 50) + "..." : body
+          title: `@${profile.username} commented on your post: ${
+            forum.title.length > 20
+              ? forum.title.slice(0, 20) + "..."
+              : forum.title
           }`,
+          body: `${body.length > 50 ? body.slice(0, 50) + "..." : body}`,
         },
       });
 

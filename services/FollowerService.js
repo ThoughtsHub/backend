@@ -65,8 +65,7 @@ class FollowerService {
         type: "PROFILEID",
         id: to,
         data: {
-          title: `User Followed`,
-          body: `${profile.username} follows you.`,
+          title: `@${profile.username} started following you.`,
         },
       });
 
