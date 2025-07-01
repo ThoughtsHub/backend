@@ -9,6 +9,7 @@ import User from "../models/User.js";
 import { Forum_ } from "../services/ForumService.js";
 import { User_ } from "../services/UserService.js";
 import updateLoader from "../utils/loader.js";
+import { createReferralCode } from "../utils/refer.js";
 import { generateInstituteAbout } from "./instituteAbout.js";
 
 function sleep(ms) {
@@ -40,7 +41,17 @@ const updateAbout = async () => {
   }
 };
 
+const setReferralCode = async () => {
+  let profiles = await Profile.findAll();
+  for (const p of profiles) {
+    const username = p.username;
+    const referCode = createReferralCode(username);
+    await Profile.update({ referralCode: referCode }, { where: { id: p.id } });
+  }
+};
+
 // await updateForumCounts();
-await updateAbout();
+// await updateAbout();
+await setReferralCode()
 
 await closePg();
