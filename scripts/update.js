@@ -51,7 +51,7 @@ const setReferralCode = async () => {
 };
 
 // await updateForumCounts();
-// await updateAbout();
-await setReferralCode()
+await updateAbout();
+// await setReferralCode()
 
 await closePg();
