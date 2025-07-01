@@ -10,6 +10,7 @@ import {
   includeWriter,
   includeWriterWith,
 } from "../constants/include.js";
+import { createReferralCode } from "../utils/refer.js";
 
 class ProfileService {
   // Profile service response codes
@@ -62,6 +63,7 @@ class ProfileService {
     if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
 
     try {
+      const referCode = createReferralCode(username);
       let profile = await Profile.create({
         fullName,
         about,
@@ -70,6 +72,7 @@ class ProfileService {
         profileImageUrl,
         username,
         userId,
+        referralCode: referCode,
       });
       profile = profile.get({ plain: true });
 
