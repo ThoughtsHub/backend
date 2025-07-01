@@ -21,6 +21,7 @@ const Profile = db.define(
     following: { ...types.INT_REQ_0 },
     forums: { ...types.INT_REQ_0 },
     referralCode: { ...types.STR_REQ },
+    wallet: { ...types.INT_REQ_0 },
     ...timestamps,
   },
   { hooks }
