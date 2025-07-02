@@ -33,6 +33,67 @@ Headers Token for Authorization (Login): **auth_token**
 
 ---
 
+## Models
+
+Each section in **Models** is divided by the model it represents in the backend.
+
+---
+
+### Institute
+
+```js
+{
+  instituteId: string;
+  aisheCode: string;
+  category: "College" |
+    "Standalone" |
+    "University" |
+    "R & D Institute" |
+    "PM Vidyalaxmi";
+  type: "Constituent / University College" |
+    "Recognized Center" |
+    "Affiliated College" |
+    "Autonomous College" |
+    "PG Center / Off-Campus Center" |
+    "Rural" |
+    "Urban" |
+    "Technical/Polytechnic" |
+    "Paramedical" |
+    "Pharmacy Institutions" |
+    "Teacher Training" |
+    "Nursing" |
+    "PGDM Institutes" |
+    "Hotel Management and Catering" |
+    "Institutions under Rehabilitation Council of India" |
+    "Institutes under Ministries" | null;
+  management: "Private" |
+    "University" |
+    "Affiliated College" |
+    "Central Government" |
+    "Private Aided (Government Aided)" |
+    "Local Body" |
+    "Constituent / University College" |
+    "Technical/Polytechnic" |
+    "State Government" |
+    "Private Un-Aided" | null;
+  state: Indian States | null;
+  name: string;
+  district: string | null;
+  website: string | null;
+  yearOfEstablishment: string;
+  location: string| null;
+  administrativeMinistry: string | null;
+
+  ** These others following only appear in category 'College':
+
+  universityType: string | null;
+  universityName: string | null;
+  university: Institute object (same as this) for the university belong to
+}
+```
+
+---
+
 ## **Routes**
 
 Each section in **Routes** is divided by the action that can be performed on the API.
