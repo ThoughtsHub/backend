@@ -27,11 +27,12 @@ class UserService {
       "User doesn't exist with this username/email",
     ],
     INCORRECT_PASS: ["Incorrect Password", "Incorrect password"],
+    BAD_REFER_CODE: ["BAD REFER CODE", "Invalid Referral Code"],
   };
 
   static usersLimit = 30;
 
-  static create = async (email, password) => {
+  static create = async (email, password, referredFrom = null) => {
     // validate email
     if (!Validate.email(email)) return sRes(this.codes.BAD_EMAIL, { email });
 
@@ -42,8 +43,21 @@ class UserService {
     password = hash(password);
 
     try {
+      if (referredFrom !== null) {
+        let profile = await Profile.findOne({
+          where: { referralCode: referredFrom },
+        });
+        if (profile === null) {
+          return sRes(this.codes.BAD_REFER_CODE, {
+            email,
+            password,
+            referredFrom,
+          });
+        }
+      }
+
       // create user
-      let user = await User.create({ email, password });
+      let user = await User.create({ email, password, referredFrom });
       user = user.get({ plain: true });
 
       return sRes(serviceCodes.OK, { user });

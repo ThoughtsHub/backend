@@ -266,11 +266,16 @@ class InstituteService {
         { instituteId, profileId, discussionId, body },
         { transaction: t }
       );
-      if (discussionId !== null)
+      if (discussionId !== null) {
         await Institute.increment(
           { discussions: 1 },
           { where: { id: instituteId }, transaction: t }
         );
+        await InsituteDiscussion.increment(
+          { replies: 1 },
+          { where: { id: discussionId }, transaction: t }
+        );
+      }
 
       disc = disc.get({ plain: true });
 

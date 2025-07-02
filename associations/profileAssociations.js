@@ -7,6 +7,7 @@ import InsituteDiscussion from "../models/InstituteDiscussion.js";
 import InstituteReview from "../models/InstituteReviews.js";
 import Profile from "../models/Profile.js";
 import ReportForum from "../models/Report_Forum.js";
+import WalletActivity from "../models/WalletActivity.js";
 
 export const profileAssociation = () => {
   Profile.hasMany(Forum, {
@@ -79,4 +80,10 @@ export const profileAssociation = () => {
     foreignKey: "profileId",
     as: "writer",
   });
+
+  Profile.hasMany(WalletActivity, {
+    foreignKey: "profileId",
+    onDelete: "CASCADE",
+  });
+  WalletActivity.belongsTo(Profile, { foreignKey: "profileId" });
 };

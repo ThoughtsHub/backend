@@ -20,7 +20,7 @@ const Profile = db.define(
     followers: { ...types.INT_REQ_0 },
     following: { ...types.INT_REQ_0 },
     forums: { ...types.INT_REQ_0 },
-    referralCode: { ...types.STR_REQ },
+    referralCode: { ...types.UNIQUE_STR_REQ },
     wallet: { ...types.INT_REQ_0 },
     ...timestamps,
   },

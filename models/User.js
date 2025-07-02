@@ -10,6 +10,7 @@ const User = db.define(
     email: { ...types.STRING, unique: true },
     mobile: { ...types.STRING, unique: true },
     fcmToken: { ...types.STRING, defaultValue: null },
+    referredFrom: { ...types.STRING },
     ...timestamps,
   },
   { hooks }

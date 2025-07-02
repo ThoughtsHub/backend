@@ -11,6 +11,8 @@ import {
   includeWriterWith,
 } from "../constants/include.js";
 import { createReferralCode } from "../utils/refer.js";
+import User from "../models/User.js";
+import WalletActivity from "../models/WalletActivity.js";
 
 class ProfileService {
   // Profile service response codes
@@ -62,19 +64,66 @@ class ProfileService {
 
     if (!Validate.id(userId)) return sRes(serviceCodes.BAD_ID, { userId });
 
+    const t = await db.transaction();
     try {
       const referCode = createReferralCode(username);
-      let profile = await Profile.create({
-        fullName,
-        about,
-        gender,
-        dob,
-        profileImageUrl,
-        username,
-        userId,
-        referralCode: referCode,
-      });
+      let profile = await Profile.create(
+        {
+          fullName,
+          about,
+          gender,
+          dob,
+          profileImageUrl,
+          username,
+          userId,
+          referralCode: referCode,
+        },
+        { transaction: t }
+      );
       profile = profile.get({ plain: true });
+
+      let user = await User.findByPk(userId, { transaction: t });
+      let referProfile = await Profile.findOne({ where: { userId: user.id } });
+      if (user.referredFrom !== null) {
+        let ops = await this.addToWallet(
+          profile.id,
+          50,
+          "User created through referral code",
+          t
+        );
+        if (!ops) {
+          await t.rollback();
+          return sRes(serviceCodes.DB_ERR, {
+            fullName,
+            about,
+            gender,
+            dob,
+            profileImageUrl,
+            username,
+            userId,
+          });
+        }
+        ops = await this.addToWallet(
+          referProfile.id,
+          50,
+          "User created from YOUR referral code",
+          t
+        );
+        if (!ops) {
+          await t.rollback();
+          return sRes(serviceCodes.DB_ERR, {
+            fullName,
+            about,
+            gender,
+            dob,
+            profileImageUrl,
+            username,
+            userId,
+          });
+        }
+      }
+
+      await t.commit();
 
       return sRes(serviceCodes.OK, { profile });
     } catch (err) {
@@ -259,6 +308,34 @@ class ProfileService {
       return sRes(serviceCodes.OK, { users });
     } catch (err) {
       return sRes(serviceCodes.DB_ERR, { offset }, err);
+    }
+  };
+
+  static addToWallet = async (
+    profileId,
+    value,
+    description,
+    transaction = undefined
+  ) => {
+    try {
+      await WalletActivity.create(
+        { profileId, value, type: "INCOME", description },
+        { transaction }
+      );
+
+      let [[_, updateResult]] = await Profile.increment(
+        { wallet: value },
+        { where: { id: profileId }, transaction }
+      );
+
+      if (updateResult !== 1) {
+        await t.rollback();
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      return false;
     }
   };
 }

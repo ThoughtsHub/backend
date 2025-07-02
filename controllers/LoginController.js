@@ -60,7 +60,7 @@ class LoginController {
   };
 
   static createPassword = async (req, res) => {
-    const { otpToken, password } = req.body;
+    const { otpToken, password, referralCode = null } = req.body;
 
     try {
       const otpTokenValue = await client.get(otpToken);
@@ -78,7 +78,7 @@ class LoginController {
 
       const [givenField, contact] = otpTokenValue.split(":");
 
-      const result = await User_.create(contact, password);
+      const result = await User_.create(contact, password, referralCode);
 
       if (serviceResultBadHandler(result, res, "Create Password failed"))
         return;

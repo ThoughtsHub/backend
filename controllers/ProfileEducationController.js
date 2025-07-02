@@ -1,5 +1,5 @@
 import { logOk, logServerErr } from "../services/LogService.js";
-import { ProfileEducation_ } from "../services/ProfileEducation.js";
+import { ProfileEducation_ } from "../services/ProfileEducationService.js";
 import { serviceResultBadHandler } from "../utils/services.js";
 
 class ProfileEducationController {
