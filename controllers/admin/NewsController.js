@@ -77,11 +77,17 @@ class AdminNewsController {
 
   static get = async (req, res) => {
     const page = toNumber(req.query.page);
+    const offset = toNumber(req.query.offset);
     let order = req.query.order ?? `[["${timestampsKeys.createdAt}", "desc"]]`;
 
     try {
       order = JSON.parse(order);
-      let result = await News_.getByOffset(page, res.originalQuery, order);
+      let result = await News_.getByOffset(
+        page,
+        res.originalQuery,
+        order,
+        offset
+      );
       if (serviceResultBadHandler(result, res, "News fetch failed (admin)"))
         return;
 
@@ -89,6 +95,7 @@ class AdminNewsController {
 
       res.ok("News fetched", {
         news,
+        newOffset: news.length < News_.newsLimit ? null : news.length,
         isOver: result.info.isOver,
       });
 
