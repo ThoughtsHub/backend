@@ -2015,3 +2015,78 @@ Gets all the users, irrelvant of the completion of the institute degree, affilia
 ```
 
 > If `newOffset` is `null`, users have been exhausted
+
+#### POST /institute/review
+
+Give rating and review to an institute
+
+**Body :**
+
+```js
+{
+  instituteId: string;
+  review: string;
+  rating: integer(0 - 5);
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  id: string;
+  instituteId: string;
+  profileId: string;
+  review: string;
+  rating: number;
+  createDate: number;
+  updateDate: number;
+}
+```
+
+#### GET /institute/review
+
+Gets all the reviews and rating on an institute
+
+**Query :**
+
+```js
+{
+    instituteId: string
+    offset: number [default: 0]
+}
+```
+
+**Result :**
+
+```js
+{
+  message: string;
+  success: boolean;
+  newOffset: number | null;
+  reviews: [
+    {
+    id: string;
+    instituteId: string;
+    profileId: string;
+    review: string;
+    rating: number;
+    createDate: number;
+    updateDate: number;
+    writer: {
+                userId: string
+                profileId: string
+                username: string
+                fullName: string
+                about: string
+                profileImageUrl: string
+                gender: string
+                dob: string
+                isFollowing: boolean
+            }
+    }
+  ]
+}
+```
