@@ -1906,6 +1906,7 @@ Gets the full details of a specific institute
   success: boolean;
   institute: {
     id: string;
+    rating: string;
     category: string;
     aisheCode: string;
     name: string;
@@ -1959,6 +1960,7 @@ Gets the institute in array filtered by values if provided
   institutes: [
     {
         id: string;
+        rating: number;
         category: string;
         aisheCode: string;
         name: string;
